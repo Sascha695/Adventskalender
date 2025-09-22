@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tag 02 – Romantisches Symbol</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <meta name="theme-color" content="#0b1220">
+</head>
+<body onload="adventEnsureAccess();">
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo"><span class="emoji">✨</span><h1>Tag 02: Romantisches Symbol</h1></div>
+        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+      </div>
+      <p class="muted">Datum: 02.12.</p>
+      <h2>Rätsel</h2>
+      <p>Sie ist rot, duftet herrlich und gilt als klassisches Zeichen der Liebe. Welche Blume ist gemeint?</p>
+      
+      <div style="height:8px"></div>
+      <div class="row wrap">
+        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
+        <button class="btn" onclick="solve()">Lösen</button>
+        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+      </div>
+      <div id="feedback" class="note hidden"></div>
+      <hr>
+      <div id="letterBox" class="hidden">
+        <p>Geschafft! Der Buchstabe für heute ist:</p>
+        <div class="letter">R</div>
+      </div>
+      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+    </div>
+  </div>
+  <script src="../assets/config.js"></script>
+  <script src="../assets/app.js"></script>
+  <script>
+    const ANSWERS = "rose";
+    const TODAY_LETTER = "R";
+    function showLetter(){
+      document.getElementById('letterBox').classList.remove('hidden');
+      fireConfetti();
+    }
+    function setFeedback(msg, ok){
+      const box = document.getElementById('feedback');
+      box.textContent = msg;
+      box.classList.remove('hidden');
+      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+    }
+    function solve(){
+      const el = document.getElementById('answer');
+      checkAnswer(el, ANSWERS, () => {
+        setFeedback("Richtig! 💫", true);
+        showLetter();
+      }, () => {
+        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+      });
+    }
+    function reveal(){
+      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
+      showLetter();
+    }
+  </script>
+</body>
+</html>
