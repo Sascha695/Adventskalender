@@ -1,66 +1,138 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 02 – Romantisches Symbol</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Adventskalender Tag 2 – Finde den Weihnachtsmann</title>
+<style>
+  html, body { height: 100%; }
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    color:#111827;
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.45), transparent 60%),
+      linear-gradient(180deg,#0b1d3a 0%, #12315e 50%, #214b87 100%);
+    overflow-x:hidden;
+  }
+
+  .starfield, .meteors { pointer-events:none; position:fixed; inset:0; z-index:0; }
+  .starfield::before, .starfield::after{
+    content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.9) 99%, transparent 100%),
+      radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,.8) 99%, transparent 100%),
+      radial-gradient(1px 1px at 55% 30%, rgba(255,255,255,.7) 99%, transparent 100%),
+      radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.7) 99%, transparent 100%),
+      radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,.8) 99%, transparent 100%),
+      radial-gradient(1px 1px at 15% 65%, rgba(255,255,255,.6) 99%, transparent 100%);
+    opacity:.7;
+  }
+
+  .meteors span{
+    position:absolute;
+    top:-10vh; left:-10vw;
+    width:2px; height:2px;
+    background:#fff; border-radius:50%;
+    box-shadow: 0 0 6px 2px rgba(255,255,255,.8);
+    transform: rotate(12deg);
+    animation: fly 6s linear infinite;
+    opacity:.95;
+  }
+  .meteors span::after{
+    content:""; position:absolute; top:-1px; left:-180px; height:2px; width:180px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.9));
+    border-radius:2px;
+  }
+  .meteors span:nth-child(1){ animation-delay: 0s;   top:8vh;  left:-15vw; }
+  .meteors span:nth-child(2){ animation-delay: 1.6s; top:20vh; left:-20vw; }
+  .meteors span:nth-child(3){ animation-delay: 3.1s; top:35vh; left:-18vw; }
+  .meteors span:nth-child(4){ animation-delay: 4.4s; top:55vh; left:-22vw; }
+  .meteors span:nth-child(5){ animation-delay: 5.0s; top:70vh; left:-25vw; }
+  @keyframes fly { to { transform: translate(120vw, 10vh) rotate(12deg); } }
+
+  header{ position:relative; z-index:1; text-align:center; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.25); padding:1.2rem 1rem .4rem; }
+  h1{ margin:0; }
+
+  .page{ position:relative; z-index:1; max-width:1050px; margin:1rem auto 2rem; padding:1rem; }
+  .card{
+    background:rgba(255,255,255,.92); backdrop-filter: blur(4px);
+    border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.15);
+    padding:1rem;
+  }
+  .msg{ margin:.6rem 0 1rem; font-weight:700; color:#ef4444; min-height:1.2em; }
+
+  .scene{
+    position:relative;
+    border-radius:12px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,.18);
+    background:#f8f5ea;
+  }
+  .scene img{ display:block; width:100%; height:auto; user-select:none; -webkit-user-drag:none; }
+
+  .hit{
+    position:absolute; border-radius:50%;
+    transform: translate(-50%, -50%);
+    width:3.2%; height:6.2%;
+    cursor:pointer;
+  }
+  .decoy{ width:2.8%; height:5.4%; }
+  .debug .hit{ outline:2px dashed rgba(255,0,0,.6); }
+  .debug .decoy{ outline:2px dashed rgba(0,128,255,.6); }
+</style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
+<body>
+  <div class="starfield"></div>
+  <div class="meteors">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <header>
+    <h1>Tag&nbsp;2 – Finde den Weihnachtsmann!</h1>
+  </header>
+
+  <div class="page">
     <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">✨</span><h1>Tag 02: Romantisches Symbol</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+      <p><strong>Aufgabe:</strong> Finde den Weihnachtsmann im Bild und tippe/klicke genau auf ihn!</p>
+      <div id="feedback" class="msg"></div>
+
+      <div id="scene" class="scene">
+        <!-- 🖼 Eingebettetes Bild -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABgAAAAQACAIAAACoEwUVAAGb0WNhQlgAAZvRanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANvtqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjRmNTI5NzRmLThiOG..." alt="Weihnachtliches Wimmelbild">
+
+        <!-- 🎅 Weihnachtsmann-Hotspot -->
+        <button class="hit" id="santa" style="top:62%; left:55%;" aria-label="Weihnachtsmann"></button>
+
+        <!-- ❌ Ablenker -->
+        <button class="hit decoy" style="top:23%; left:18%;"></button>
+        <button class="hit decoy" style="top:26%; left:35%;"></button>
+        <button class="hit decoy" style="top:29%; left:63%;"></button>
+        <button class="hit decoy" style="top:40%; left:76%;"></button>
+        <button class="hit decoy" style="top:58%; left:25%;"></button>
+        <button class="hit decoy" style="top:66%; left:18%;"></button>
+        <button class="hit decoy" style="top:70%; left:36%;"></button>
+        <button class="hit decoy" style="top:74%; left:72%;"></button>
+        <button class="hit decoy" style="top:48%; left:50%;"></button>
+        <button class="hit decoy" style="top:33%; left:52%;"></button>
+        <button class="hit decoy" style="top:84%; left:42%;"></button>
       </div>
-      <p class="muted">Datum: 02.12.</p>
-      <h2>Rätsel</h2>
-      <p>Sie ist rot, duftet herrlich und gilt als klassisches Zeichen der Liebe. Welche Blume ist gemeint?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">R</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
-  <script>
-    const ANSWERS = "rose";
-    const TODAY_LETTER = "R";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
-    }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
-    }
-  </script>
+
+<script>
+  const msg = document.getElementById('feedback');
+  const santa = document.getElementById('santa');
+  const decoys = document.querySelectorAll('.decoy');
+
+  santa.addEventListener('click', () => {
+    msg.style.color = '#16a34a';
+    msg.textContent = 'Jaaa! Du hast den Weihnachtsmann gefunden 🎅';
+  });
+
+  decoys.forEach(d => d.addEventListener('click', () => {
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Das war nicht der Weihnachtsmann! Versuch es nochmal.';
+  }));
+</script>
 </body>
 </html>
+
