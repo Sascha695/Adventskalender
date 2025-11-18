@@ -1,66 +1,244 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 04 – Herz-Frage</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+<meta charset="utf-8">
+<title>Adventskalender Tag 4</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Hintergrundbild für die ganze Seite */
+body {
+  background: url('assets/classroom_elf.png') 
+  no-repeat center center fixed;
+  background-position: center 50px; /* 50 px weiter nach unten */
+  background-size: cover;
+  max-width: 600px;      /* maximale Breite */
+  margin: 2rem auto;       /* zentriert das Feld */
+  padding: 1.5rem;       /* innerer Abstand */
+  border-radius: 15px;
+  font-family: sans-serif;
+}
+
+/* Vollbild-Weihnachtsmann-Nachricht */
+#santaMessage {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: gold;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 9999;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.5s ease;
+}
+
+#santaMessage button {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px #fff;
+  transition: transform 0.2s;
+}
+  
+
+main.puzzle-container {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(30px);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  margin: 30;
+}
+}
+#santaMessage button:hover {
+  transform: scale(1.1);
+  background: #cc0000;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">💖</span><h1>Tag 04: Herz-Frage</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 04.12.</p>
-      <h2>Rätsel</h2>
-      <p>Es schlägt für dich und ist das Symbol der Liebe. Was ist gemeint?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">H</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
+<body>
+<header>
+  <h1>Tag&nbsp;4 – Weihnachts-Quiz</h1>
+</header>
+
+<main class="puzzle-container">
+  <p>Beantworte alle Fragen richtig, um den Buchstaben zu erhalten.</p>
+
+  <form id="quizForm">
+    <div>
+      <p>1. Zum locker reinkommen: Wie viele Adventssonntage gibt es?</p>
+      <label><input type="radio" name="q1" value="drei"> drei</label><br>
+      <label><input type="radio" name="q1" value="vier"> vier</label><br>
+      <label><input type="radio" name="q1" value="fünf"> fünf</label><br>
+      <label><input type="radio" name="q1" value="Ich verstehe die Frage nicht"> Ich verstehe die Frage nicht</label>
     </div>
+
+    <div>
+      <p>2. Welches Tier zieht den Schlitten des Weihnachtsmanns?</p>
+      <label><input type="radio" name="q2" value="Pferd"> Pferd</label><br>
+      <label><input type="radio" name="q2" value="Rentier"> Rentier</label><br>
+      <label><input type="radio" name="q2" value="Esel"> Esel</label><br>
+      <label>
+        <input type="radio" name="q2" value="Den Weihnachtsmann gibt es gar nicht" id="noSanta">
+        Den Weihnachtsmann gibt es nicht
+      </label>
+    </div>
+
+    <div>
+      <p>3. Welche Farbe hatte der Weihnachtsmann ursprünglich, bevor er durch eine berühmte Werbekampagne rot wurde?</p>
+      <label><input type="radio" name="q3" value="Weiß"> Weiß</label><br>
+      <label><input type="radio" name="q3" value="Braun"> Braun</label><br>
+      <label><input type="radio" name="q3" value="Grün"> Grün</label><br>
+      <label><input type="radio" name="q3" value="Gelb"> Gelb</label><br>
+    </div>
+
+    <div>
+      <p>4. „Feliz Navidad“ heißt übersetzt „Frohe Weihnachten“ in welcher Sprache?</p>
+      <label><input type="radio" name="q4" value="Kroatisch"> Kroatisch</label><br>
+      <label><input type="radio" name="q4" value="Portugiesisch"> Portugiesisch</label><br>
+      <label><input type="radio" name="q4" value="Italienisch"> Italienisch</label><br>
+      <label><input type="radio" name="q4" value="Spanisch"> Spanisch</label><br>
+    </div>
+
+    <div>
+      <p>5. „Wer hat nochmal das Stück "der Geist der Weihnacht" geschrieben, in dem wir waren?</p>
+      <label><input type="radio" name="q5" value="William Shakespare"> William Shakespeare</label><br>
+      <label><input type="radio" name="q5" value="Charles Dickens"> Charles Dickens</label><br>
+      <label><input type="radio" name="q5" value="Oscar Wilde"> Oscar Wilde</label><br>
+      <label><input type="radio" name="q5" value="Mark Twain"> Mark Twain</label><br>
+    </div>
+
+    <div>
+      <p>6. „Wie heißt der Geizhals, der im Stück "Der Geist der Weihnacht" von den Geistern heimgesucht wird?</p>
+      <label><input type="radio" name="q6" value="Bob Crachilt"> Bob Crachilt</label><br>
+      <label><input type="radio" name="q6" value="Jacob Marley"> Jacob Marley</label><br>
+      <label><input type="radio" name="q6" value="Ebenezer Scrooge"> Ebenezer Scrooge</label><br>
+      <label><input type="radio" name="q6" value="Tiny Tim"> Tiny Tim</label><br>
+    </div>
+
+    <div>
+      <p>7. „Heute ist der vierte Dezember. Wessen Gedenktag wird heute gefeiert? Ich bin gespannt, ob deine Mutter das weiß</p>
+      <label><input type="radio" name="q7" value="Heilige Katharina"> Heilige Katharina</label><br>
+      <label><input type="radio" name="q7" value="Heilige Lucia"> Heilige Lucia</label><br>
+      <label><input type="radio" name="q7" value="Heilige Barbara"> Heilige Barbara</label><br>
+      <label><input type="radio" name="q7" value="Heilige Margareta"> Heilige Margareta</label><br>
+    </div>
+
+    <div>
+      <p>8. „Was ist der traditionelle Brauch am vierten Dezember</p>
+      <label><input type="radio" name="q8" value="Man backt Sascha einen Kuchen"> Man backt Sascha einen Kuchen</label><br>
+      <label><input type="radio" name="q8" value="Man stellt den Zweig eines Obstbaumes ins Wasser, der bis Weihnachten Blühen soll"> Man stellt den Zweig eines Obstbaumes ins Wasser, der bis Weihnachten Blühen soll</label><br>
+      <label><input type="radio" name="q8" value="Man isst einen Apfel, um Gesundheit für das neue Jahr zu wünschen"> Man isst einen Apfel, um Gesundheit für das neue Jahr zu wünschen</label><br>
+      <label><input type="radio" name="q8" value="Man bringt den ertsten Christbaumschmuck an"> Man bringt den ertsten Christbaumschmuck an</label><br>
+    </div>
+
+     <div>
+     <p>9. „Wann wird in Spanien traditionell Weihnachten gefeiert?</p>
+      <label><input type="radio" name="q9" value="Am 24. Dezember"> Am 24.Dezember</label><br>
+      <label><input type="radio" name="q9" value="Am 25. Dezember"> Am 25. Dezember</label><br>
+      <label><input type="radio" name="q9" value="Am 6. Januar"> Am 6. Januar</label><br>
+      <label><input type="radio" name="q9" value="Am 31. Dezember"> Am 31. Dezember </label><br>
+    </div>
+
+    <div>
+     <p>10. „Welche Figur bringt in Italien die Geschenke zu Weihnachten?</p>
+      <label><input type="radio" name="q10" value="Babbo Natale"> Babbo Natale</label><br>
+      <label><input type="radio" name="q10" value="Santo Claus"> Santo Claus</label><br>
+      <label><input type="radio" name="q10" value="La Befana"> La Befana</label><br>
+      <label><input type="radio" name="q10" value="Il Bambino Gesù"> Il Bambino Gesù </label><br>
+    </div>
+
+    
+
+    <button type="button" onclick="checkQuiz()">Überprüfen</button>
+  </form>
+
+  <div id="quizFeedback" style="color:red; margin-top:10px;"></div>
+
+  <div id="letter-container" class="letter-container" style="display:none;">
+    <p>Dein Buchstabe:</p>
+    <div class="letter" id="letter"></div>
+    <p>Merke dir diesen Buchstaben!</p>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
-  <script>
-    const ANSWERS = "herz";
-    const TODAY_LETTER = "H";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+</main>
+
+<script>
+// Wenn jemand "Den Weihnachtsmann gibt es nicht" auswählt:
+document.getElementById('noSanta').addEventListener('change', () => {
+  if (document.getElementById('noSanta').checked) {
+    showSantaMessage();
+  }
+});
+
+function showSantaMessage() {
+  const msg = document.createElement('div');
+  msg.id = 'santaMessage';
+  msg.innerHTML = `
+    <div style="font-size:3rem; line-height:1">🎅✨</div>
+    <p>Ho ho ho! Natürlich gibt es den Weihnachtsmann!<br>
+       Wer bringt denn sonst die ganzen Geschenke? 😉</p>
+    <button type="button" onclick="closeSantaMessage()">
+      Ich glaube jetzt an den Weihnachtsmann 🎁
+    </button>
+  `;
+  document.body.appendChild(msg);
+}
+function closeSantaMessage() {
+  const msg = document.getElementById('santaMessage');
+  if (msg) msg.remove();
+}
+
+// --- Quiz Logik ---
+function checkQuiz() {
+  const form = document.getElementById('quizForm');
+  const answers = {
+    q1: 'vier',
+    q2: 'Rentier',
+    q3: 'Grün',
+    q4: 'Spanisch',
+    q5: 'Charles Dickens',
+    q6: 'Ebenezer Scrooge',
+    q7: 'Heilige Barbara',
+    q8: 'Man stellt den Zweig eines Obstbaumes ins Wasser, der bis Weihnachten Blühen soll',
+    q9: 'Am 6. Januar',
+    q10: 'Il Bambino Gesù'
+  };
+
+  for (let key in answers) {
+    const selected = form.elements[key].value;
+    if (selected !== answers[key]) {
+      document.getElementById('quizFeedback').style.color = 'red';
+      document.getElementById('quizFeedback').textContent = 'Leider falsch, versuche es erneut!';
+      return;
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
-    }
-  </script>
+  }
+
+  document.getElementById('quizFeedback').textContent = '';
+  showLetter('n');
+}
+
+function showLetter(letter) {
+  const container = document.getElementById('letter-container');
+  document.getElementById('letter').textContent = letter;
+  container.style.display = 'block';
+}
+</script>
+
 </body>
 </html>
