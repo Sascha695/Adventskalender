@@ -15,7 +15,19 @@
       linear-gradient(180deg,#0b1d3a 0%, #12315e 50%, #214b87 100%);
     overflow-x:hidden;
   }
-
+ .hit {
+  background: transparent; /* kein Hintergrund */
+  border: none;            /* keine Umrandung */
+  opacity: 0;              /* komplett unsichtbar */
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  width: 3.2%;
+  height: 6.2%;
+  cursor: pointer;
+}
+}
+  /* ---------------------- Hintergrund & Sterne ---------------------- */
   .starfield, .meteors { pointer-events:none; position:fixed; inset:0; z-index:0; }
   .starfield::before, .starfield::after{
     content:""; position:absolute; inset:0;
@@ -29,27 +41,38 @@
     opacity:.7;
   }
 
+  /* ---------------------- Sternschnuppen ---------------------- */
   .meteors span{
     position:absolute;
     top:-10vh; left:-10vw;
     width:2px; height:2px;
     background:#fff; border-radius:50%;
     box-shadow: 0 0 6px 2px rgba(255,255,255,.8);
-    transform: rotate(12deg);
-    animation: fly 6s linear infinite;
-    opacity:.95;
+    transform: rotate(15deg);
+    opacity:0;
+    animation: meteorFly linear infinite;
   }
+
   .meteors span::after{
-    content:""; position:absolute; top:-1px; left:-180px; height:2px; width:180px;
+    content:"";
+    position:absolute;
+    top:-1px; left:-180px;
+    height:2px; width:180px;
     background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.9));
     border-radius:2px;
   }
-  .meteors span:nth-child(1){ animation-delay: 0s;   top:8vh;  left:-15vw; }
-  .meteors span:nth-child(2){ animation-delay: 1.6s; top:20vh; left:-20vw; }
-  .meteors span:nth-child(3){ animation-delay: 3.1s; top:35vh; left:-18vw; }
-  .meteors span:nth-child(4){ animation-delay: 4.4s; top:55vh; left:-22vw; }
-  .meteors span:nth-child(5){ animation-delay: 5.0s; top:70vh; left:-25vw; }
-  @keyframes fly { to { transform: translate(120vw, 10vh) rotate(12deg); } }
+
+  /* realistischer Flug mit sanftem Ein- und Ausblenden */
+  @keyframes meteorFly {
+    0% { opacity: 0; transform: translate(0,0) rotate(15deg); }
+    5% { opacity: 1; }
+    50% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { 
+      opacity: 0;
+      transform: translate(120vw, 30vh) rotate(15deg);
+    }
+  }
 
   header{ position:relative; z-index:1; text-align:center; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.25); padding:1.2rem 1rem .4rem; }
   h1{ margin:0; }
@@ -72,19 +95,25 @@
   .hit{
     position:absolute; border-radius:50%;
     transform: translate(-50%, -50%);
-    width:3.2%; height:6.2%;
+    width:3%; height:10%;
     cursor:pointer;
   }
   .decoy{ width:2.8%; height:5.4%; }
   .debug .hit{ outline:2px dashed rgba(255,0,0,.6); }
   .debug .decoy{ outline:2px dashed rgba(0,128,255,.6); }
+
+  .sticker{
+    position:absolute; transform: translate(-50%, -50%);
+    font-size: clamp(16px, 2.2vw, 28px);
+    pointer-events:none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.2));
+    opacity:.95;
+  }
 </style>
 </head>
 <body>
   <div class="starfield"></div>
-  <div class="meteors">
-    <span></span><span></span><span></span><span></span><span></span>
-  </div>
+  <div class="meteors"></div>
 
   <header>
     <h1>Tag&nbsp;2 – Finde den Weihnachtsmann!</h1>
@@ -92,19 +121,23 @@
 
   <div class="page">
     <div class="card">
-      <p><strong>Aufgabe:</strong> Finde den Weihnachtsmann im Bild und tippe/klicke genau auf ihn!</p>
+      <p><strong>Aufgabe:</strong> Leider ist uns der Weihnachtsmann verloren gegangen. Und das so kurz vor Weihnachten. Er ist etwas schüchern aber mit deiner Hilfe finden wir ihn bestimmt. Also Lupe raus und an die Arbeit. Finde den Weihnachtsmann im Bild und tippe genau auf ihn!</p>
       <div id="feedback" class="msg"></div>
 
       <div id="scene" class="scene">
-        <!-- 🖼 Eingebettetes Bild -->
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABgAAAAQACAIAAACoEwUVAAGb0WNhQlgAAZvRanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANvtqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjRmNTI5NzRmLThiOG..." alt="Weihnachtliches Wimmelbild">
+        <img src="assets/find_santa.png" alt="Weihnachtliches Wimmelbild">
 
-        <!-- 🎅 Weihnachtsmann-Hotspot -->
-        <button class="hit" id="santa" style="top:62%; left:55%;" aria-label="Weihnachtsmann"></button>
+        <button class="hit" id="santa" style="top:30%; left:15%;" aria-label="Weihnachtsmann"></button>
 
-        <!-- ❌ Ablenker -->
-        <button class="hit decoy" style="top:23%; left:18%;"></button>
-        <button class="hit decoy" style="top:26%; left:35%;"></button>
+        <!-- Ablenker -->
+        <button class="hit decoy" style="top:13%; left:18%;"></button>
+        <button class="hit decoy" style="top:3%; left:18%;"></button>
+        <button class="hit decoy" style="top:8%; left:20%;"></button>
+        <button class="hit decoy" style="top:9%; left:6%;"></button>
+        <button class="hit decoy" style="top:20%; left:5%;"></button>
+        <button class="hit decoy" style="top:5%; left:20%;"></button>
+        <button class="hit decoy" style="top:20%; left:20%;"></button>
+        <button class="hit decoy" style="top:40%; left:20%;"></button>
         <button class="hit decoy" style="top:29%; left:63%;"></button>
         <button class="hit decoy" style="top:40%; left:76%;"></button>
         <button class="hit decoy" style="top:58%; left:25%;"></button>
@@ -114,25 +147,166 @@
         <button class="hit decoy" style="top:48%; left:50%;"></button>
         <button class="hit decoy" style="top:33%; left:52%;"></button>
         <button class="hit decoy" style="top:84%; left:42%;"></button>
+        <button class="hit decoy" style="top:53%; left:28%;"></button>
+        <button class="hit decoy" style="top:76%; left:54%;"></button>
+        <button class="hit decoy" style="top:45%; left:25%;"></button>
+        <button class="hit decoy" style="top:89%; left:75%;"></button>
+        <button class="hit decoy" style="top:25%; left:36%;"></button>
+        <button class="hit decoy" style="top:97%; left:76%;"></button>
+        <button class="hit decoy" style="top:12%; left:36%;"></button>
+        <button class="hit decoy" style="top:35%; left:96%;"></button>
+        <button class="hit decoy" style="top:75%; left:43%;"></button>
+        <button class="hit decoy" style="top:55%; left:73%;"></button>
+        <button class="hit decoy" style="top:63%; left:46%;"></button>
+         <button class="hit decoy" style="top:97%; left:10%;"></button>
+        <button class="hit decoy" style="top:97%; left:20%;"></button>
+        <button class="hit decoy" style="top:97%; left:30%;"></button>
+        <button class="hit decoy" style="top:90%; left:90%;"></button>
+        <button class="hit decoy" style="top:80%; left:90%;"></button>
+        <button class="hit decoy" style="top:70%; left:90%;"></button>
+        <button class="hit decoy" style="top:97%; left:20%;"></button>
+        <button class="hit decoy" style="top:97%; left:30%;"></button>
+        <button class="hit decoy" style="top:20%; left:90%;"></button>
+        <button class="hit decoy" style="top:20%; left:90%;"></button>
+        <button class="hit decoy" style="top:20%; left:90%;"></button>
+        <button class="hit decoy" style="top:100%; left:90%;"></button>
+        <button class="hit decoy" style="top:10%; left:100%;"></button>
+        <button class="hit decoy" style="top:17%; left:90%;"></button>
+        <button class="hit decoy" style="top:17%; left:80%;"></button>
+        <button class="hit decoy" style="top:10%; left:70%;"></button>
+        <button class="hit decoy" style="top:10%; left:60%;"></button>
+        <button class="hit decoy" style="top:20%; left:60%;"></button>
+        <button class="hit decoy" style="top:50%; left:10%;"></button>
+        <button class="hit decoy" style="top:47%; left:10%;"></button>
+        <button class="hit decoy" style="top:37%; left:10%;"></button>
+        <button class="hit decoy" style="top:20%; left:10%;"></button>
+        <button class="hit decoy" style="top:10%; left:10%;"></button>
+        <button class="hit decoy" style="top:10%; left:5%;"></button>
+        <button class="hit decoy" style="top:50%; left:10%;"></button>
+        <button class="hit decoy" style="top:60%; left:10%;"></button>
+        <button class="hit decoy" style="top:70%; left:10%;"></button>
+        <button class="hit decoy" style="top:80%; left:10%;"></button>
+        <button class="hit decoy" style="top:90%; left:5%;"></button>
+      
+      
+      
+
+
+        <!-- 🎄 Ablenker rund um den Baum & Mitte -->
+        <button class="hit decoy" style="top:40%; left:45%;"></button>
+        <button class="hit decoy" style="top:42%; left:48%;"></button>
+        <button class="hit decoy" style="top:38%; left:50%;"></button>
+        <button class="hit decoy" style="top:45%; left:52%;"></button>
+        <button class="hit decoy" style="top:47%; left:46%;"></button>
+        <button class="hit decoy" style="top:50%; left:50%;"></button>
+
+        <!-- ⛸️ Ablenker beim Eislaufbereich -->
+        <button class="hit decoy" style="top:68%; left:32%;"></button>
+        <button class="hit decoy" style="top:72%; left:36%;"></button>
+        <button class="hit decoy" style="top:70%; left:28%;"></button>
+        <button class="hit decoy" style="top:75%; left:33%;"></button>
+
+        <!-- 🏘️ Ablenker im Hintergrund / obere Bereiche -->
+        <button class="hit decoy" style="top:10%; left:25%;"></button>
+        <button class="hit decoy" style="top:8%; left:40%;"></button>
+        <button class="hit decoy" style="top:15%; left:55%;"></button>
+        <button class="hit decoy" style="top:20%; left:70%;"></button>
+        <button class="hit decoy" style="top:12%; left:80%;"></button>
+        <button class="hit decoy" style="top:18%; left:90%;"></button>
+
+         <!-- 🦌 Ablenker bei Rentieren und Elfen -->
+        <button class="hit decoy" style="top:55%; left:65%;"></button>
+         <button class="hit decoy" style="top:58%; left:68%;"></button>
+        <button class="hit decoy" style="top:53%; left:70%;"></button>
+        <button class="hit decoy" style="top:60%; left:72%;"></button>
+        <button class="hit decoy" style="top:62%; left:75%;"></button>
+
+        <!-- 🎁 Ablenker ganz unten -->
+        <button class="hit decoy" style="top:90%; left:20%;"></button>
+        <button class="hit decoy" style="top:92%; left:45%;"></button>
+        <button class="hit decoy" style="top:94%; left:70%;"></button>
+        <button class="hit decoy" style="top:96%; left:85%;"></button>
+        <button class="hit decoy" style="top:98%; left:50%;"></button>
       </div>
     </div>
   </div>
 
 <script>
+  /* 🌠 Dynamisch generierte Sternschnuppen für mehr Natürlichkeit */
+  const meteorContainer = document.querySelector('.meteors');
+
+  function createMeteor() {
+    const m = document.createElement('span');
+    const startTop = Math.random() * 80; // Start-Höhe 0–80%
+    const startLeft = -10 - Math.random() * 20; // leicht außerhalb des Bilds
+    const duration = 4 + Math.random() * 4; // 4–8 Sekunden
+    const delay = Math.random() * 6; // Startverzögerung
+    const angle = 10 + Math.random() * 10; // 10–20°
+    const scale = 0.8 + Math.random() * 1.2; // Größe leicht unterschiedlich
+
+    m.style.top = `${startTop}vh`;
+    m.style.left = `${startLeft}vw`;
+    m.style.animationDuration = `${duration}s`;
+    m.style.animationDelay = `${delay}s`;
+    m.style.transform = `rotate(${angle}deg) scale(${scale})`;
+
+    meteorContainer.appendChild(m);
+  }
+
+  // 10 Sternschnuppen mit zufälligen Eigenschaften erzeugen
+  for (let i = 0; i < 10; i++) createMeteor();
+
+  // Feedback-Logik
   const msg = document.getElementById('feedback');
   const santa = document.getElementById('santa');
   const decoys = document.querySelectorAll('.decoy');
 
   santa.addEventListener('click', () => {
     msg.style.color = '#16a34a';
-    msg.textContent = 'Jaaa! Du hast den Weihnachtsmann gefunden 🎅';
+    msg.textContent = 'Juhuuu! Du hast den Weihnachtsmann gefunden 🎅 Hoffentlich entwischt er uns nicht nochmal. Für deine Mühe bekommst du den Buchstaben "h"';
+    // 🎉 Konfetti-Effekt
+const confettiContainer = document.createElement('div');
+confettiContainer.style.position = 'fixed';
+confettiContainer.style.inset = '0';
+confettiContainer.style.overflow = 'hidden';
+confettiContainer.style.pointerEvents = 'none';
+confettiContainer.style.zIndex = '9999';
+document.body.appendChild(confettiContainer);
+
+for (let i = 0; i < 100; i++) {
+  const piece = document.createElement('div');
+  piece.style.position = 'absolute';
+  piece.style.top = '-10px';
+  piece.style.left = Math.random() * 100 + 'vw';
+  piece.style.width = '8px';
+  piece.style.height = '12px';
+  piece.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+  piece.style.opacity = Math.random();
+  piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+  piece.style.animation = `fall ${3 + Math.random() * 3}s linear forwards`;
+  confettiContainer.appendChild(piece);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.8;
+  }
+}`;
+document.head.appendChild(style);
+
+// Entferne Konfetti nach 5 Sekunden
+setTimeout(() => confettiContainer.remove(), 5000);
   });
 
   decoys.forEach(d => d.addEventListener('click', () => {
     msg.style.color = '#ef4444';
-    msg.textContent = 'Das war nicht der Weihnachtsmann! Versuch es nochmal.';
+    msg.textContent = 'Bitte mal die Brille putzen. Das war doch nicht der Weihnachtsmann 🙅🏻‍♂️ Versuch es nochmal.';
   }));
 </script>
 </body>
 </html>
+
 
