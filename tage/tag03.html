@@ -1,65 +1,255 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 03 – Weihnachtliches Tier</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Adventskalender Tag 3</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      color: #fff;
+      text-align: center;
+      background-image: url('assets/cozy_fire_place.png'); /* HIER: Hintergrundbildpfad */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* halbtransparenter Overlay für bessere Lesbarkeit */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 0;
+    }
+
+    header, main, footer { position: relative; z-index: 1; }
+
+    header h1 {
+      margin: 1rem 0;
+      font-size: 2rem;
+      color: #ffd700;
+      text-shadow: 2px 2px 6px #000;
+    }
+
+    .puzzle-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+
+    .memory-card {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* quadratisch */
+      perspective: 800px;
+      cursor: pointer;
+    }
+
+    .memory-card .front, .memory-card .back {
+      position: absolute; inset: 0;
+      border-radius: 10px;
+      backface-visibility: hidden;
+      transition: transform 0.4s;
+    }
+
+    .memory-card .back {
+      background: linear-gradient(135deg, #d40000, #900000);
+      border: 2px solid #fff;
+    }
+
+    .memory-card .front {
+      background-size: cover;
+      background-position: center;
+      transform: rotateY(180deg);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .memory-card.flip .front { transform: rotateY(0); }
+    .memory-card.flip .back  { transform: rotateY(180deg); }
+
+    .letter-container {
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1rem; border-radius: 1rem;
+      color: #fff;
+    }
+
+    .letter {
+      font-size: 3rem; font-weight: bold;
+      color: #ffeb3b; text-shadow: 0 0 10px #fff;
+    }
+
+    footer a { color: #fff; text-decoration: none; display: inline-block; margin: 1rem 0; font-weight: bold; }
+    footer a:hover { text-decoration: underline; }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">❄️</span><h1>Tag 03: Weihnachtliches Tier</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 03.12.</p>
-      <h2>Rätsel</h2>
-      <p>In der Weihnachtskrippe steht es traditionell neben dem Esel. Es ist ein Rind und sagt Muuuh. Welches Tier ist gemeint?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">O</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+<body>
+  <header>
+    <h1>Tag&nbsp;3 – Memory-Spiel</h1>
+  </header>
+
+  <main class="puzzle-container">
+    <p>Finde alle passenden Paare von Weihnachtsmotiven. Wenn du alle Paare gefunden hast, erscheint der Buchstabe.</p>
+    <div class="memory-grid" id="memoryGrid"></div>
+    <div id="letter-container" class="letter-container" style="display:none;">
+      <p>Dein Buchstabe:</p>
+      <div class="letter" id="letter"></div>
+      <p>Merke dir diesen Buchstaben!</p>
     </div>
-  </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  </main>
+
+  <footer>
+    <a href="index.html">Zurück zum Kalender</a>
+  </footer>
+
   <script>
-    const ANSWERS = "ochse";
-    const TODAY_LETTER = "O";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    // --- Kartenliste ---
+    const cards = [
+      { name: 'tree', img: 'assets/tree.png' },
+      { name: 'gift', img: 'assets/gift.png' },
+      { name: 'snowman', img: 'assets/snowman.png' },
+      { name: 'reindeer', img: 'assets/reindeer.png' },
+      { name: 'couple', img: 'assets/birthday_couple.png' },
+      { name: 'owl', img: 'assets/duo_eule.png' },
+      { name: 'elf', img: 'assets/elf.png' },
+      { name: 'hot chocolate', img: 'assets/hot_chocolate.png' },
+      { name: 'kranz', img: 'assets/kranz.png' },
+      { name: 'lebkuchenmann', img: 'assets/lebkuchenmann.png' },
+      { name: 'raccoon', img: 'assets/raccoon.png' },
+      { name: 'santa and sledge', img: 'assets/santa_and_sledge.png' },
+      { name: 'santa head', img: 'assets/santa_head.png' },
+      { name: 'sarah and sascha', img: 'assets/sarah_sascha.png' },
+      { name: 'ski couple', img: 'assets/ski_couple.png' },
+      { name: 'skis', img: 'assets/skis.png' },
+      { name: 'snowflake', img: 'assets/snowflake.png' },
+      { name: 'squirrel', img: 'assets/squirrel.png' },
+      { name: 'sternschnuppe', img: 'assets/sternschnuppe.png' },
+      { name: 'weihnachtskugeln', img: 'assets/weichnachtskugeln.png' },
+      { name: 'winter fish', img: 'assets/winter_fish.png' },
+      { name: 'zuckerstange', img: 'assets/zuckerstange.png' }
+    ];
+
+    // --- Preloader: zeigt dir sofort, welche Bildpfade fehlen ---
+    function preloadImages(list) {
+      return Promise.all(list.map(({img, name}) =>
+        new Promise((resolve) => {
+          const i = new Image();
+          i.onload = () => resolve({ok: true, img, name});
+          i.onerror = () => resolve({ok: false, img, name});
+          i.src = img;
+        })
+      ));
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+
+    preloadImages(cards).then(results => {
+      const missing = results.filter(r => !r.ok);
+      if (missing.length) {
+        console.group('Fehlende/fehlerhafte Bildpfade');
+        missing.forEach(r => console.warn(`FEHLT: ${r.img} (${r.name})`));
+        console.groupEnd();
+      } else {
+        console.info('Alle Kartenbilder geladen ✅');
+      }
+    });
+
+    // --- Deck bauen ---
+    let deck = cards.concat(cards).sort(() => Math.random() - 0.5);
+
+    const memoryGrid = document.getElementById('memoryGrid');
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matches = 0;
+
+    // kleines Debug
+    console.log('Unique Motive:', cards.length, 'Gesamtkarten:', deck.length);
+
+    deck.forEach((card) => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('memory-card');
+      cardElement.dataset.name = card.name;
+
+      const back = document.createElement('div');
+      back.classList.add('back');
+
+      const front = document.createElement('div');
+      front.classList.add('front');
+
+      // ROBUST: Bild testen; bei Fehler Platzhalter anzeigen
+      const probe = new Image();
+      probe.onload = () => { front.style.backgroundImage = `url('${card.img}')`; };
+      probe.onerror = () => {
+        front.style.background = '#444';
+        front.style.color = '#fff';
+        front.style.fontSize = '12px';
+        front.style.padding = '6px';
+        front.textContent = card.name + ' (fehlt)';
+        console.warn('Bild fehlt oder Pfad falsch:', card.img);
+      };
+      probe.src = card.img;
+
+      cardElement.appendChild(back);
+      cardElement.appendChild(front);
+
+      cardElement.addEventListener('click', () => {
+        if (lockBoard) return;
+        if (cardElement.classList.contains('matched')) return;
+
+        cardElement.classList.add('flip');
+        if (!firstCard) {
+          firstCard = cardElement;
+          return;
+        }
+        if (firstCard === cardElement) return;
+
+        secondCard = cardElement;
+        lockBoard = true;
+
+        if (firstCard.dataset.name === secondCard.dataset.name) {
+          firstCard.classList.add('matched');
+          secondCard.classList.add('matched');
+          matches++;
+          resetBoard();
+
+          if (matches === cards.length) {
+            showLetter('a');
+          }
+        } else {
+          setTimeout(() => {
+            firstCard.classList.remove('flip');
+            secondCard.classList.remove('flip');
+            resetBoard();
+          }, 700);
+        }
       });
+
+      memoryGrid.appendChild(cardElement);
+    });
+
+    function resetBoard() {
+      [firstCard, secondCard, lockBoard] = [null, null, false];
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function showLetter(letter) {
+      const container = document.getElementById('letter-container');
+      document.getElementById('letter').textContent = letter;
+      container.style.display = 'block';
     }
   </script>
 </body>
