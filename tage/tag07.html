@@ -1,66 +1,509 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 07 – Buchstaben-Trivia</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Day 7: Word Soup</title>
+  <style>
+    :root{ --accent:#c54c3d; --found:#12884b; }
+    :root{
+      --bg-image: url('assets/buchstabensuppe.png');
+      --bg-size:  cover;
+      --bg-pos-x: 50%;
+      --bg-pos-y: 50%;
+      --bg-opacity: 0.8;
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0; background:#f7efe6; color:#222;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background-image: var(--bg-image);
+      background-repeat:no-repeat;
+      background-size: var(--bg-size);
+      background-position: var(--bg-pos-x) var(--bg-pos-y);
+      opacity: var(--bg-opacity);
+      z-index:0; pointer-events:none;
+    }
+
+    header, main{ position:relative; z-index:1; }
+
+    header{ text-align:center; background:#c54c3d; color:#fff; padding:1rem .75rem; }
+    header h1{ margin:0; font-size:2rem; }
+
+    main{ max-width:1000px; margin:1rem auto 2rem; padding:1rem; }
+    .wrap{ display:grid; grid-template-columns: min(92vw,520px) 1fr; gap:1rem; align-items:start; }
+    @media (max-width:900px){ .wrap{ grid-template-columns:1fr; } }
+
+    .card{
+      background:rgba(255,255,255,.85);
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.12);
+      padding:1rem;
+      backdrop-filter: blur(2px);
+    }
+
+    /* GRID */
+    .grid{
+      user-select:none; touch-action:none;
+      display:grid; grid-template-columns:repeat(var(--size),1fr); grid-template-rows:repeat(var(--size),1fr);
+      width:min(92vw,520px); aspect-ratio:1/1; background:#000; border-radius:12px; overflow:hidden;
+    }
+    .cell{
+      display:flex; align-items:center; justify-content:center;
+      font:700 1.05rem/1 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#fff8ee; position:relative;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.25), inset 1px 0 0 rgba(0,0,0,.25);
+      transition: background .12s ease, box-shadow .12s ease, transform .12s ease, font-size .12s ease, color .12s ease, text-shadow .12s ease;
+    }
+
+    /* deutlich sichtbare grüne Markierung */
+    .cell.locked{
+      background: var(--found);
+      color:#fff;
+      font-weight:900;
+      text-shadow:0 1px 0 rgba(0,0,0,.25);
+      box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,.18),
+        0 0 0 3px rgba(18,136,75,.28);
+      transform: scale(1.02);
+      z-index:1;
+      font-size:1.15rem;
+    }
+
+    @media (prefers-reduced-motion:no-preference){
+      .cell.locked{ animation: foundPop .3s ease-out; }
+      @keyframes foundPop{
+        0%{ transform:scale(1.08); }
+        100%{ transform:scale(1.02); }
+      }
+    }
+
+    .cell.preview{
+      background:#ffd9cc;
+      box-shadow: inset 0 0 0 2px #ff936f;
+    }
+    .cell.current{
+      background:#ffbe9f;
+      box-shadow:
+        inset 0 0 0 2px #ff6a3d,
+        0 0 0 3px rgba(197,76,61,.15);
+      transform: scale(1.02);
+      z-index: 1;
+      font-weight:900;
+      text-shadow:0 1px 0 rgba(255,255,255,.7);
+    }
+
+    @media (max-width:700px){
+      .cell{ font-size:1.2rem; }
+      .cell.preview{ font-size:1.25rem; }
+      .cell.current{ font-size:1.35rem; }
+      .cell.locked{ font-size:1.3rem; }
+    }
+
+    /* Bildertafel */
+    .pics h2{ margin:.2rem 0 .6rem; }
+    .hint{ font-size:.95rem; color:#555; margin:.25rem 0 .75rem; }
+    .picgrid{
+      display:grid; gap:.6rem;
+      grid-template-columns: repeat(auto-fill, minmax(90px,1fr));
+    }
+    .pic{
+      position:relative; aspect-ratio: 1/1;
+      border:1px solid rgba(0,0,0,.12); border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      background:#fff;
+      overflow:hidden;
+    }
+    .pic img{
+      max-width:80%; max-height:80%; object-fit:contain;
+      display:block;
+      transition: filter .2s ease, transform .2s ease;
+    }
+    .pic .cap{ display:none !important; }
+
+    .pic.found img{ filter: grayscale(1) brightness(0.9); transform: scale(0.96); }
+    .pic.found::after{
+      content:"✓"; position:absolute; top:6px; right:8px;
+      background:var(--found); color:#fff; font-weight:900;
+      width:24px; height:24px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.2);
+    }
+
+    .bar{ text-align:center; margin-top:.8rem; }
+    .btn{
+      appearance:none;border:none;cursor:pointer;background:var(--accent);color:#fff;
+      padding:.6rem 1rem;border-radius:10px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);
+    }
+    .msg{ display:block; margin-top:.5rem; color:#333; font-weight:600; }
+
+    /* ===========================
+       KONFETTI (Buchstaben)
+       =========================== */
+    .confetti-layer{
+      position:fixed; inset:0; pointer-events:none; z-index:9999;
+      overflow:hidden;
+    }
+    .confetti-letter{
+      position:absolute; top:-10%;
+      will-change: transform, opacity;
+      font-weight:900;
+      text-shadow:0 1px 0 rgba(0,0,0,.25);
+      opacity:.95;
+      transform: translate3d(0,-100px,0) rotate(0deg);
+      animation-name: fall, spin;
+      animation-timing-function: linear, ease-in-out;
+      animation-fill-mode: forwards, none;
+    }
+    @keyframes fall{
+      0%   { transform:translate3d(var(--x,0), -8vh, 0) rotate(var(--r0,0deg)); }
+      100% { transform:translate3d(calc(var(--x,0) + var(--drift,0px)), 108vh, 0) rotate(var(--r1,360deg)); }
+    }
+    @keyframes spin{
+      0%,100% { }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .confetti-letter{ animation: none; top:auto; bottom:4vh; opacity:.7; }
+    }
+
+    /* Alles schön mittig ausrichten */
+main{
+  display:flex;
+  flex-direction:column;
+  align-items:center;        /* zentriert den gesamten Inhalt in <main> */
+}
+
+/* Das 2-Spalten-Layout selbst mittig anordnen */
+.wrap{
+  justify-content:center;    /* zentriert die Grid-Spalten im Container */
+  justify-items:center;      /* Karten in ihrer Spalte zentrieren */
+}
+
+/* Das Letter-Grid in seiner Karte zentrieren */
+.grid{
+  margin-inline:auto;        /* Grid selbst zentrieren */
+}
+
+/* Damit Bilder-Karte die gleiche Breite wie das Grid hat (mobil) */
+.pics{
+  width:min(92vw,520px);
+}
+
+/* Nur die erste Karte (mit dem Grid) als Flex-Box,
+   damit ihr Inhalt (das Grid) sauber mittig sitzt */
+.wrap > .card:first-child{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">⭐</span><h1>Tag 07: Buchstaben-Trivia</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 07.12.</p>
-      <h2>Rätsel</h2>
-      <p>Welcher Buchstabe kommt in der deutschen Sprache am häufigsten vor?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">E</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+<body>
+  <header><h1>Day 7: Word Soup</h1></header>
+
+  <!-- 🌟 Story richtig im BODY platziert -->
+  <section class="card" style="max-width:800px; margin:1rem auto; text-align:center; background:rgba(255,255,255,.9);">
+    <p style="font-size:1.1rem; line-height:1.5; margin:1rem;">
+In Santa’s Christmas workshop, the delicious smell of soup is in the air –
+Mrs. Santa Claus has cooked a big pot of alphabet soup so that Santa can keep up his strength.
+But oh dear! While stirring, a bunch of Christmas words suddenly appeared in the soup – and now Santa can’t find them all anymore!
+      <em>Help him finding all the words, before the soup is getting cold! 🍲🎄</em>
+    </p>
+  </section>
+
+  <main>
+    <div class="wrap">
+      <section class="card">
+        <div id="grid" class="grid" aria-label="Word soup"></div>
+      </section>
+
+      <section class="card pics">
+        <h2>Find all of those pictures</h2>
+        <div class="hint">Just wipe <b>from left to right</b> and <b>from top to bottom</b>.</div>
+        <div id="picGrid" class="picgrid"></div>
+        <div class="bar">
+          <button class="btn" id="resetBtn">Mix New</button>
+          <span class="msg" id="statusMsg"></span>
+        </div>
+      </section>
     </div>
-  </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  </main>
+
   <script>
-    const ANSWERS = "e";
-    const TODAY_LETTER = "E";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+  /* ==== dein JS inkl. Touch-Snap-Logik (unverändert aus deiner Nachricht) ==== */
+  const IMAGES = [
+    { word:"PRESENT", src:"assets/gift.png"},
+    { word:"THREEKINGS", src:"assets/drei_koenige.png"},
+    { word:"NIKOLAUS", src:"assets/nikolaus.png"},
+    { word:"REINDEER", src:"assets/reindeer.png"},
+    { word:"SLEDGE", src:"assets/schlitten.png"},
+    { word:"CANDLE", src:"assets/candle.png"},
+    { word:"CHRISTMASTREE", src:"assets/tree2.png"},
+    { word:"CRIB", src:"assets/krippe.png"},
+    { word:"STAR", src:"assets/stern.png"},
+    { word:"COOKIES", src:"assets/kekse.png"},
+    { word:"BELLS", src:"assets/glocken.png"},
+    { word:"SNOWMAN", src:"assets/snowman2.png"}
+  ];
+  const WORDS = IMAGES.map(i=>i.word);
+  const SIZE = 15;
+  const FILL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  const gridEl = document.getElementById('grid');
+  const picGridEl = document.getElementById('picGrid');
+  const statusMsg = document.getElementById('statusMsg');
+  const resetBtn = document.getElementById('resetBtn');
+
+  function emptyGrid(){return Array.from({length:SIZE},()=>Array(SIZE).fill(null));}
+  const DIRS=[[1,0],[0,1]];
+
+  function tryPlace(grid,word){
+    for(let t=0;t<300;t++){
+      const [dx,dy]=DIRS[Math.floor(Math.random()*DIRS.length)];
+      const len=word.length;
+      const maxX=dx?SIZE-len:SIZE;
+      const maxY=dy?SIZE-len:SIZE;
+      const x0=Math.floor(Math.random()*maxX);
+      const y0=Math.floor(Math.random()*maxY);
+      let ok=true;
+      for(let i=0;i<len;i++){
+        const x=x0+dx*i,y=y0+dy*i;
+        const c=grid[y][x];
+        if(c&&c!==word[i]){ok=false;break;}
+      }
+      if(!ok)continue;
+      for(let i=0;i<len;i++){grid[y0+dy*i][x0+dx*i]=word[i];}
+      return true;
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+    return false;
+  }
+
+  function buildGrid(words){
+    const grid=emptyGrid();
+    for(const w of words) tryPlace(grid,w.toUpperCase());
+    for(let y=0;y<SIZE;y++)
+      for(let x=0;x<SIZE;x++)
+        if(!grid[y][x]) grid[y][x]=FILL[Math.floor(Math.random()*FILL.length)];
+    return grid;
+  }
+
+  let data,foundWords,confettiShown=false;
+
+  function renderGrid(){
+    gridEl.style.setProperty('--size',SIZE);
+    gridEl.innerHTML='';
+    for(let y=0;y<SIZE;y++){
+      for(let x=0;x<SIZE;x++){
+        const d=document.createElement('div');
+        d.className='cell';
+        d.dataset.x=x;d.dataset.y=y;
+        d.textContent=data[y][x];
+        gridEl.appendChild(d);
+      }
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+  }
+
+  // Bilderanzeige mit Fehlerdiagnose
+  function renderPictures(){
+    picGridEl.innerHTML='';
+    for(const it of IMAGES){
+      const box=document.createElement('div');
+      box.className='pic'; box.id='pic_'+it.word;
+
+      const img=document.createElement('img');
+      img.src = it.src;
+      img.alt = it.word;
+
+      img.addEventListener('error', () => {
+        box.style.outline = '3px solid #c54c3d';
+        box.title = `Bild nicht gefunden: ${it.src}`;
+        box.innerHTML = `<span style="font:600 12px/1.2 system-ui; color:#c54c3d; text-align:center; padding:6px;">❌<br>${it.src}</span>`;
       });
+      img.addEventListener('load', () => { box.title = it.src; });
+
+      box.appendChild(img);
+      picGridEl.appendChild(box);
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+  }
+
+  // ====== Konfetti (Buchstaben) ======
+  function startLetterConfetti(count=180, duration=8000){
+    if(confettiShown) return; // nur einmal
+    confettiShown = true;
+
+    const layer = document.createElement('div');
+    layer.className = 'confetti-layer';
+    document.body.appendChild(layer);
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ";
+    const colors  = ["#c54c3d","#12884b","#e0a100","#1976d2","#9c27b0","#ff6f00","#00897b"];
+
+    for(let i=0;i<count;i++){
+      const s = document.createElement('span');
+      s.className = 'confetti-letter';
+      s.textContent = letters[Math.floor(Math.random()*letters.length)];
+
+      const left = Math.random()*100;
+      const drift = (Math.random()*200-100)+"px";
+      const size = 14 + Math.random()*22;
+      const rot0 = Math.floor(Math.random()*360)+"deg";
+      const rot1 = Math.floor(Math.random()*720+360)+"deg";
+      const delay = Math.random()*0.8;
+      const time = 6 + Math.random()*6;
+
+      s.style.left = left+"vw";
+      s.style.setProperty('--x', '0px');
+      s.style.setProperty('--drift', drift);
+      s.style.setProperty('--r0', rot0);
+      s.style.setProperty('--r1', rot1);
+      s.style.fontSize = size+"px";
+      s.style.color = colors[Math.floor(Math.random()*colors.length)];
+      s.style.animationDuration = `${time}s, ${time*0.9}s`;
+      s.style.animationDelay = `${delay}s, ${delay}s`;
+
+      layer.appendChild(s);
     }
+
+    setTimeout(()=>layer.remove(), duration);
+  }
+
+  /* ===== Touch-/Pointer-Logik mit "Snap"-Korridor ===== */
+  let selecting=false,startCell=null,previewEls=[],activePointerId=null,currentEl=null;
+  let axis=null; // 'h' (horizontal) | 'v' (vertikal) | null
+  const DIR_LOCK_THRESHOLD = 12; // px, ab wann wir die Wischrichtung fixieren
+
+  function clearPreview(){
+    previewEls.forEach(el=>el.classList.remove('preview'));
+    previewEls=[];
+    if(currentEl){currentEl.classList.remove('current');currentEl=null;}
+  }
+
+  function lineCells(x0,y0,x1,y1){
+    const dx=Math.sign(x1-x0),dy=Math.sign(y1-y0);
+    if((dx===1&&dy===0)||(dx===0&&dy===1)){
+      const out=[];let x=x0,y=y0;
+      while(true){out.push({x,y});if(x===x1&&y===y1)break;x+=dx;y+=dy;}
+      return out;
+    }
+    return [];
+  }
+  function lettersOf(cells){return cells.map(({x,y})=>data[y][x]).join('');}
+  function lockCells(cells){cells.forEach(({x,y})=>gridEl.children[y*SIZE+x].classList.add('locked'));}
+  function markFound(w){
+    foundWords.add(w);
+    document.getElementById('pic_'+w)?.classList.add('found');
+    statusMsg.textContent=`${foundWords.size}/${IMAGES.length} gefunden`;
+  }
+  function vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch{}}
+
+  // Neu: Zelle per Projektion aus Pointer-Position berechnen (auch wenn der Finger neben dem Wort ist)
+  function projectedCellFromPointer(clientX, clientY){
+    const r = gridEl.getBoundingClientRect();
+    const cw = r.width / SIZE;
+    const ch = r.height / SIZE;
+
+    // Index aus Position ableiten (auch wenn leicht außerhalb -> clampen)
+    let gx = Math.floor((clientX - r.left) / cw);
+    let gy = Math.floor((clientY - r.top) / ch);
+    if(Number.isNaN(gx) || Number.isNaN(gy)){ return null; }
+    gx = Math.max(0, Math.min(SIZE-1, gx));
+    gy = Math.max(0, Math.min(SIZE-1, gy));
+
+    // Wenn Achse fixiert: auf Start-Zeile/Spalte projizieren
+    if(axis === 'h' && startCell){ gy = startCell.y; }
+    if(axis === 'v' && startCell){ gx = startCell.x; }
+
+    const el = gridEl.children[gy*SIZE+gx];
+    return {x:gx,y:gy,el};
+  }
+
+  function onDown(e){
+    if(e.button!==undefined&&e.button!==0)return;
+    const t=e.target.closest('.cell');if(!t)return;
+    startCell={x:+t.dataset.x,y:+t.dataset.y,el:t};
+    selecting=true;activePointerId=e.pointerId;
+    axis=null; // Richtung noch nicht fest
+    clearPreview();
+    t.classList.add('preview','current');
+    previewEls=[t];currentEl=t;
+    gridEl.setPointerCapture(activePointerId);
+    vibrate(8);
+    e.preventDefault();
+  }
+
+  function onMove(e){
+    if(!selecting||e.pointerId!==activePointerId)return;
+
+    // Richtung nach erstem spürbaren Move (~12px) festlegen
+    if(axis===null){
+      const dx = e.clientX - startCell.el.getBoundingClientRect().left - (startCell.el.offsetWidth/2);
+      const dy = e.clientY - startCell.el.getBoundingClientRect().top  - (startCell.el.offsetHeight/2);
+      const adx = Math.abs(dx), ady = Math.abs(dy);
+      if(adx>DIR_LOCK_THRESHOLD || ady>DIR_LOCK_THRESHOLD){
+        axis = adx > ady ? 'h' : 'v';
+      }
+    }
+
+    // Ziel-Zelle per Projektion bestimmen
+    let c = projectedCellFromPointer(e.clientX, e.clientY) || startCell;
+
+    // Vorschau aktualisieren
+    previewEls.forEach(el=>el.classList.remove('preview'));
+    previewEls=[];
+    const cells=lineCells(startCell.x,startCell.y,c.x,c.y);
+    for(const {x,y} of cells){
+      const el=gridEl.children[y*SIZE+x];
+      el.classList.add('preview');previewEls.push(el);
+    }
+    if(currentEl!==gridEl.children[c.y*SIZE+c.x]){
+      currentEl?.classList.remove('current');
+      currentEl=gridEl.children[c.y*SIZE+c.x];
+      currentEl.classList.add('current');
+    }
+  }
+
+  function onUp(e){
+    if(!selecting||e.pointerId!==activePointerId)return;
+    const c=projectedCellFromPointer(e.clientX,e.clientY)||startCell;
+    const cells=lineCells(startCell.x,startCell.y,c.x,c.y);
+    const sel=lettersOf(cells);
+    const match=WORDS.find(w=>!foundWords.has(w)&&w===sel);
+    if(match){lockCells(cells);markFound(match);vibrate(25);}
+    clearPreview();
+    selecting=false;
+    axis=null; // Reset für nächsten Zug
+    gridEl.releasePointerCapture(activePointerId);
+    if(foundWords.size===IMAGES.length){
+      statusMsg.textContent = "🎉 HEUREKA, you found all the words. Congratulations! Today's letter is: W";
+      startLetterConfetti();
+    }
+  }
+
+  function addEvents(){
+    gridEl.addEventListener('pointerdown',onDown,{passive:false});
+    gridEl.addEventListener('pointermove',onMove,{passive:false});
+    gridEl.addEventListener('pointerup',onUp,{passive:false});
+    gridEl.addEventListener('pointercancel',onUp,{passive:false});
+  }
+
+  function init(){
+    data=buildGrid(WORDS);foundWords=new Set();
+    confettiShown=false;
+    renderGrid();renderPictures();
+    statusMsg.textContent=`0/${IMAGES.length} gefunden`;
+  }
+
+  resetBtn.addEventListener('click',init);
+  addEvents();init();
   </script>
 </body>
 </html>
+
