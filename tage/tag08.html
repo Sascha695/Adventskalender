@@ -1,66 +1,345 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 08 – Römische Zahl</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adventskalender – Weihnachts-Mathe-Rätsel</title>
+
+  <style>
+    /* ===================== FESTES HINTERGRUNDBILD (Ebene 1) ===================== */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: url("assets/teaching_santa.png") center center / cover no-repeat;
+      z-index: -2;          /* ganz hinten */
+    }
+
+    /* ===================== FALLING COLORED NUMBERS (Ebene 2) ===================== */
+    .numbers-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .num-fall {
+      position: absolute;
+      top: -10%;
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-shadow: 0 0 6px rgba(0,0,0,0.35);
+      animation: fall linear infinite;
+      user-select: none;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.6; }
+    }
+
+    /* ===================== SEITENLAYOUT (Ebene 3 – Inhalt) ===================== */
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1f2937;
+      overflow-x: hidden;
+      background: transparent;  /* kein weiteres Hintergrundbild hier */
+      position: relative;
+    }
+
+    header {
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,.35);
+      padding: 1.25rem 1rem .25rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 0;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1.25rem;
+      position: relative;
+      z-index: 0;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      padding: 1.5rem 1.25rem;
+    }
+
+    /* ===================== STEUERUNG ===================== */
+    .controls{
+      display:flex;
+      gap:.5rem;
+      flex-wrap:wrap;
+      margin:.75rem 0 1.25rem;
+      justify-content:center;
+    }
+
+    .btn{
+      border:none;
+      background:linear-gradient(90deg, #22c55e, #16a34a);
+      color:#fff;
+      padding:.6rem 1rem;
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow:0 8px 16px rgba(22,163,74,.25);
+      font-weight:700;
+    }
+
+    .btn.sec{
+      background:#e11d48;
+      box-shadow:0 8px 16px rgba(225,29,72,.25);
+    }
+
+    .message{
+      margin:.6rem 0;
+      text-align:center;
+      font-weight:700;
+      min-height:1.5em;
+    }
+
+    .message.ok{ color:#16a34a; }
+    .message.err{ color:#e11d48; }
+
+    .letter-box{
+      text-align:center;
+      margin-top:.75rem;
+    }
+
+    .letter{
+      display:inline-block;
+      font-weight:900;
+      font-size:clamp(2rem, 6vw, 3.5rem);
+      padding:.35rem 1rem;
+      border-radius:14px;
+      background:#0ea5e9;
+      color:#fff;
+      box-shadow:0 6px 14px rgba(14,165,233,.35);
+    }
+
+    /* ===================== MATHE-RÄTSEL ===================== */
+    .puzzle-header{
+      text-align:center;
+      margin-bottom:1.25rem;
+    }
+
+    .puzzle-header h2{
+      margin:.1rem 0;
+      font-size:clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing:.06em;
+      color:#b91c1c;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+
+    .puzzle-header p{
+      margin:.1rem 0;
+      color:#4b5563;
+    }
+
+    .puzzle {
+      max-width:480px;
+      margin:0 auto;
+      border-radius:18px;
+      padding:1.2rem;
+      border:6px solid #f97373;
+      background: repeating-linear-gradient(45deg, #fee2e2 0 10px, #fee2e2 10px, #fca5a5 10px 20px);
+    }
+
+    .puzzle-inner{
+      border-radius:12px;
+      background: rgba(255, 255, 255, 1);
+      padding:1.25rem .75rem;
+    }
+
+    .equation{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:.4rem;
+      font-size:1.4rem;
+      margin:.45rem 0;
+      flex-wrap:wrap;
+    }
+
+    .symbol{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.6rem;
+      background:#f9fafb;
+      box-shadow:0 2px 4px rgba(0,0,0,.08);
+    }
+
+    .ball{ background:#bbf7d0; }
+    .gift{ background:#fecaca; }
+    .sock{ background:#fef3c7; border-radius:12px; }
+
+    .final input{
+      width:80px;
+      padding:.2rem .4rem;
+      font-size:1.3rem;
+      text-align:center;
+      border-radius:8px;
+      border:1px solid #cbd5e1;
+    }
+
+    .final input:focus{
+      outline:2px solid #22c55e;
+      outline-offset:1px;
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
+
+<body>
+  <!-- Ebene 1: festes Hintergrundbild -->
+  <div class="bg-layer"></div>
+
+  <!-- Ebene 2: fallende Zahlen -->
+  <div class="numbers-layer" id="numbersLayer"></div>
+
+  <!-- Ebene 3: Inhalt (scrollt) -->
+  <header>Tag 8 – Weihnachts-Mathe-Rätsel</header>
+
+  <div class="page">
     <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🍪</span><h1>Tag 08: Römische Zahl</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+
+      <div class="puzzle-header">
+        <h2>Merry Christmas</h2>
+        <p>Kannst du dieses Mathe-Puzzle lösen?</p>
       </div>
-      <p class="muted">Datum: 08.12.</p>
-      <h2>Rätsel</h2>
-      <p>Wie wird die Zahl 1 in römischen Zahlen geschrieben? (Gib den Buchstaben ein.)</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <div class="puzzle">
+        <div class="puzzle-inner">
+
+          <div class="equation">
+            <div class="symbol ball">🎄</div>
+            <span>+</span>
+            <div class="symbol ball">🎄</div>
+            <span>+</span>
+            <div class="symbol ball">🎄</div>
+            <span>= 6</span>
+          </div>
+
+          <div class="equation">
+            <div class="symbol ball">🎄</div>
+            <span>+</span>
+            <div class="symbol ball">🎄</div>
+            <span>+</span>
+            <div class="symbol gift">🎁</div>
+            <span>= 16</span>
+          </div>
+
+          <div class="equation">
+            <div class="symbol sock">🧦</div>
+            <span>+</span>
+            <div class="symbol sock">🧦</div>
+            <span>+</span>
+            <div class="symbol gift">🎁</div>
+            <span>= 20</span>
+          </div>
+
+          <div class="equation final">
+            <div class="symbol sock">🧦</div>
+            <span>+</span>
+            <div class="symbol ball">🎄</div>
+            <span>+</span>
+            <div class="symbol gift">🎁</div>
+            <span>=</span>
+            <input id="answer" type="number" inputmode="numeric">
+          </div>
+
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">I</div>
+
+      <div class="controls">
+        <button class="btn" id="checkBtn">Überprüfen</button>
+        <button class="btn sec" id="clearBtn">Alles löschen</button>
       </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
+      <div id="msg" class="message"></div>
+
+      <div class="letter-box" id="letterBox" style="display:none;">
+        <p>Dein Buchstabe:</p>
+        <div class="letter">W</div>
+        <p>Merke dir diesen Buchstaben!</p>
+      </div>
+
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
   <script>
-    const ANSWERS = "i";
-    const TODAY_LETTER = "I";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    /* ===== Mathe-Logik ===== */
+    const CORRECT_ANSWER = 18;
+    const answerInput = document.getElementById("answer");
+    const msg = document.getElementById("msg");
+    const letterBox = document.getElementById("letterBox");
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      const val = Number(answerInput.value.trim());
+      msg.classList.remove("ok","err");
+
+      if (!answerInput.value.trim()) {
+        msg.textContent = "Bitte gib eine Zahl ein.";
+        msg.classList.add("err");
+        letterBox.style.display = "none";
+        return;
+      }
+
+      if (val === CORRECT_ANSWER) {
+        msg.textContent = "Super, das stimmt! 🎉";
+        msg.classList.add("ok");
+        letterBox.style.display = "block";
+      } else {
+        msg.textContent = "Leider falsch. Versuch es nochmal!";
+        msg.classList.add("err");
+        letterBox.style.display = "none";
+      }
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      answerInput.value = "";
+      msg.textContent = "";
+      msg.classList.remove("ok","err");
+      letterBox.style.display = "none";
+      answerInput.focus();
+    });
+
+    /* ===== Bunte fallende Zahlen ===== */
+    const layer = document.getElementById("numbersLayer");
+    const COLORS = ["#ef4444","#22c55e","#facc15","#3b82f6","#ffffff"];
+
+    function createNumber() {
+      const elem = document.createElement("div");
+      elem.className = "num-fall";
+      elem.textContent = Math.floor(Math.random()*10);
+      elem.style.left = Math.random()*100 + "vw";
+      elem.style.animationDuration = 6 + Math.random()*6 + "s";
+      elem.style.fontSize = (1 + Math.random()*1.8) + "rem";
+      elem.style.color = COLORS[Math.floor(Math.random()*COLORS.length)];
+      elem.style.opacity = 0.6 + Math.random()*0.4;
+      layer.appendChild(elem);
+      setTimeout(() => elem.remove(), 14000);
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+
+    for (let i = 0; i < 40; i++) {
+      setTimeout(createNumber, i*150);
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
-    }
+    setInterval(createNumber, 700);
   </script>
 </body>
 </html>
