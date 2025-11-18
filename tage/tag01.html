@@ -1,66 +1,305 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 01 – Wärmendes Advents-Rätsel</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adventskalender Tag 1 – Kreuzworträtsel</title>
+  <style>
+    /* ---------------- Winter-Hintergrund mit Schneefall (CSS-only) ---------------- */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      color: #1f2937;
+      background:
+        radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,0.55), transparent 60%),
+        linear-gradient(#e9f4ff, #cfe6ff 30%, #b7d7ff 60%, #a4c9fa);
+      overflow-x: hidden;
+    }
+    header {
+      text-align: center; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.25);
+      position: relative; z-index: 2; padding: 1.25rem 1rem .25rem;
+    }
+    h1 { margin: 0; }
+
+    .page { max-width: 1100px; margin: 2rem auto 3rem; padding: 1.25rem; position: relative; z-index: 2; }
+    .card {
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(4px);
+      border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.12); padding: 1.25rem;
+    }
+
+    /* Schneelayer */
+    .snow-layer{
+      pointer-events:none; position:fixed; inset:0; z-index:1;
+      --c1: rgba(255,255,255,.95); --c2: rgba(255,255,255,.75); --c3: rgba(255,255,255,.55);
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, var(--c1) 100%, transparent 0),
+        radial-gradient(2px 2px at 130px 80px, var(--c1) 100%, transparent 0),
+        radial-gradient(3px 3px at 70px 110px, var(--c2) 100%, transparent 0),
+        radial-gradient(3px 3px at 200px 40px, var(--c2) 100%, transparent 0),
+        radial-gradient(4px 4px at 40px 60px, var(--c3) 100%, transparent 0),
+        radial-gradient(4px 4px at 160px 150px, var(--c3) 100%, transparent 0);
+      background-size: 300px 300px, 400px 400px, 500px 500px, 600px 600px, 700px 700px, 800px 800px;
+      animation: snowLayer1 12s linear infinite;
+    }
+    .snow-layer::before, .snow-layer::after{
+      content:""; position:fixed; inset:-10% 0 0 0; pointer-events:none;
+    }
+    .snow-layer::before{
+      background-image:
+        radial-gradient(2px 2px at 50px 20px, var(--c1) 100%, transparent 0),
+        radial-gradient(2px 2px at 220px 120px, var(--c1) 100%, transparent 0),
+        radial-gradient(3px 3px at 120px 200px, var(--c2) 100%, transparent 0),
+        radial-gradient(3px 3px at 280px 60px, var(--c2) 100%, transparent 0),
+        radial-gradient(4px 4px at 90px 140px, var(--c3) 100%, transparent 0),
+        radial-gradient(4px 4px at 260px 240px, var(--c3) 100%, transparent 0);
+      background-size: 350px 350px, 450px 450px, 550px 550px, 650px 650px, 750px 750px, 850px 850px;
+      animation: snowLayer2 18s linear infinite; opacity:.9;
+    }
+    .snow-layer::after{
+      background-image:
+        radial-gradient(2px 2px at 100px 10px, var(--c1) 100%, transparent 0),
+        radial-gradient(2px 2px at 260px 90px, var(--c1) 100%, transparent 0),
+        radial-gradient(3px 3px at 180px 170px, var(--c2) 100%, transparent 0),
+        radial-gradient(3px 3px at 320px 30px, var(--c2) 100%, transparent 0),
+        radial-gradient(4px 4px at 140px 130px, var(--c3) 100%, transparent 0),
+        radial-gradient(4px 4px at 300px 220px, var(--c3) 100%, transparent 0);
+      background-size: 280px 280px, 380px 380px, 480px 480px, 580px 580px, 680px 680px, 780px 780px;
+      animation: snowLayer3 24s linear infinite; opacity:.7;
+    }
+    @keyframes snowLayer1 { to { background-position: 0 600px, 0 400px, 0 500px, 0 600px, 0 700px, 0 800px; } }
+    @keyframes snowLayer2 { to { background-position: 0 700px, 0 500px, 0 600px, 0 700px, 0 800px, 0 900px; } }
+    @keyframes snowLayer3 { to { background-position: 0 800px, 0 600px, 0 700px, 0 800px, 0 900px, 0 1000px; } }
+
+    /* --------------- Crossword Styles --------------- */
+    .controls{ display:flex; gap:.5rem; flex-wrap:wrap; margin:.75rem 0 1.25rem; }
+    .btn{
+      border:none; background:linear-gradient(90deg, #22c55e, #16a34a); color:#fff;
+      padding:.6rem 1rem; border-radius:999px; cursor:pointer; box-shadow:0 8px 16px rgba(22,163,74,.25);
+      font-weight:700;
+    }
+    .btn.sec{ background:#e11d48; box-shadow:0 8px 16px rgba(225,29,72,.25); }
+
+    .grid {
+      --cell: 30px; /* Handyfreundlich */
+      display: grid;
+      grid-template-columns: repeat(22, var(--cell));
+      grid-auto-rows: var(--cell);
+      gap: 2px;
+      background: #cbd5e1;
+      padding: 6px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+      overflow: auto; max-height: 60vh;
+    }
+    .cell { position: relative; background:#fff; border-radius:4px; display:grid; place-items:center; font-weight:700; }
+    .cell.block{ background:#1f2937; }
+    .cell input{
+      width:100%; height:100%; border:none; outline:none; background:transparent;
+      text-transform:uppercase; text-align:center; font-size:1rem; font-weight:700;
+    }
+    .num { position:absolute; top:2px; left:4px; font-size:10px; color:#475569; font-weight:700; user-select:none; }
+
+    .message { margin:.6rem 0; color:#e11d48; font-weight:700; }
+    .letter-box{ text-align:center; margin-top:.5rem; }
+    .letter{
+      display:inline-block; font-weight:900; font-size:clamp(2rem, 6vw, 3.5rem);
+      padding:.35rem 1rem; border-radius:14px; background:#0ea5e9; color:#fff; box-shadow:0 6px 14px rgba(14,165,233,.35);
+    }
+
+    /* Hinweise */
+    .clues { margin-top: 1.25rem; display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 720px){ .clues{ grid-template-columns: 1fr; } }
+    .clues h3{ margin:.4rem 0; }
+    .clues ol{ margin:.2rem 0 .8rem 1.25rem; }
+    .clues li{ margin:.25rem 0; }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
+<body>
+  <div class="snow-layer" aria-hidden="true"></div>
+
+  <header>
+    <h1>Tag&nbsp;1 – Kreuzworträtsel</h1>
+  </header>
+
+  <div class="page">
     <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🎁</span><h1>Tag 01: Wärmendes Advents-Rätsel</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+      <div class="controls">
+        <button class="btn" id="checkBtn">Überprüfen</button>
+        <button class="btn sec" id="clearBtn">Alles löschen</button>
       </div>
-      <p class="muted">Datum: 01.12.</p>
-      <h2>Rätsel</h2>
-      <p>Es flackert, spendet Licht und Wärme, doch fass es nicht an, sonst verbrennst du dich. Was ist es?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <div id="grid" class="grid" aria-label="Kreuzworträtsel-Gitter"></div>
+      <div id="msg" class="message" role="status"></div>
+
+      <div class="letter-box" id="letterBox" style="display:none;">
+        <p>Dein Buchstabe:</p>
+        <div class="letter" id="letter">E</div>
+        <p>Merke dir diesen Buchstaben!</p>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">F</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
+      <!-- Lösungshinweise -->
+      <section class="clues">
+        <div>
+          <h3>Waagerecht</h3>
+          <ol>
+            <li value="1">Die Heiligen drei …</li>                      <!-- KOENIGE -->
+            <li value="3">Was läutet zu Weihnachten?</li>               <!-- GLOCKEN -->
+            <li value="6">Wer kommt am 6. Dezember?</li>                <!-- NIKOLAUS -->
+            <li value="8">Was war letztes Jahr im ersten Türchen?</li>  <!-- PLAETZCHEN -->
+            <li value="9">Was macht draußen alles zauberhaft weiß?</li> <!-- SCHNEE -->
+            <li value="10">Wie heißt der letzte Monat im Jahr?</li>     <!-- DEZEMBER -->
+            <li value="11">Was braucht man zum Rodeln?</li>             <!-- SCHLITTEN -->
+            <li value="11">Was man tut, um einer Schildkröte unter Wasser zu begegnen?</li>             <!-- Tauchen -->
+          </ol>
+        </div>
+        <div>
+          <h3>Senkrecht</h3>
+          <ol>
+            <li value="2">Welches Wort fehlt im Liedtext: „Oh …, oh …, wie grün sind deine Blätter?“</li> <!-- TANNENBAUM -->
+            <li value="4">Wie heißt das Fest direkt nach Weihnachten?</li>                                 <!-- SILVESTER -->
+            <li value="5">Wer bringt an Heiligabend die Geschenke?</li>                                    <!-- WEIHNACHTSMANN -->
+            <li value="7">Wie heißt der Markt, auf dem man in der Weihnachtszeit Bummlern kann?</li>        <!-- WEIHNACHTSMARKT -->
+            <li value="12">Was hängt am Weihnachtsbaum?</li>                                                <!-- KUGELN -->
+            <li value="13">Duftendes Gewürz, typisch für die Weihnachtsbäckerei.</li>                      <!-- ZIMT -->
+            <li value="14">Wie heißt das Rentier mit der roten Nase?</li>                                   <!-- RUDOLF -->
+            <li value="15">Welches Lied hab ich dir auf der Gitarre vorgespielt?</li>                       <!-- IRIS -->
+            <li value="16">Wo waren wir dieses Jahr im Urlaub?</li>                                         <!-- Bosnien -->
+          </ol>
+        </div>
+      </section>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
   <script>
-    const ANSWERS = "feuer";
-    const TODAY_LETTER = "F";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    /* ====== Wörter (Großschrift, keine Leerzeichen) ====== */
+    const WORDS = {
+      // Waagerecht
+      1:  "KOENIGE",
+      3:  "GLOCKEN",
+      6:  "NIKOLAUS",
+      8:  "PLAETZCHEN",
+      9:  "SCHNEE",
+      10: "DEZEMBER",
+      11: "SCHLITTEN",
+      17: "TAUCHEN",
+      // Senkrecht
+      2:  "TANNENBAUM",
+      4:  "SILVESTER",
+      5:  "WEIHNACHTSMANN",
+      7:  "WEIHNACHTSMARKT",
+      12: "KUGELN",
+      13: "ZIMT",
+      14: "RUDOLF",
+      15: "IRIS",
+      16: "BOSNIEN"
+    };
+
+    /* ====== Gitter 16×22 – Koordinaten ====== */
+    const ROWS = 16, COLS = 22;
+    const PLACEMENTS = [
+      // Waagerecht
+      {num:1,  row:5,  col:5,  dir:'A', answer: WORDS[1]},
+      {num:3,  row:3,  col:1,  dir:'A', answer: WORDS[3]},
+      {num:6,  row:7,  col:9,  dir:'A', answer: WORDS[6]},
+      {num:8,  row:3,  col:11,  dir:'A', answer: WORDS[8]},
+      {num:9,  row:9,  col:12,  dir:'A', answer: WORDS[9]},
+      {num:10, row:13, col:5,  dir:'A', answer: WORDS[10]},
+      {num:11, row:11, col:14,  dir:'A', answer: WORDS[11]},
+      {num:17, row:16, col:14,  dir:'A', answer: WORDS[17]},
+      // Senkrecht
+      {num:2,  row:1,  col:7, dir:'D', answer: WORDS[2]},
+      {num:4,  row:1,  col:2,  dir:'D', answer: WORDS[4]},
+      {num:5,  row:3,  col:9,  dir:'D', answer: WORDS[5]},
+      {num:7,  row:2,  col:14,  dir:'D', answer: WORDS[7]},
+      {num:12, row:8,  col:21, dir:'D', answer: WORDS[12]},
+      {num:13, row:8,  col:19, dir:'D', answer: WORDS[13]},
+      {num:14, row:11,  col:5, dir:'D', answer: WORDS[14]},
+      {num:15, row:11,  col:18, dir:'D', answer: WORDS[15]},
+      {num:16, row:1,  col:22, dir:'D', answer: WORDS[16]}
+    ];
+
+    /* ======== Engine ======== */
+    const board = Array.from({length: ROWS}, () => Array(COLS).fill(null));
+
+    function placeWords(){
+      for (const p of PLACEMENTS){
+        const letters = p.answer.split("");
+        for (let i=0;i<letters.length;i++){
+          const r = p.row - 1 + (p.dir === 'D' ? i : 0);
+          const c = p.col - 1 + (p.dir === 'A' ? i : 0);
+          if (r < 0 || r >= ROWS || c < 0 || c >= COLS) continue;
+          if (!board[r][c]) board[r][c] = { char: letters[i], input: null, num: null };
+          else board[r][c].char = letters[i];
+        }
+      }
+      for (const p of PLACEMENTS){
+        const r = p.row - 1, c = p.col - 1;
+        if (r>=0 && r<ROWS && c>=0 && c<COLS && board[r][c] && board[r][c].num == null){
+          board[r][c].num = p.num;
+        }
+      }
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+
+    function renderGrid(){
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+      for (let r=0;r<ROWS;r++){
+        for (let c=0;c<COLS;c++){
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          const item = board[r][c];
+          if (!item){
+            cell.classList.add("block");
+          } else {
+            const inp = document.createElement("input");
+            inp.maxLength = 1; item.input = inp; cell.appendChild(inp);
+            if (item.num){
+              const num = document.createElement("div");
+              num.className = "num"; num.textContent = item.num; cell.appendChild(num);
+            }
+          }
+          grid.appendChild(cell);
+        }
+      }
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
+
+    function validate(){
+      for (const p of PLACEMENTS){
+        for (let i=0;i<p.answer.length;i++){
+          const r = p.row - 1 + (p.dir === 'D' ? i : 0);
+          const c = p.col - 1 + (p.dir === 'A' ? i : 0);
+          if (r < 0 || r >= ROWS || c < 0 || c >= COLS) continue;
+          const item = board[r][c]; const val = (item.input?.value || "").toUpperCase();
+          if (val !== p.answer[i]) return false;
+        }
+      }
+      return true;
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function clearAll(){
+      for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
+        const it = board[r][c]; if (it && it.input) it.input.value = "";
+      }
+      document.getElementById("msg").textContent = "";
+      document.getElementById("letterBox").style.display = "none";
     }
+
+    placeWords();
+    renderGrid();
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      const ok = validate();
+      const msg = document.getElementById("msg");
+      if (!ok){
+        msg.textContent = "Mindestens ein Feld ist falsch oder leer. Versuch’s nochmal!";
+      } else {
+        msg.textContent = "";
+        document.getElementById("letterBox").style.display = "block";
+        document.getElementById("letter").textContent = "o";
+      }
+    });
+    document.getElementById("clearBtn").addEventListener("click", clearAll);
   </script>
 </body>
 </html>
