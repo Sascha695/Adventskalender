@@ -1,66 +1,452 @@
-<!doctype html>
-<html lang="de">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 10 – Holzfigur</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Día 10 – Juego del Papá Noel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui; }
+
+    /* WICHTIG: Scrollen komplett deaktivieren */
+    html, body {
+      height: 100%;
+      overflow: hidden;         /* keine Scrollbars, kein Scrollen */
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #d62828;
+      color: #fff;
+      padding: 20px 10px;
+      gap: 20px;
+      overflow-x: hidden;
+      overscroll-behavior: none; /* verhindert "Gummiband"-Scroll z.B. auf iOS */
+    }
+
+    header h1 { font-size: 1.8rem; text-align: center; }
+
+    .instructions {
+      max-width: 800px;
+      text-align: center;
+      font-size: 1rem;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .game-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .image-container {
+      position: relative;
+      width: 600px;
+      max-width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+      background-image: url("assets/noel_scene.png");
+      background-size: cover;
+      background-position: center;
+      touch-action: none; /* hier auch kein Scroll-Gesten */
+    }
+
+    .target-number {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: #c0182b;
+      border: 2px solid #c0182b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transform: translate(-50%, -50%);
+      user-select: none;
+    }
+
+    .target-number.correct {
+      background: #1f9152;
+      color: #fff;
+      border-color: #1f9152;
+    }
+
+    .word-list {
+      min-width: 240px;
+      max-width: 360px;
+      background: rgba(0,0,0,0.25);
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .words { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+    .word-card {
+      padding: 8px 12px;
+      border-radius: 20px;
+      background: #fff;
+      color: #000;
+      cursor: grab;
+      touch-action: none; /* Drag statt Scroll auf den Karten */
+      font-size: 0.95rem;
+    }
+
+    .word-card.used { opacity: 0.4; cursor: default; }
+
+    .placed-word {
+      position: absolute;
+      background: rgba(255,255,255,0.95);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      transform: translate(-50%, -70%);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .feedback { text-align: center; min-height: 1.2em; }
+    .feedback.ok { color: #7cff9b; }
+    .feedback.bad { color: #ff8c8c; }
+
+    .status { text-align: center; margin-top: 6px; }
+
+    footer { opacity: 0.7; text-align: center; font-size: 0.85rem; }
+
+    /* PARTY-OVERLAY IN DER MITTE DES BILDSCHIRMS */
+    #partyOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;           /* wird per JS auf block gesetzt */
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #partyBox {
+      background: rgba(255,255,255,0.96);
+      color: #111;
+      padding: 20px 25px;
+      border-radius: 16px;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    #partyBox h2 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+
+    #partyBox p {
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    #partyBox .letter {
+      margin-top: 8px;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    /* KONFETTI */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      opacity: 0.9;
+      z-index: 9999;
+      pointer-events: none;
+      animation-name: confetti-fall;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translate3d(0, -100px, 0) rotateZ(0deg);
+      }
+      100% {
+        transform: translate3d(0, 110vh, 0) rotateZ(360deg);
+      }
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🎶</span><h1>Tag 10: Holzfigur</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 10.12.</p>
-      <h2>Rätsel</h2>
-      <p>Er ist aus Holz geschnitzt, trägt oft Uniform und knackt Walnüsse. Welche Figur ist das?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">N</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+<body>
+  <header><h1>Día 10 – Palabras de Papá Noel</h1></header>
+
+  <div class="instructions">
+    No he olvidado nuestro día de español. Hoy aprendemos algo de vocabulario. Por favor, anota todas las palabras correctas a los números.
+  </div>
+
+  <main class="game-layout">
+    <section class="image-container" id="imageContainer"></section>
+
+    <section class="word-list">
+      <h2>Palabras</h2>
+      <div class="words" id="wordList"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="status" id="status"></div>
+    </section>
+  </main>
+
+  <!-- PARTY-OVERLAY -->
+  <div id="partyOverlay">
+    <div id="partyBox">
+      <h2>¡Felicidades!</h2>
+      <p>Has colocado todas las palabras correctamente.</p>
+      <p>De ti se puede aprender mucho.</p>
+      <p class="letter">Tu letra de hoy es: <strong>L</strong></p>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
   <script>
-    const ANSWERS = "nussknacker";
-    const TODAY_LETTER = "N";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
-    }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+    /* ========= SPANISCHE WÖRTER (13) ========= */
+
+    const words = [
+      { id: "Papá Noel",            label: "Papá Noel" },
+      { id: "el ángel",             label: "el ángel" },
+      { id: "la chimenea",          label: "la chimenea" },
+      { id: "el árbol de Navidad",  label: "el árbol de Navidad" },
+      { id: "el regalo navideño",   label: "el regalo navideño" },
+      { id: "la bola de Navidad",   label: "la bola de Navidad" },
+      { id: "la tarjeta de Navidad",label: "la tarjeta de Navidad" },
+      { id: "el cascanueces",       label: "el cascanueces" },
+      { id: "la iluminación",       label: "la iluminación" },
+      { id: "la corona de Navidad", label: "la corona de Navidad" },
+      { id: "la vela",              label: "la vela" },          // Kerze
+      { id: "los calcetines",       label: "los calcetines" },   // Socken
+      { id: "el gato",              label: "el gato" }           // Katze
+    ];
+
+    /* ========= ZAHLEN / POSITIONEN ========= */
+
+    const targetsConfig = [
+      { number: 1,  x: 8,  y: 90, correctWordId: "Papá Noel" },
+      { number: 2,  x: 55, y: 22, correctWordId: "el ángel" },
+      { number: 3,  x: 89, y: 20, correctWordId: "la corona de Navidad" },
+      { number: 4,  x: 63, y: 65, correctWordId: "la iluminación" },
+      { number: 5,  x: 60, y: 57, correctWordId: "el árbol de Navidad" },
+      { number: 6,  x: 10, y: 30, correctWordId: "la chimenea" },
+      { number: 7,  x: 91, y: 60, correctWordId: "el cascanueces" },
+      { number: 8,  x: 45, y: 75, correctWordId: "el regalo navideño" },
+      { number: 9,  x: 64, y: 37, correctWordId: "la bola de Navidad" },
+      { number: 10, x: 30, y: 10, correctWordId: "la tarjeta de Navidad" },
+      { number: 11, x: 6,  y: 11, correctWordId: "la vela" },
+      { number: 12, x: 28, y: 32, correctWordId: "los calcetines" },
+      { number: 13, x: 74, y: 86, correctWordId: "el gato" }
+    ];
+
+    /* ========= SPIELVARIABLEN ========= */
+
+    const imageContainer = document.getElementById("imageContainer");
+    const wordListEl = document.getElementById("wordList");
+    const feedbackEl = document.getElementById("feedback");
+    const statusEl = document.getElementById("status");
+    const partyOverlay = document.getElementById("partyOverlay");
+
+    let correctCount = 0;
+    let draggingCard = null;
+    let dragClone = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let partyStarted = false;
+
+    /* ========= ZIELE ERZEUGEN ========= */
+
+    function initTargets() {
+      targetsConfig.forEach(cfg => {
+        const t = document.createElement("div");
+        t.className = "target-number";
+        t.style.left = cfg.x + "%";
+        t.style.top = cfg.y + "%";
+        t.textContent = cfg.number;
+        t.dataset.correctWordId = cfg.correctWordId;
+        t.dataset.number = cfg.number;
+        imageContainer.appendChild(t);
       });
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    /* ========= WORTKÄRTCHEN ========= */
+
+    function initWords() {
+      words.forEach(w => {
+        const card = document.createElement("div");
+        card.className = "word-card";
+        card.textContent = w.label;
+        card.dataset.wordId = w.id;
+
+        card.addEventListener("pointerdown", (e) => startDrag(e, card), { passive: false });
+        wordListEl.appendChild(card);
+      });
     }
+
+    /* ========= DRAG START ========= */
+
+    function startDrag(e, card) {
+      if (card.classList.contains("used")) return;
+
+      e.preventDefault(); // verhindert Scrollstart
+
+      draggingCard = card;
+
+      const rect = card.getBoundingClientRect();
+      dragOffsetX = e.clientX - rect.left;
+      dragOffsetY = e.clientY - rect.top;
+
+      dragClone = card.cloneNode(true);
+      dragClone.style.position = "fixed";
+      dragClone.style.left = rect.left + "px";
+      dragClone.style.top = rect.top + "px";
+      dragClone.style.opacity = "0.9";
+      dragClone.style.zIndex = "9999";
+      dragClone.style.pointerEvents = "none";
+
+      document.body.appendChild(dragClone);
+    }
+
+    /* ========= DRAG BEWEGEN ========= */
+
+    function onPointerMove(e) {
+      if (!dragClone) return;
+      e.preventDefault(); // verhindert Scrollen während des Ziehens
+
+      dragClone.style.left = (e.clientX - dragOffsetX) + "px";
+      dragClone.style.top  = (e.clientY - dragOffsetY) + "px";
+    }
+
+    /* ========= DRAG LOS ========= */
+
+    function onPointerUp(e) {
+      if (!draggingCard) return;
+
+      e.preventDefault(); // sicherheitshalber
+
+      if (dragClone) dragClone.remove();
+
+      const snapRadius = 60;
+      const targets = Array.from(document.querySelectorAll(".target-number"));
+      let chosenTarget = null;
+      let minDist = Infinity;
+
+      targets.forEach(t => {
+        const r = t.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+        if (dist < minDist) {
+          minDist = dist;
+          chosenTarget = t;
+        }
+      });
+
+      if (chosenTarget && minDist <= snapRadius) {
+        dropOnTarget(draggingCard, chosenTarget);
+      }
+
+      draggingCard = null;
+      dragClone = null;
+    }
+
+    /* ========= DROP-LOGIK ========= */
+
+    function dropOnTarget(wordCard, target) {
+      const correctId = target.dataset.correctWordId;
+
+      if (wordCard.dataset.wordId !== correctId) {
+        feedbackEl.textContent = "No. Intenta otra vez.";
+        feedbackEl.className = "feedback bad";
+        return;
+      }
+
+      target.classList.add("correct");
+      wordCard.classList.add("used");
+
+      const placed = document.createElement("div");
+      placed.className = "placed-word";
+      placed.textContent = wordCard.textContent;
+      placed.style.left = target.style.left;
+      placed.style.top = target.style.top;
+      imageContainer.appendChild(placed);
+
+      feedbackEl.textContent = "¡Muy bien!";
+      feedbackEl.className = "feedback ok";
+
+      correctCount++;
+      updateStatus();
+    }
+
+    /* ========= PARTY-FUNKTION ========= */
+
+    function startParty() {
+      if (partyStarted) return;
+      partyStarted = true;
+
+      // Overlay anzeigen
+      partyOverlay.style.display = "flex";
+
+      // Konfetti erzeugen
+      const colors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ffffff"];
+      const confettiCount = 150;
+
+      for (let i = 0; i < confettiCount; i++) {
+        const conf = document.createElement("div");
+        conf.className = "confetti";
+        const size = 6 + Math.random() * 6;
+        conf.style.width = size + "px";
+        conf.style.height = (size * 1.6) + "px";
+        conf.style.left = Math.random() * 100 + "vw";
+        conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        const duration = 3 + Math.random() * 2;
+        const delay = Math.random() * 1.5;
+        conf.style.animationDuration = duration + "s";
+        conf.style.animationDelay = delay + "s";
+        document.body.appendChild(conf);
+
+        // Konfetti nach Animation entfernen
+        setTimeout(() => conf.remove(), (duration + delay) * 1000 + 500);
+      }
+
+      // Overlay durch Klick schließen (optional)
+      partyOverlay.addEventListener("click", () => {
+        partyOverlay.style.display = "none";
+      });
+    }
+
+    /* ========= STATUS ========= */
+
+    function updateStatus() {
+      statusEl.textContent = `Correctos: ${correctCount} / ${targetsConfig.length}`;
+
+      if (correctCount === targetsConfig.length) {
+        statusEl.innerHTML = `<span>¡Perfecto! Juego completo.</span>`;
+        startParty();
+      }
+    }
+
+    /* ========= EVENT-LISTENER ========= */
+
+    document.addEventListener("pointermove", onPointerMove, { passive: false });
+    document.addEventListener("pointerup", onPointerUp, { passive: false });
+    document.addEventListener("pointercancel", onPointerUp, { passive: false });
+
+    initTargets();
+    initWords();
+    updateStatus();
   </script>
 </body>
 </html>
