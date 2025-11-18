@@ -1,66 +1,265 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 12 – Geschenkebringer</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adventskalender Tag 12</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* =========================
+       HINTERGRUNDBILD
+       =========================
+       → Hier kannst du den Bildpfad ändern:
+       Ersetze 'dein-hintergrundbild.jpg' durch dein eigenes Bild.
+    */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background-color: #e2f4f9; /* Fallback-Farbe, falls Bild nicht lädt */
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("dein-hintergrundbild.jpg");
+      background-size: contain;         /* Bild vollständig zeigen */
+      background-position: center top;  /* Auf dem Handy schön zentriert */
+      background-repeat: no-repeat;
+      background-color: #e2f4f9;        /* dezenter Füllton für Ränder */
+      opacity: 0.45;
+      z-index: -1;                      /* hinter allem Inhalt */
+      pointer-events: none;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    footer {
+      font-size: 0.85rem;
+    }
+
+    /* Abstand nach oben, damit man zuerst das Bild sieht */
+    .puzzle-container {
+      padding: 100vh 1rem 4rem 1rem; /* auf kleinen Screens: eine ganze Bildschirmhöhe Abstand */
+    }
+
+    /* auf größeren Bildschirmen etwas weniger Abstand */
+    @media (min-width: 768px) {
+      .puzzle-container {
+        padding-top: 60vh;
+      }
+    }
+
+    /* Karte mit Rätsel */
+    .puzzle-card {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: rgba(255, 253, 247, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      line-height: 1.5;
+    }
+
+    .puzzle-title {
+      font-family: "Brush Script MT", "Pacifico", cursive;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #2f6532;
+    }
+
+    .puzzle-text {
+      font-size: 1rem;
+      color: #2b2b2b;
+      margin-bottom: 0.6rem;
+    }
+
+    .puzzle-question {
+      font-weight: bold;
+      color: #1f6b3a;
+      margin-top: 1rem;
+    }
+
+    .answer-area {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .answer-area input {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+      width: 80px;
+      text-align: center;
+    }
+
+    .answer-area button {
+      padding: 0.4rem 0.8rem;
+      margin-left: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .letter-container {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .letter {
+      display: inline-block;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 2px solid #1f6b3a;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1f6b3a;
+      background: #f5fff7;
+    }
+
+    /* HINWEIS-BEREICH */
+    .hint-section {
+      margin-top: 1.5rem;
+      border-top: 1px dashed #7ca88a;
+      padding-top: 1rem;
+    }
+
+    .hint-section h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #28563a;
+      text-align: center;
+    }
+
+    .hint-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hint-buttons button {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .hint-text {
+      display: none;
+      font-size: 0.95rem;
+      color: #234130;
+      margin-top: 0.4rem;
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🔔</span><h1>Tag 12: Geschenkebringer</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+<body>
+  <header>
+    <h1>Tag&nbsp;12 – Weihnachtsrätsel</h1>
+  </header>
+
+  <main class="puzzle-container">
+    <div class="puzzle-card">
+      <h2 class="puzzle-title">Viel Verkehr</h2>
+
+      <p class="puzzle-text">
+        Die Werkstatt und die Geschenkverpackungsfabrik des Weihnachtsmanns
+        sind durch zwei Bimmelbahnen miteinander verbunden.
+      </p>
+      <p class="puzzle-text">
+        Jede volle Stunde fährt an der Werkstatt eine Bahn los,
+        die für den Weg zur Fabrik genau fünf Stunden benötigt.
+      </p>
+      <p class="puzzle-text">
+        Zur gleichen Zeit fährt an der Fabrik jeweils eine Bahn zur Werkstatt,
+        die aufgrund des starken und eisigen Gegenwindes am Nordpol genau sieben Stunden braucht.
+      </p>
+      <p class="puzzle-text puzzle-question">
+        Wie vielen Bahnen begegnet eine Bimmelbahn am späten Nachmittag,
+        die von der Werkstatt aus gestartet ist, auf ihrem Weg zur Fabrik?
+      </p>
+
+      <div class="answer-area">
+        <label for="answerInput">Deine Antwort (Zahl): </label>
+        <input type="number" id="answerInput" min="0">
+        <button type="button" onclick="checkRiddle()">Überprüfen</button>
       </div>
-      <p class="muted">Datum: 12.12.</p>
-      <h2>Rätsel</h2>
-      <p>In manchen Regionen bringt nicht der Weihnachtsmann, sondern ein blondgelocktes himmlisches Wesen die Geschenke. Wie heißt es?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <div id="quizFeedback2" style="color:red; margin-top:10px; text-align:center;"></div>
+
+      <!-- HINWEISE -->
+      <div class="hint-section">
+        <h3>Brauchst du einen Hinweis?</h3>
+        <div class="hint-buttons">
+          <button type="button" onclick="toggleHint(1)">Hinweis&nbsp;1</button>
+          <button type="button" onclick="toggleHint(2)">Hinweis&nbsp;2</button>
+          <button type="button" onclick="toggleHint(3)">Hinweis&nbsp;3</button>
+        </div>
+
+        <div id="hint1" class="hint-text">
+          Stell dir vor, die Bimmelbahnen fahren schon den ganzen Tag im gleichen Rhythmus.
+          „Später Nachmittag“ heißt: Der Betrieb läuft längst im Gleichgewicht.
+        </div>
+        <div id="hint2" class="hint-text">
+          Wenn eine Bahn an der Werkstatt losfährt, sind bereits mehrere Bahnen von der
+          Fabrik aus auf dem Rückweg. Überlege: Wie viele Züge können in 7 Stunden (Fahrzeit zurück)
+          gestartet sein, wenn jede Stunde eine Bahn losfährt?
+        </div>
+        <div id="hint3" class="hint-text">
+          Die Bimmelbahn aus der Werkstatt trifft<br>
+          1. alle Züge, die schon unterwegs von der Fabrik zur Werkstatt sind, wenn sie startet, <strong>und</strong><br>
+          2. alle Züge, die in den 5 Stunden ihrer Fahrt noch an der Fabrik losfahren.<br>
+          Addiere diese beiden Anzahlen.
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">C</div>
+
+      <div id="letter-container" class="letter-container" style="display:none;">
+        <p>Richtig! Dein Buchstabe für das Lösungswort ist:</p>
+        <div class="letter" id="letter">R</div>
+        <p>Merke dir diesen Buchstaben!</p>
       </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
-  </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  </main>
+
+  <footer>
+    <!-- Optional: dein Footer-Text -->
+  </footer>
+
   <script>
-    const ANSWERS = "christkind";
-    const TODAY_LETTER = "C";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    function checkRiddle() {
+      const input = document.getElementById('answerInput').value.trim();
+      const feedback = document.getElementById('quizFeedback2');
+      const correctAnswer = '12'; // Lösung des Rätsels
+
+      if (input === correctAnswer) {
+        feedback.textContent = '';
+        showLetter('R');
+      } else {
+        feedback.textContent = 'Leider falsch, versuche es erneut!';
+        document.getElementById('letter-container').style.display = 'none';
+      }
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+
+    function showLetter(letter) {
+      const container = document.getElementById('letter-container');
+      document.getElementById('letter').textContent = letter;
+      container.style.display = 'block';
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    // HINWEIS-TOGGLE
+    function toggleHint(nr) {
+      const el = document.getElementById('hint' + nr);
+      if (!el) return;
+      const isVisible = el.style.display === 'block';
+      el.style.display = isVisible ? 'none' : 'block';
     }
   </script>
 </body>
 </html>
+
