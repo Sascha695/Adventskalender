@@ -48,7 +48,7 @@
       color:#fff;
       padding:1rem .75rem;
       box-shadow:0 4px 10px rgba(0,0,0,.25);
-      margin-bottom: 36rem;
+      margin-bottom: 30rem;
     }
     header h1{ margin:0; font-size:2rem; }
 
@@ -202,6 +202,96 @@
       box-shadow:0 4px 14px rgba(0,0,0,.28);
       margin-top:.5rem;
     }
+
+    /* === PARTY-OVERLAY === */
+    .party-overlay{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.55);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .35s ease;
+      overflow:hidden;
+    }
+
+    .party-overlay.visible{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .party-box{
+      position:relative;
+      z-index:2;
+      max-width:480px;
+      margin:1rem;
+      padding:1.5rem 1.8rem;
+      border-radius:18px;
+      background:rgba(255,255,255,.95);
+      box-shadow:0 10px 30px rgba(0,0,0,.4);
+      text-align:center;
+    }
+
+    .party-box h2{
+      margin-top:0;
+      margin-bottom:.6rem;
+      font-size:1.7rem;
+      color:#b4382c;
+    }
+
+    .party-letter{
+      font-size:1.2rem;
+      margin:.4rem 0 .2rem;
+    }
+
+    .party-letter span{
+      display:inline-block;
+      margin-left:.25rem;
+      padding:.1rem .55rem;
+      border-radius:999px;
+      background:#c54c3d;
+      color:#fff;
+      font-weight:800;
+      font-size:1.4rem;
+    }
+
+    .party-sub{
+      margin-top:.4rem;
+      font-size:.95rem;
+      color:#555;
+    }
+
+    .party-gift{
+      position:absolute;
+      top:-80px;
+      width:48px;
+      height:48px;
+      background-size:contain;
+      background-repeat:no-repeat;
+      background-position:center;
+      animation-name:giftFall;
+      animation-timing-function:linear;
+      animation-iteration-count:infinite;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    @keyframes giftFall{
+      0%{
+        transform:translateY(-120%) rotate(0deg);
+        opacity:0;
+      }
+      10%{
+        opacity:1;
+      }
+      100%{
+        transform:translateY(120vh) rotate(360deg);
+        opacity:0;
+      }
+    }
   </style>
 </head>
 
@@ -247,6 +337,19 @@
     </div>
   </main>
 
+  <!-- PARTY-OVERLAY -->
+  <div id="partyOverlay" class="party-overlay" aria-hidden="true">
+    <div class="party-box">
+      <h2>Hurra! Du hast alle Geschenke gerettet!</h2>
+      <p class="party-letter">
+        Dein heutiger Buchstabe ist:
+        <span>e</span>
+      </p>
+      <p class="party-sub">Tippe irgendwo, um weiterzuspielen.</p>
+    </div>
+    <!-- fallende Geschenke werden per JavaScript hier eingefügt -->
+  </div>
+
   <script>
     const SIZE = 8;
     const gridEl = document.getElementById('grid');
@@ -254,6 +357,7 @@
     const statusTotalEl = document.getElementById('statusTotal');
     const successMsgEl = document.getElementById('successMsg');
     const resetBtn = document.getElementById('resetBtn');
+    const partyOverlay = document.getElementById('partyOverlay');
 
     // Koordinaten: (x,y) intern 0–7, 0 = links/oben
     const GIFT_PAIRS = [
@@ -271,7 +375,7 @@
         // Nutzer: (3,3) und (8,6)
         positions: [ {x:2,y:2}, {x:7,y:5} ]
       },
-      
+
       {
         id: 'yellow',
         cssClass: 'path-yellow',
@@ -312,6 +416,7 @@
     let gridData;
     let pathOwner;
     let completedColors;
+    let partyShown = false;
 
     let drawing = false;
     let currentColor = null;
@@ -361,6 +466,7 @@
     function resetPaths(){
       pathOwner = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
       completedColors = new Set();
+      partyShown = false;
       statusCountEl.textContent = '0';
       statusTotalEl.textContent = GIFT_PAIRS.length;
       successMsgEl.textContent = '';
@@ -373,6 +479,9 @@
           'on-path','current-step'
         );
       });
+
+      // Party-Overlay zurücksetzen
+      hideParty();
     }
 
     function vibrate(ms){
@@ -520,9 +629,11 @@
 
       Array.from(gridEl.children).forEach(c => c.classList.remove('current-step'));
 
-      if(allColorsCompleted()){
+      if(allColorsCompleted() && !partyShown){
         successMsgEl.textContent =
           'Hurra! Alle Geschenke sind verbunden. Geschenkdieb Gerd hat keine Chance mehr! Dein heutiger Buchstabe ist: e';
+        partyShown = true;
+        startParty();
       }
     }
 
@@ -531,6 +642,8 @@
       gridEl.addEventListener('pointermove', pointerMove, {passive:false});
       gridEl.addEventListener('pointerup',   pointerUp,   {passive:false});
       gridEl.addEventListener('pointercancel', pointerUp, {passive:false});
+
+      partyOverlay.addEventListener('click', hideParty);
     }
 
     function init(){
@@ -540,6 +653,43 @@
     }
 
     resetBtn.addEventListener('click', resetPaths);
+
+    // === PARTY-FUNKTIONEN ===
+    function createGiftRain(count = 28){
+      const urls = GIFT_PAIRS.map(p => p.img);
+      // vorhandene Geschenke entfernen, falls noch welche da sind
+      partyOverlay.querySelectorAll('.party-gift').forEach(g => g.remove());
+
+      for(let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'party-gift';
+        const imgUrl = urls[i % urls.length];
+
+        el.style.left = (Math.random() * 100) + '%';
+        const delay = Math.random() * 2.5;
+        const duration = 5 + Math.random() * 3;
+        el.style.animationDelay = delay + 's';
+        el.style.animationDuration = duration + 's';
+        el.style.backgroundImage = `url('${imgUrl}')`;
+
+        partyOverlay.appendChild(el);
+      }
+    }
+
+    function startParty(){
+      createGiftRain();
+      partyOverlay.classList.add('visible');
+      partyOverlay.setAttribute('aria-hidden','false');
+    }
+
+    function hideParty(){
+      partyOverlay.classList.remove('visible');
+      partyOverlay.setAttribute('aria-hidden','true');
+      // fallende Geschenke wieder entfernen, damit beim nächsten Mal neu gestartet wird
+      setTimeout(()=>{
+        partyOverlay.querySelectorAll('.party-gift').forEach(g => g.remove());
+      }, 400);
+    }
 
     addEvents();
     init();
