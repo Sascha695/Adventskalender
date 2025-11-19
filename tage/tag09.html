@@ -211,114 +211,115 @@
   </div>
 
   <script>
-    /*
-      --- Konfiguration der Unterschiede (Hotspots) ---
+  /*
+    --- Konfiguration der Unterschiede (Hotspots) ---
 
-      Jede Stelle ist ein Objekt:
-        x, y = relative Position (0–1) innerhalb des Bildes
-        r    = Radius (0–1), relativ zur Bildbreite
+    Jede Stelle ist ein Objekt:
+      x, y = relative Position (0–1) innerhalb des Bildes
+      r    = Radius (0–1), relativ zur Bildbreite
 
-      Diese Werte musst du zu deinem Bild anpassen.
-    */
-    const hotspots = [
-      { x: 0.23, y: 0.30, r: 0.06 }, // Unterschied 1
-      { x: 0.65, y: 0.35, r: 0.06 }, // Unterschied 2
-      { x: 0.35, y: 0.70, r: 0.06 }, // Unterschied 3
-      { x: 0.78, y: 0.78, r: 0.06 }  // Unterschied 4
-      { x: 0.23, y: 0.30, r: 0.06 }, // Unterschied 5
-      { x: 0.65, y: 0.35, r: 0.06 }, // Unterschied 6
-      { x: 0.35, y: 0.70, r: 0.06 }, // Unterschied 7
-    ];
+    Diese Werte musst du zu deinem Bild anpassen.
+  */
+  const hotspots = [
+    { x: 0.18, y: 0.22, r: 0.05 }, // Unterschied 1
+    { x: 0.40, y: 0.30, r: 0.05 }, // Unterschied 2
+    { x: 0.65, y: 0.35, r: 0.05 }, // Unterschied 3
+    { x: 0.80, y: 0.45, r: 0.05 }, // Unterschied 4
+    { x: 0.28, y: 0.65, r: 0.05 }, // Unterschied 5
+    { x: 0.55, y: 0.72, r: 0.05 }, // Unterschied 6
+    { x: 0.78, y: 0.80, r: 0.05 }  // Unterschied 7
+  ];
 
-    const found = new Array(hotspots.length).fill(false);
-    const puzzleArea = document.getElementById('puzzleArea');
-    const statusEl = document.getElementById('status');
-    const feedbackEl = document.getElementById('feedback');
-    const letterContainer = document.getElementById('letter-container');
+  const found = new Array(hotspots.length).fill(false);
+  const puzzleArea = document.getElementById('puzzleArea');
+  const statusEl = document.getElementById('status');
+  const feedbackEl = document.getElementById('feedback');
+  const letterContainer = document.getElementById('letter-container');
 
-    const FINAL_LETTER = 'n';
+  const FINAL_LETTER = 'n';
 
-    function updateStatus() {
-      const total = hotspots.length;
-      const count = found.filter(Boolean).length;
-      statusEl.textContent = `Gefundene Unterschiede: ${count} von ${total}`;
+  function updateStatus() {
+    const total = hotspots.length;
+    const count = found.filter(Boolean).length;
+    statusEl.textContent = `Gefundene Unterschiede: ${count} von ${total}`;
+  }
+
+  function showFeedback(text, isOk) {
+    feedbackEl.textContent = text;
+    feedbackEl.classList.remove('ok', 'error');
+    if (text === '') return;
+    if (isOk) {
+      feedbackEl.classList.add('ok');
+    } else {
+      feedbackEl.classList.add('error');
     }
+  }
 
-    function showFeedback(text, isOk) {
-      feedbackEl.textContent = text;
-      feedbackEl.classList.remove('ok', 'error');
-      if (text === '') return;
-      if (isOk) {
-        feedbackEl.classList.add('ok');
-      } else {
-        feedbackEl.classList.add('error');
+  function showLetter() {
+    letterContainer.style.display = 'block';
+  }
+
+  function addMarkerForHotspot(index) {
+    const hs = hotspots[index];
+    const marker = document.createElement('div');
+    marker.className = 'found-marker';
+    marker.style.left = (hs.x * 100) + '%';
+    marker.style.top = (hs.y * 100) + '%';
+    puzzleArea.appendChild(marker);
+  }
+
+  function handleHit(index) {
+    if (!found[index]) {
+      found[index] = true;
+      addMarkerForHotspot(index);
+      updateStatus();
+      showFeedback('Richtig! Gut gesehen.', true);
+
+      if (found.every(Boolean)) {
+        showLetter();
+      }
+    } else {
+      showFeedback('Den Unterschied hast du schon gefunden.', true);
+    }
+  }
+
+  function handleMiss() {
+    showFeedback('Leider falsch. Versuche es nochmal!', false);
+  }
+
+  // Klick / Tipp auf das Bild
+  puzzleArea.addEventListener('click', function (event) {
+    const rect = puzzleArea.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+
+    const relX = clickX / rect.width;
+    const relY = clickY / rect.height;
+
+    let hitIndex = -1;
+
+    for (let i = 0; i < hotspots.length; i++) {
+      const hs = hotspots[i];
+      const dx = relX - hs.x;
+      const dy = relY - hs.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= hs.r) {
+        hitIndex = i;
+        break;
       }
     }
 
-    function showLetter() {
-      letterContainer.style.display = 'block';
+    if (hitIndex >= 0) {
+      handleHit(hitIndex);
+    } else {
+      handleMiss();
     }
+  });
 
-    function addMarkerForHotspot(index) {
-      const hs = hotspots[index];
-      const marker = document.createElement('div');
-      marker.className = 'found-marker';
-      marker.style.left = (hs.x * 100) + '%';
-      marker.style.top = (hs.y * 100) + '%';
-      puzzleArea.appendChild(marker);
-    }
+  // Initial: Status setzen
+  updateStatus();
+</script>
 
-    function handleHit(index) {
-      if (!found[index]) {
-        found[index] = true;
-        addMarkerForHotspot(index);
-        updateStatus();
-        showFeedback('Richtig! Gut gesehen.', true);
-
-        if (found.every(Boolean)) {
-          showLetter();
-        }
-      } else {
-        showFeedback('Den Unterschied hast du schon gefunden.', true);
-      }
-    }
-
-    function handleMiss() {
-      showFeedback('Leider falsch. Versuche es nochmal!', false);
-    }
-
-    // Klick / Tipp auf das Bild
-    puzzleArea.addEventListener('click', function (event) {
-      const rect = puzzleArea.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-      const clickY = event.clientY - rect.top;
-
-      const relX = clickX / rect.width;
-      const relY = clickY / rect.height;
-
-      let hitIndex = -1;
-
-      for (let i = 0; i < hotspots.length; i++) {
-        const hs = hotspots[i];
-        const dx = relX - hs.x;
-        const dy = relY - hs.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance <= hs.r) {
-          hitIndex = i;
-          break;
-        }
-      }
-
-      if (hitIndex >= 0) {
-        handleHit(hitIndex);
-      } else {
-        handleMiss();
-      }
-    });
-
-    // Initial: Status setzen
-    updateStatus();
-  </script>
 </body>
 </html>
