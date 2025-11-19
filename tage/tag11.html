@@ -3,62 +3,139 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 11 – Alphabet-Frage</title>
+  <title>Tag 11 – Geschenkechaos</title>
   <link rel="stylesheet" href="../assets/style.css">
   <meta name="theme-color" content="#0b1220">
+
+  <!-- Zusätzliche Styles für Hintergrundbild & Puzzle -->
+  <style>
+    /* festes Hintergrundbild für die ganze Seite */
+    body {
+      background-image: url("assets/fox_presents.png"); /* <-- HIER dein Hintergrundbild */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed; /* bleibt stehen */
+      background-repeat: no-repeat;
+    }
+
+    /* Karte leicht transparent, damit man das Rätsel gut lesen kann */
+    .card {
+      background: rgba(11, 18, 32, 0.92); /* dunkles leicht transparentes Overlay */
+      backdrop-filter: blur(4px);
+    }
+
+    .puzzle-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .puzzle-wrapper img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+
+    .note.hidden,
+    #letterBox.hidden,
+    #solutionBox.hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body onload="adventEnsureAccess();">
   <div class="container">
     <div class="card">
       <div class="header">
-        <div class="logo"><span class="emoji">🦌</span><h1>Tag 11: Alphabet-Frage</h1></div>
+        <div class="logo">
+          <span class="emoji">🦌</span>
+          <h1>Tag 11: Geschenkechaos</h1>
+        </div>
         <a class="lock" href="../index.html">⬅︎ Zurück</a>
       </div>
+
       <p class="muted">Datum: 11.12.</p>
+
       <h2>Rätsel</h2>
-      <p>Welcher Buchstabe steht an erster Stelle im Alphabet?</p>
-      
+      <p>
+        Verbinde alle gleichfarbigen Geschenke miteinander. Du darfst die Linien
+        nur horizontal oder vertikal führen. Die Linien dürfen sich
+        <strong>nicht kreuzen</strong> und jedes Kästchen darf nur
+        <strong>einmal</strong> benutzt werden.
+      </p>
+
+      <div class="puzzle-wrapper">
+        <!-- Bild vom Rätsel -->
+        <img src="../assets/geschenkechaos.png"
+             alt="Geschenkechaos-Rätsel mit Geschenken in einem Raster">
+
+        <!-- Bild von der Lösung (zuerst versteckt) -->
+        <div id="solutionBox" class="hidden">
+          <img src="../assets/geschenkechaos-loesung.png"
+               alt="Lösung des Geschenkechaos-Rätsels">
+        </div>
+      </div>
+
       <div style="height:8px"></div>
+
       <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
+        <!-- Button: „Ich bin fertig“ – zeigt Buchstaben -->
+        <button class="btn" onclick="solve()">Ich bin fertig!</button>
+
+        <!-- Button: Lösung & Buchstabe anzeigen -->
         <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
       </div>
+
       <div id="feedback" class="note hidden"></div>
+
       <hr>
+
       <div id="letterBox" class="hidden">
         <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">A</div>
+        <div class="letter">A</div> <!-- nach Wunsch ändern -->
       </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
+      <div class="footer">
+        <small>
+          Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.
+        </small>
+      </div>
     </div>
   </div>
+
   <script src="../assets/config.js"></script>
   <script src="../assets/app.js"></script>
   <script>
-    const ANSWERS = "a";
     const TODAY_LETTER = "A";
+
     function showLetter(){
       document.getElementById('letterBox').classList.remove('hidden');
       fireConfetti();
     }
+
     function setFeedback(msg, ok){
       const box = document.getElementById('feedback');
       box.textContent = msg;
       box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+      if(ok){
+        box.classList.add('success');
+      } else {
+        box.classList.remove('success');
+      }
     }
+
+    // Wird geklickt, wenn jemand meint fertig zu sein
     function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
+      setFeedback("Super! Wenn du fertig bist, kannst du dir den Buchstaben notieren. 🎁", true);
+      showLetter();
     }
+
+    // Zeigt die Lösungsgrafik + Buchstaben
     function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
+      document.getElementById('solutionBox').classList.remove('hidden');
+      setFeedback("Hier siehst du eine mögliche Lösung. Wichtig ist nur, dass sich die Linien nicht kreuzen. ✨", true);
       showLetter();
     }
   </script>
