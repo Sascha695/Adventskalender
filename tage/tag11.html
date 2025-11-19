@@ -167,7 +167,6 @@
     /* Pfad-Farben */
     .path-red    { background:#ffe0e0; }
     .path-blue   { background:#e0ecff; }
-    .path-green  { background:#e3f5e5; }
     .path-yellow { background:#fff9dc; }
     .path-purple { background:#f4e6ff; }
     .path-orange { background:#ffe9d6; }
@@ -272,13 +271,7 @@
         // Nutzer: (3,3) und (8,6)
         positions: [ {x:2,y:2}, {x:7,y:5} ]
       },
-      {
-        id: 'green',
-        cssClass: 'path-green',
-        img: 'assets/gift_green.png',
-        // unverändert
-        positions: [ {x:3,y:0}, {x:4,y:5} ]
-      },
+      
       {
         id: 'yellow',
         cssClass: 'path-yellow',
@@ -374,7 +367,7 @@
 
       Array.from(gridEl.children).forEach(cell => {
         cell.classList.remove(
-          'path-red','path-blue','path-green',
+          'path-red','path-blue',
           'path-yellow','path-purple','path-orange',
           'path-pink','path-white',
           'on-path','current-step'
