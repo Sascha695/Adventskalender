@@ -2,34 +2,40 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Adventskalender Tag 9 – Finde die Unterschiede</title>
+
   <style>
-    /* --- Allgemeines Layout & Hintergrund --- */
+    /* ===================== Ebene 1: festes Hintergrundbild ===================== */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: url("assets/cozy_fire_place.png") center center / cover no-repeat;
+      z-index: -2; /* ganz hinten */
+    }
+
+    /* ===================== Grundlayout & Schrift ===================== */
     * {
       box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
     }
 
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fdfdfd;
-      /* Standard-Hintergrund, falls keins hochgeladen wurde */
-      background: linear-gradient(135deg, #1b2735 0%, #090a0f 100%);
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-attachment: fixed; /* Hintergrund bleibt stehen */
+      background: transparent; /* kein weiteres Hintergrundbild, das macht die bg-layer */
+      overflow-x: hidden;
     }
 
     header, footer {
       text-align: center;
       padding: 1rem;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.6rem;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.35);
     }
 
     footer a {
@@ -42,11 +48,13 @@
       text-decoration: underline;
     }
 
-    /* --- Inhalt --- */
+    /* ===================== Inhaltsebene (scrollt) ===================== */
     .page-wrapper {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      z-index: 0; /* vor dem Hintergrund */
     }
 
     main {
@@ -59,7 +67,7 @@
     .puzzle-container {
       width: 100%;
       max-width: 800px;
-      margin: 0 auto;
+      margin: 0 auto 2rem;
       background: rgba(255, 255, 255, 0.95);
       color: #333;
       border-radius: 16px;
@@ -79,30 +87,7 @@
       text-align: center;
     }
 
-    /* --- Upload-Bereich --- */
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .control-group label {
-      font-weight: 600;
-    }
-
-    input[type="file"] {
-      font-size: 0.85rem;
-    }
-
-    /* --- Puzzlebild & Interaktion --- */
+    /* ===================== Puzzlebild & Interaktion ===================== */
     .puzzle-area {
       position: relative;
       margin: 0 auto 0.75rem;
@@ -135,7 +120,7 @@
       background: rgba(46, 204, 113, 0.25);
     }
 
-    /* --- Feedback & Status --- */
+    /* ===================== Feedback & Status ===================== */
     .status {
       text-align: center;
       margin-bottom: 0.5rem;
@@ -189,6 +174,10 @@
   </style>
 </head>
 <body>
+  <!-- Ebene 1: festes Hintergrundbild -->
+  <div class="bg-layer"></div>
+
+  <!-- Ebene 2: Inhalt (scrollt) -->
   <div class="page-wrapper">
     <header>
       <h1>Tag&nbsp;9 – Finde die Unterschiede</h1>
@@ -203,27 +192,9 @@
           Meldung.
         </p>
 
-        <section class="controls">
-          <div class="control-group">
-            <label for="imageUpload">Eigenes Rätselbild verwenden:</label>
-            <input type="file" id="assets/unterschiede.png" accept="image/*">
-            <small>
-              Hinweis: Wenn du ein eigenes Bild nutzt, müssen die „Trefferpunkte“ im JavaScript-Code angepasst werden,
-              damit sie zu deinem Bild passen.
-            </small>
-          </div>
-
-          <div class="control-group">
-            <label for="bgUpload">Eigenes Hintergrundbild wählen:</label>
-            <input type="file" id="assets/cozy_fire_place.png" accept="image/*">
-            <small>Der Hintergrund bleibt fest stehen, während du die Seite nach unten scrollst.</small>
-          </div>
-        </section>
-
         <div id="puzzleArea" class="puzzle-area">
-          <!-- Standardbild (kannst du natürlich durch dein eigenes ersetzen) -->
-          <!-- Wichtig: Pfad anpassen oder eigenes Bild einfügen -->
-          <img id="puzzleImage" src="assets/spot-the-difference-example.jpg" alt="Finde die Unterschiede">
+          <!-- Fest eingebautes Rätselbild -->
+          <img id="puzzleImage" src="assets/unterschiede.png" alt="Finde die Unterschiede">
         </div>
 
         <p id="status" class="status"></p>
@@ -232,7 +203,7 @@
         <div id="letter-container" class="letter-container">
           <p>Super, du hast alle Unterschiede gefunden!</p>
           <p>Dein Buchstabe:</p>
-          <div class="letter" id="letter">T</div>
+          <div class="letter" id="letter">n</div>
           <p>Merke dir diesen Buchstaben!</p>
         </div>
       </div>
@@ -249,12 +220,9 @@
 
       Jede Stelle ist ein Objekt:
         x, y = relative Position (0–1) innerhalb des Bildes
-        r     = Radius (0–1), also relativ zur Breite des Bildes
+        r    = Radius (0–1), relativ zur Bildbreite
 
-      Beispiel: { x: 0.25, y: 0.4, r: 0.06 }
-      bedeutet: ein Kreis bei 25% Breite / 40% Höhe mit Radius 6% der Bildbreite.
-
-      Diese Werte musst du anpassen, wenn du ein anderes Rätselbild nutzt.
+      Diese Werte musst du zu deinem Bild anpassen.
     */
     const hotspots = [
       { x: 0.23, y: 0.30, r: 0.06 }, // Unterschied 1
@@ -265,16 +233,10 @@
 
     const found = new Array(hotspots.length).fill(false);
     const puzzleArea = document.getElementById('puzzleArea');
-    const puzzleImage = document.getElementById('puzzleImage');
     const statusEl = document.getElementById('status');
     const feedbackEl = document.getElementById('feedback');
     const letterContainer = document.getElementById('letter-container');
-    const letterEl = document.getElementById('letter');
 
-    const imageUpload = document.getElementById('imageUpload');
-    const bgUpload = document.getElementById('bgUpload');
-
-    // Buchstabe für dieses Türchen
     const FINAL_LETTER = 'n';
 
     function updateStatus() {
@@ -286,6 +248,7 @@
     function showFeedback(text, isOk) {
       feedbackEl.textContent = text;
       feedbackEl.classList.remove('ok', 'error');
+      if (text === '') return;
       if (isOk) {
         feedbackEl.classList.add('ok');
       } else {
@@ -294,7 +257,6 @@
     }
 
     function showLetter() {
-      letterEl.textContent = FINAL_LETTER;
       letterContainer.style.display = 'block';
     }
 
@@ -302,7 +264,6 @@
       const hs = hotspots[index];
       const marker = document.createElement('div');
       marker.className = 'found-marker';
-      // Position in Prozent, damit es mit skaliert
       marker.style.left = (hs.x * 100) + '%';
       marker.style.top = (hs.y * 100) + '%';
       puzzleArea.appendChild(marker);
@@ -315,12 +276,10 @@
         updateStatus();
         showFeedback('Richtig! Gut gesehen.', true);
 
-        const allFound = found.every(Boolean);
-        if (allFound) {
+        if (found.every(Boolean)) {
           showLetter();
         }
       } else {
-        // Bereits gefunden
         showFeedback('Den Unterschied hast du schon gefunden.', true);
       }
     }
@@ -340,7 +299,6 @@
 
       let hitIndex = -1;
 
-      // prüfen, ob Klick in der Nähe eines Hotspots liegt
       for (let i = 0; i < hotspots.length; i++) {
         const hs = hotspots[i];
         const dx = relX - hs.x;
@@ -358,46 +316,6 @@
       } else {
         handleMiss();
       }
-    });
-
-    // Eigenes Rätselbild hochladen
-    imageUpload.addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        puzzleImage.src = e.target.result;
-
-        // Hinweis: Hotspots bleiben gleich! Für ein wirklich neues Rätsel
-        // sollten sie im Code angepasst werden.
-        // Optional: gefundene Marker zurücksetzen
-        while (puzzleArea.querySelector('.found-marker')) {
-          puzzleArea.removeChild(puzzleArea.querySelector('.found-marker'));
-        }
-        for (let i = 0; i < found.length; i++) {
-          found[i] = false;
-        }
-        letterContainer.style.display = 'none';
-        showFeedback('', false);
-        updateStatus();
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Eigenes Hintergrundbild hochladen
-    bgUpload.addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        document.body.style.backgroundImage = `url('${e.target.result}')`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundRepeat = 'no-repeat';
-        document.body.style.backgroundAttachment = 'fixed'; // sicherheitshalber nochmal
-      };
-      reader.readAsDataURL(file);
     });
 
     // Initial: Status setzen
