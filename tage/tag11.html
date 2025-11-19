@@ -1,143 +1,571 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 11 – Geschenkechaos</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tag 11: Geschenkchaos</title>
 
-  <!-- Zusätzliche Styles für Hintergrundbild & Puzzle -->
   <style>
-    /* festes Hintergrundbild für die ganze Seite */
-    body {
-      background-image: url("assets/fox_presents.png"); /* <-- HIER dein Hintergrundbild */
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed; /* bleibt stehen */
-      background-repeat: no-repeat;
+    :root{
+      --accent: #c54c3d;
+      --found: #12884b;
+
+      /* >>> HINTERGRUNDBILD HIER ANPASSEN <<< */
+      --bg-image: url('assets/fox_presents.png');
+      --bg-size:  cover;
+      --bg-pos-x: 50%;
+      --bg-pos-y: 50%;
+      --bg-opacity: 0.9;
     }
 
-    /* Karte leicht transparent, damit man das Rätsel gut lesen kann */
-    .card {
-      background: rgba(11, 18, 32, 0.92); /* dunkles leicht transparentes Overlay */
-      backdrop-filter: blur(4px);
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:#f7efe6;
+      color:#222;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      position:relative;
     }
 
-    .puzzle-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+    /* Fixes Hintergrundbild hinter allem */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image: var(--bg-image);
+      background-repeat:no-repeat;
+      background-size: var(--bg-size);
+      background-position: var(--bg-pos-x) var(--bg-pos-y);
+      opacity: var(--bg-opacity);
+      z-index:0;
+      pointer-events:none;
     }
 
-    .puzzle-wrapper img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    header, main, section{ position:relative; z-index:1; }
+
+    header{
+      text-align:center;
+      background:#c54c3d;
+      color:#fff;
+      padding:1rem .75rem;
+      box-shadow:0 4px 10px rgba(0,0,0,.25);
+    }
+    header h1{ margin:0; font-size:2rem; }
+
+    .story{
+      max-width:800px;
+      margin:1rem auto;
+      padding:1rem 1.2rem;
+      background:rgba(255,255,255,.92);
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 6px 16px rgba(0,0,0,.16);
+    }
+    .story p{
+      font-size:1.05rem;
+      line-height:1.6;
+      margin:.4rem 0;
     }
 
-    .note.hidden,
-    #letterBox.hidden,
-    #solutionBox.hidden {
-      display: none;
-    }
-  </style>
-</head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo">
-          <span class="emoji">🦌</span>
-          <h1>Tag 11: Geschenkechaos</h1>
-        </div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-
-      <p class="muted">Datum: 11.12.</p>
-
-      <h2>Rätsel</h2>
-      <p>
-        Verbinde alle gleichfarbigen Geschenke miteinander. Du darfst die Linien
-        nur horizontal oder vertikal führen. Die Linien dürfen sich
-        <strong>nicht kreuzen</strong> und jedes Kästchen darf nur
-        <strong>einmal</strong> benutzt werden.
-      </p>
-
-      <div class="puzzle-wrapper">
-        <!-- Bild vom Rätsel -->
-        <img src="../assets/geschenkechaos.png"
-             alt="Geschenkechaos-Rätsel mit Geschenken in einem Raster">
-
-        <!-- Bild von der Lösung (zuerst versteckt) -->
-        <div id="solutionBox" class="hidden">
-          <img src="../assets/geschenkechaos-loesung.png"
-               alt="Lösung des Geschenkechaos-Rätsels">
-        </div>
-      </div>
-
-      <div style="height:8px"></div>
-
-      <div class="row wrap">
-        <!-- Button: „Ich bin fertig“ – zeigt Buchstaben -->
-        <button class="btn" onclick="solve()">Ich bin fertig!</button>
-
-        <!-- Button: Lösung & Buchstabe anzeigen -->
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-
-      <div id="feedback" class="note hidden"></div>
-
-      <hr>
-
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">A</div> <!-- nach Wunsch ändern -->
-      </div>
-
-      <div class="footer">
-        <small>
-          Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.
-        </small>
-      </div>
-    </div>
-  </div>
-
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
-  <script>
-    const TODAY_LETTER = "A";
-
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    main{
+      max-width:1100px;
+      margin:1rem auto 2rem;
+      padding:0 1rem 1.5rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
     }
 
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){
-        box.classList.add('success');
-      } else {
-        box.classList.remove('success');
+    .wrap{
+      width:100%;
+      display:grid;
+      grid-template-columns: minmax(260px,1fr) min(92vw,520px);
+      gap:1rem;
+      align-items:start;
+      justify-content:center;
+      justify-items:center;
+    }
+    @media (max-width:900px){
+      .wrap{
+        grid-template-columns: 1fr;
       }
     }
 
-    // Wird geklickt, wenn jemand meint fertig zu sein
-    function solve(){
-      setFeedback("Super! Wenn du fertig bist, kannst du dir den Buchstaben notieren. 🎁", true);
-      showLetter();
+    .card{
+      background:rgba(255,255,255,.9);
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
+      padding:1rem 1.2rem;
     }
 
-    // Zeigt die Lösungsgrafik + Buchstaben
-    function reveal(){
-      document.getElementById('solutionBox').classList.remove('hidden');
-      setFeedback("Hier siehst du eine mögliche Lösung. Wichtig ist nur, dass sich die Linien nicht kreuzen. ✨", true);
-      showLetter();
+    .card h2{
+      margin-top:0;
+      font-size:1.35rem;
+      color:#b4382c;
     }
+
+    .rules ul{
+      padding-left:1.1rem;
+      margin:.4rem 0;
+      font-size:.98rem;
+    }
+
+    .rules li{ margin:.25rem 0; }
+
+    .status-line{
+      margin-top:.7rem;
+      font-weight:600;
+      font-size:.95rem;
+      color:#444;
+    }
+
+    /* =====================
+       GITTER
+       ===================== */
+    .grid{
+      user-select:none;
+      touch-action:none;
+      display:grid;
+      grid-template-columns:repeat(var(--size),1fr);
+      grid-template-rows:repeat(var(--size),1fr);
+      width:min(92vw,520px);
+      aspect-ratio:1/1;
+      background:#0c5731;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 10px 25px rgba(0,0,0,.35);
+    }
+
+    .cell{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fffdf7;
+      box-shadow:
+        inset 0 1px 0 rgba(0,0,0,.2),
+        inset 1px 0 0 rgba(0,0,0,.2);
+      transition: background .12s ease, transform .12s ease;
+      font-size:0; /* keine Buchstaben anzeigen, nur Bilder/Farben */
+    }
+
+    .cell.gift::after{
+      content:"";
+      position:absolute;
+      inset:10%;
+      border-radius:9px;
+      border:2px solid rgba(0,0,0,.12);
+      box-shadow:0 3px 6px rgba(0,0,0,.15);
+      background:#fff;
+    }
+
+    .gift-icon{
+      position:relative;
+      width:70%;
+      height:70%;
+      object-fit:contain;
+      z-index:1;
+    }
+
+    /* Pfad-Farben (einfach anpassbar) */
+    .path-red    { background:#ffe0e0; }
+    .path-blue   { background:#e0ecff; }
+    .path-green  { background:#e3f5e5; }
+    .path-yellow { background:#fff9dc; }
+    .path-purple { background:#f4e6ff; }
+    .path-orange { background:#ffe9d6; }
+
+    /* Start-/Endzelle leicht hervorheben */
+    .cell.gift.on-path{
+      transform:scale(1.04);
+    }
+
+    .cell.current-step{
+      box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,.3),
+        0 0 0 3px rgba(255,255,255,.5);
+    }
+
+    .success-msg{
+      margin-top:.8rem;
+      font-weight:700;
+      color:var(--found);
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      background:var(--accent);
+      color:#fff;
+      padding:.55rem 1rem;
+      border-radius:10px;
+      font-weight:700;
+      box-shadow:0 4px 14px rgba(0,0,0,.28);
+      margin-top:.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Tag 11: Geschenkchaos</h1>
+  </header>
+
+  <!-- Story / Einleitung -->
+  <section class="story">
+    <p>
+      Geschenkdieb Gerd schleicht durch die Weihnachtswerkstatt. Überall liegen bunte Päckchen verstreut –
+      und damit das Chaos nicht vollkommen ausbricht, musst du die Geschenke retten!
+    </p>
+    <p>
+      Verbinde immer zwei Geschenke <strong>derselben Farbe</strong> miteinander, indem du mit dem Finger
+      (oder der Maus) einen Weg über die Felder zeichnest. Aber Vorsicht: Wege
+      dürfen sich nicht kreuzen, und jedes Kästchen darf nur von <strong>einer</strong> Farbe benutzt werden.
+    </p>
+  </section>
+
+  <main>
+    <div class="wrap">
+
+      <!-- Linke Karte: Regeln & Infos -->
+      <section class="card rules">
+        <h2>So funktioniert’s</h2>
+        <ul>
+          <li>Tippe eines der Geschenke an, um mit dieser Farbe zu starten.</li>
+          <li>Ziehe mit dem Finger (oder der Maus) von Feld zu Feld – nur oben, unten, links oder rechts.</li>
+          <li>Erreiche das zweite Geschenk derselben Farbe, ohne andere Wege zu berühren.</li>
+          <li>Wenn eine Farbe falsch verbunden wurde, tippe eines ihrer Geschenke an, um den Weg zu löschen.</li>
+        </ul>
+        <p class="status-line">
+          Verbundene Farben: <span id="statusCount">0</span>/<span id="statusTotal">0</span>
+        </p>
+        <button class="btn" id="resetBtn">Rätsel neu mischen</button>
+        <div class="success-msg" id="successMsg"></div>
+      </section>
+
+      <!-- Rechte Karte: Gitter -->
+      <section class="card">
+        <div id="grid" class="grid" aria-label="Geschenke verbinden"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // ===============================
+    // KONFIGURATION DES RÄTSELS
+    // ===============================
+    const SIZE = 8;                           // 8x8-Feld
+    const gridEl = document.getElementById('grid');
+    const statusCountEl = document.getElementById('statusCount');
+    const statusTotalEl = document.getElementById('statusTotal');
+    const successMsgEl = document.getElementById('successMsg');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Farben / Bilder / Positionen – hier kannst du Bilder & Koordinaten anpassen
+    // Koordinaten: (x,y) mit 0 = links/oben
+    const GIFT_PAIRS = [
+      {
+        id: 'red',
+        cssClass: 'path-red',
+        img: 'assets/gift_red.png',
+        positions: [ {x:1,y:0}, {x:6,y:7} ]
+      },
+      {
+        id: 'blue',
+        cssClass: 'path-blue',
+        img: 'assets/gift_blue.png',
+        positions: [ {x:5,y:1}, {x:0,y:6} ]
+      },
+      {
+        id: 'green',
+        cssClass: 'path-green',
+        img: 'assets/gift_green.png',
+        positions: [ {x:3,y:0}, {x:4,y:5} ]
+      },
+      {
+        id: 'yellow',
+        cssClass: 'path-yellow',
+        img: 'assets/gift_yellow.png',
+        positions: [ {x:7,y:2}, {x:2,y:7} ]
+      },
+      {
+        id: 'purple',
+        cssClass: 'path-purple',
+        img: 'assets/gift_purple.png',
+        positions: [ {x:1,y:3}, {x:5,y:5} ]
+      },
+      {
+        id: 'orange',
+        cssClass: 'path-orange',
+        img: 'assets/gift_orange.png',
+        positions: [ {x:6,y:0}, {x:3,y:6} ]
+      }
+    ];
+
+    // ===============================
+    // DATENSTRUKTUREN
+    // ===============================
+    let gridData;        // Infos über Geschenke / leere Felder
+    let pathOwner;       // pathOwner[y][x] = Farb-ID, die dieses Feld benutzt (oder null)
+    let completedColors; // Set mit bereits verbundenen Farben
+
+    // Zustand beim Zeichnen
+    let drawing = false;
+    let currentColor = null;       // Farb-ID
+    let currentCssClass = null;    // zugehörige CSS-Klasse
+    let currentPathCells = [];     // [{x,y},...]
+
+    // ===============================
+    // GITTER AUFBAUEN
+    // ===============================
+    function initGridData(){
+      gridData = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
+
+      // Geschenke setzen
+      for(const pair of GIFT_PAIRS){
+        for(const pos of pair.positions){
+          gridData[pos.y][pos.x] = {
+            type:'gift',
+            color: pair.id,
+            cssClass: pair.cssClass,
+            img: pair.img
+          };
+        }
+      }
+    }
+
+    function renderGrid(){
+      gridEl.innerHTML = '';
+      gridEl.style.setProperty('--size', SIZE);
+
+      for(let y=0;y<SIZE;y++){
+        for(let x=0;x<SIZE;x++){
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          cell.dataset.x = x;
+          cell.dataset.y = y;
+
+          const info = gridData[y][x];
+          if(info && info.type === 'gift'){
+            cell.classList.add('gift');
+            const img = document.createElement('img');
+            img.src = info.img;
+            img.alt = info.color + 'es Geschenk';
+            img.className = 'gift-icon';
+            cell.appendChild(img);
+          }
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function resetPaths(){
+      pathOwner = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
+      completedColors = new Set();
+      statusCountEl.textContent = '0';
+      statusTotalEl.textContent = GIFT_PAIRS.length;
+      successMsgEl.textContent = '';
+
+      // alle Farbhintergründe entfernen
+      Array.from(gridEl.children).forEach(cell => {
+        cell.classList.remove(
+          'path-red','path-blue','path-green',
+          'path-yellow','path-purple','path-orange',
+          'on-path','current-step'
+        );
+      });
+    }
+
+    // ===============================
+    // HILFSFUNKTIONEN
+    // ===============================
+    function vibrate(ms){
+      try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){}
+    }
+
+    function cellFromPointerEvent(e){
+      const rect = gridEl.getBoundingClientRect();
+      const cw = rect.width / SIZE;
+      const ch = rect.height / SIZE;
+      let gx = Math.floor((e.clientX - rect.left)/cw);
+      let gy = Math.floor((e.clientY - rect.top)/ch);
+      if(isNaN(gx) || isNaN(gy)) return null;
+      gx = Math.max(0, Math.min(SIZE-1, gx));
+      gy = Math.max(0, Math.min(SIZE-1, gy));
+      const el = gridEl.children[gy*SIZE + gx];
+      return {x:gx,y:gy,el};
+    }
+
+    function neighbours(a,b){
+      const dx = Math.abs(a.x - b.x);
+      const dy = Math.abs(a.y - b.y);
+      return (dx + dy === 1);
+    }
+
+    function clearColorPath(colorId){
+      for(let y=0;y<SIZE;y++){
+        for(let x=0;x<SIZE;x++){
+          if(pathOwner[y][x] === colorId){
+            pathOwner[y][x] = null;
+            const cellEl = gridEl.children[y*SIZE+x];
+            const pairConf = GIFT_PAIRS.find(p=>p.id===colorId);
+            if(pairConf){
+              cellEl.classList.remove(pairConf.cssClass,'on-path','current-step');
+            }
+          }
+        }
+      }
+      completedColors.delete(colorId);
+      statusCountEl.textContent = completedColors.size;
+    }
+
+    function applyPathClass(x,y,colorId,cssClass){
+      const cellEl = gridEl.children[y*SIZE+x];
+      cellEl.classList.add(cssClass);
+      pathOwner[y][x] = colorId;
+    }
+
+    function allColorsCompleted(){
+      return completedColors.size === GIFT_PAIRS.length;
+    }
+
+    // ===============================
+    // ZEICHEN-LOGIK
+    // ===============================
+    let activePointerId = null;
+
+    function pointerDown(e){
+      if(e.button !== undefined && e.button !== 0) return;
+      const target = e.target.closest('.cell');
+      if(!target) return;
+
+      const x = +target.dataset.x;
+      const y = +target.dataset.y;
+      const info = gridData[y][x];
+
+      if(!info || info.type !== 'gift') return;
+
+      // ggf. vorhandenen Pfad dieser Farbe löschen
+      clearColorPath(info.color);
+
+      drawing = true;
+      activePointerId = e.pointerId;
+      currentColor = info.color;
+      currentCssClass = info.cssClass;
+      currentPathCells = [];
+
+      // Startzelle hinzufügen
+      currentPathCells.push({x,y});
+      applyPathClass(x,y,currentColor,currentCssClass);
+      target.classList.add('on-path','current-step');
+      vibrate(15);
+
+      gridEl.setPointerCapture(activePointerId);
+      e.preventDefault();
+    }
+
+    function pointerMove(e){
+      if(!drawing || e.pointerId !== activePointerId) return;
+
+      const cellInfo = cellFromPointerEvent(e);
+      if(!cellInfo) return;
+      const {x,y,el} = cellInfo;
+
+      const last = currentPathCells[currentPathCells.length-1];
+      if(last.x === x && last.y === y) return; // schon da
+
+      // nur Nachbarzellen erlauben
+      if(!neighbours(last, {x,y})) return;
+
+      // andere Farbe blockiert dieses Feld?
+      const owner = pathOwner[y][x];
+      if(owner && owner !== currentColor) return;
+
+      const cellData = gridData[y][x];
+      if(cellData && cellData.type === 'gift' && cellData.color !== currentColor){
+        return; // fremdes Geschenk
+      }
+
+      // neue Zelle in Pfad übernehmen
+      currentPathCells.push({x,y});
+      applyPathClass(x,y,currentColor,currentCssClass);
+
+      // Start- und End-Geschenke auf dem Pfad hervorheben
+      const prevEl = gridEl.children[last.y*SIZE+last.x];
+      prevEl.classList.remove('current-step');
+      el.classList.add('current-step');
+      if(cellData && cellData.type==='gift'){
+        el.classList.add('on-path');
+      }
+    }
+
+    function pointerUp(e){
+      if(!drawing || e.pointerId !== activePointerId) return;
+      gridEl.releasePointerCapture(activePointerId);
+
+      const last = currentPathCells[currentPathCells.length-1];
+      const info = gridData[last.y][last.x];
+
+      if(info && info.type==='gift' && info.color===currentColor){
+        // Haben wir beide Geschenke dieser Farbe im Pfad?
+        const pair = GIFT_PAIRS.find(p=>p.id===currentColor);
+        const posA = pair.positions[0];
+        const posB = pair.positions[1];
+
+        const foundA = currentPathCells.some(c=>c.x===posA.x && c.y===posA.y);
+        const foundB = currentPathCells.some(c=>c.x===posB.x && c.y===posB.y);
+
+        if(foundA && foundB){
+          completedColors.add(currentColor);
+          statusCountEl.textContent = completedColors.size;
+          vibrate(30);
+        } else {
+          // nicht beide Enden erwischt -> Pfad zurücksetzen
+          clearColorPath(currentColor);
+        }
+      } else {
+        // Kein Geschenk am Ende -> Pfad zurücksetzen
+        clearColorPath(currentColor);
+      }
+
+      drawing = false;
+      activePointerId = null;
+      currentColor = null;
+      currentCssClass = null;
+      currentPathCells = [];
+
+      // aktuelle Hervorhebung entfernen
+      Array.from(gridEl.children).forEach(c => c.classList.remove('current-step'));
+
+      if(allColorsCompleted()){
+        successMsgEl.textContent =
+          'Hurra! Alle Geschenke sind verbunden. Geschenkdieb Gerd hat keine Chance mehr!';
+      }
+    }
+
+    function addEvents(){
+      gridEl.addEventListener('pointerdown', pointerDown, {passive:false});
+      gridEl.addEventListener('pointermove', pointerMove, {passive:false});
+      gridEl.addEventListener('pointerup',   pointerUp,   {passive:false});
+      gridEl.addEventListener('pointercancel', pointerUp, {passive:false});
+    }
+
+    // ===============================
+    // INITIALISIERUNG
+    // ===============================
+    function init(){
+      initGridData();
+      renderGrid();
+      resetPaths();
+    }
+
+    resetBtn.addEventListener('click', init);
+
+    addEvents();
+    init();
   </script>
 </body>
 </html>
