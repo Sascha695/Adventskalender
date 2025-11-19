@@ -9,7 +9,6 @@
     :root{
       --accent: #c54c3d;
       --found: #12884b;
-
       /* >>> HINTERGRUNDBILD HIER ANPASSEN <<< */
       --bg-image: url('assets/fox_presents.png');
       --bg-size:  cover;
@@ -21,7 +20,7 @@
     html,body{height:100%}
     body{
       margin:0;
-      padding: 100hv
+      padding: 0;               /* keine „Misch“-Logik nötig */
       background:#f7efe6;
       color:#222;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -217,7 +216,7 @@
   <!-- Story / Einleitung -->
   <section class="story">
     <p>
-      Die Geschenkproduktion ist in vollem Gange. Leider hat sich Gerd der Fuchs in die Geschenkefabrik vom Weihnachtsmann 
+      Die Geschenkproduktion ist in vollem Gange. Leider hat sich Gerd der Fuchs in die Geschenkefabrik vom Weihnachtsmann
       hereingeschlichen und bringt alle Geschenke durcheinander.
       Damit das Chaos nicht vollkommen ausbricht, musst du die Geschenke retten!
     </p>
@@ -243,7 +242,8 @@
         <p class="status-line">
           Verbundene Farben: <span id="statusCount">0</span>/<span id="statusTotal">0</span>
         </p>
-        <button class="btn" id="resetBtn">Rätsel neu mischen</button>
+        <!-- Button löscht nur die Pfade, Layout bleibt gleich -->
+        <button class="btn" id="resetBtn">Alle Wege löschen</button>
         <div class="success-msg" id="successMsg"></div>
       </section>
 
@@ -266,7 +266,7 @@
     const successMsgEl = document.getElementById('successMsg');
     const resetBtn = document.getElementById('resetBtn');
 
-    // Farben / Bilder / Positionen – hier kannst du Bilder & Koordinaten anpassen
+    // Feste Positionen – genau wie in deiner Vorlage
     // Koordinaten: (x,y) mit 0 = links/oben
     const GIFT_PAIRS = [
       {
@@ -326,7 +326,7 @@
     function initGridData(){
       gridData = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
 
-      // Geschenke setzen
+      // Geschenke setzen (immer gleich)
       for(const pair of GIFT_PAIRS){
         for(const pos of pair.positions){
           gridData[pos.y][pos.x] = {
@@ -559,12 +559,13 @@
     // INITIALISIERUNG
     // ===============================
     function init(){
-      initGridData();
-      renderGrid();
-      resetPaths();
+      initGridData();  // feste Vorlage
+      renderGrid();    // Gitter mit Geschenken
+      resetPaths();    // aber keine Mischung
     }
 
-    resetBtn.addEventListener('click', init);
+    // Button: nur Wege löschen, kein neues Layout
+    resetBtn.addEventListener('click', resetPaths);
 
     addEvents();
     init();
