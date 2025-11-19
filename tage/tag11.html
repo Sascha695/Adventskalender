@@ -20,14 +20,13 @@
     html,body{height:100%}
     body{
       margin:0;
-      padding: 0;               /* keine „Misch“-Logik nötig */
+      padding: 0;
       background:#f7efe6;
       color:#222;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       position:relative;
     }
 
-    /* Fixes Hintergrundbild hinter allem */
     body::before{
       content:"";
       position:fixed;
@@ -120,9 +119,6 @@
       color:#444;
     }
 
-    /* =====================
-       GITTER
-       ===================== */
     .grid{
       user-select:none;
       touch-action:none;
@@ -147,7 +143,7 @@
         inset 0 1px 0 rgba(0,0,0,.2),
         inset 1px 0 0 rgba(0,0,0,.2);
       transition: background .12s ease, transform .12s ease;
-      font-size:0; /* keine Buchstaben anzeigen, nur Bilder/Farben */
+      font-size:0;
     }
 
     .cell.gift::after{
@@ -168,15 +164,16 @@
       z-index:1;
     }
 
-    /* Pfad-Farben (einfach anpassbar) */
+    /* Pfad-Farben */
     .path-red    { background:#ffe0e0; }
     .path-blue   { background:#e0ecff; }
     .path-green  { background:#e3f5e5; }
     .path-yellow { background:#fff9dc; }
     .path-purple { background:#f4e6ff; }
     .path-orange { background:#ffe9d6; }
+    .path-pink   { background:#ffe0f4; }
+    .path-white  { background:#f2f2f2; }
 
-    /* Start-/Endzelle leicht hervorheben */
     .cell.gift.on-path{
       transform:scale(1.04);
     }
@@ -213,7 +210,6 @@
     <h1>Tag 11: Geschenkchaos</h1>
   </header>
 
-  <!-- Story / Einleitung -->
   <section class="story">
     <p>
       Die Geschenkproduktion ist in vollem Gange. Leider hat sich Gerd der Fuchs in die Geschenkefabrik vom Weihnachtsmann
@@ -230,7 +226,6 @@
   <main>
     <div class="wrap">
 
-      <!-- Linke Karte: Regeln & Infos -->
       <section class="card rules">
         <h2>So funktioniert’s</h2>
         <ul>
@@ -242,12 +237,10 @@
         <p class="status-line">
           Verbundene Farben: <span id="statusCount">0</span>/<span id="statusTotal">0</span>
         </p>
-        <!-- Button löscht nur die Pfade, Layout bleibt gleich -->
         <button class="btn" id="resetBtn">Alle Wege löschen</button>
         <div class="success-msg" id="successMsg"></div>
       </section>
 
-      <!-- Rechte Karte: Gitter -->
       <section class="card">
         <div id="grid" class="grid" aria-label="Geschenke verbinden"></div>
       </section>
@@ -256,77 +249,85 @@
   </main>
 
   <script>
-    // ===============================
-    // KONFIGURATION DES RÄTSELS
-    // ===============================
-    const SIZE = 8;                           // 8x8-Feld
+    const SIZE = 8;
     const gridEl = document.getElementById('grid');
     const statusCountEl = document.getElementById('statusCount');
     const statusTotalEl = document.getElementById('statusTotal');
     const successMsgEl = document.getElementById('successMsg');
     const resetBtn = document.getElementById('resetBtn');
 
-    // Feste Positionen – genau wie in deiner Vorlage
-    // Koordinaten: (x,y) mit 0 = links/oben
+    // Koordinaten: (x,y) intern 0–7, 0 = links/oben
     const GIFT_PAIRS = [
       {
         id: 'red',
         cssClass: 'path-red',
         img: 'assets/gift.png',
-        positions: [ {x:1,y:0}, {x:6,y:7} ]
+        // Nutzer: (2,8) und (7,8)
+        positions: [ {x:1,y:7}, {x:6,y:7} ]
       },
       {
         id: 'blue',
         cssClass: 'path-blue',
         img: 'assets/gift_blue.png',
-        positions: [ {x:5,y:1}, {x:0,y:6} ]
+        // Nutzer: (3,3) und (8,6)
+        positions: [ {x:2,y:2}, {x:7,y:5} ]
       },
       {
         id: 'green',
         cssClass: 'path-green',
         img: 'assets/gift_green.png',
+        // unverändert
         positions: [ {x:3,y:0}, {x:4,y:5} ]
       },
       {
         id: 'yellow',
         cssClass: 'path-yellow',
         img: 'assets/gift_yellow.png',
-        positions: [ {x:7,y:2}, {x:2,y:7} ]
+        // Nutzer: (1,8) und (4,6)
+        positions: [ {x:0,y:7}, {x:3,y:5} ]
       },
       {
         id: 'purple',
         cssClass: 'path-purple',
         img: 'assets/gift_purple.png',
-        positions: [ {x:1,y:3}, {x:5,y:5} ]
+        // Nutzer: (2,1) und (3,5)
+        positions: [ {x:1,y:0}, {x:2,y:4} ]
       },
       {
         id: 'orange',
         cssClass: 'path-orange',
         img: 'assets/gift_orange.png',
-        positions: [ {x:6,y:0}, {x:3,y:6} ]
+        // Nutzer: (4,2) und (7,2)
+        positions: [ {x:3,y:1}, {x:6,y:1} ]
+      },
+      {
+        id: 'pink',
+        cssClass: 'path-pink',
+        img: 'assets/gift_pink.png',
+        // Nutzer: (8,5) und (8,8)
+        positions: [ {x:7,y:4}, {x:7,y:7} ]
+      },
+      {
+        id: 'white',
+        cssClass: 'path-white',
+        img: 'assets/gift_white.png',
+        // Nutzer: (2,7) und (4,5)
+        positions: [ {x:1,y:6}, {x:3,y:4} ]
       }
     ];
 
-    // ===============================
-    // DATENSTRUKTUREN
-    // ===============================
-    let gridData;        // Infos über Geschenke / leere Felder
-    let pathOwner;       // pathOwner[y][x] = Farb-ID, die dieses Feld benutzt (oder null)
-    let completedColors; // Set mit bereits verbundenen Farben
+    let gridData;
+    let pathOwner;
+    let completedColors;
 
-    // Zustand beim Zeichnen
     let drawing = false;
-    let currentColor = null;       // Farb-ID
-    let currentCssClass = null;    // zugehörige CSS-Klasse
-    let currentPathCells = [];     // [{x,y},...]
+    let currentColor = null;
+    let currentCssClass = null;
+    let currentPathCells = [];
 
-    // ===============================
-    // GITTER AUFBAUEN
-    // ===============================
     function initGridData(){
       gridData = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
 
-      // Geschenke setzen (immer gleich)
       for(const pair of GIFT_PAIRS){
         for(const pos of pair.positions){
           gridData[pos.y][pos.x] = {
@@ -371,19 +372,16 @@
       statusTotalEl.textContent = GIFT_PAIRS.length;
       successMsgEl.textContent = '';
 
-      // alle Farbhintergründe entfernen
       Array.from(gridEl.children).forEach(cell => {
         cell.classList.remove(
           'path-red','path-blue','path-green',
           'path-yellow','path-purple','path-orange',
+          'path-pink','path-white',
           'on-path','current-step'
         );
       });
     }
 
-    // ===============================
-    // HILFSFUNKTIONEN
-    // ===============================
     function vibrate(ms){
       try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){}
     }
@@ -434,9 +432,6 @@
       return completedColors.size === GIFT_PAIRS.length;
     }
 
-    // ===============================
-    // ZEICHEN-LOGIK
-    // ===============================
     let activePointerId = null;
 
     function pointerDown(e){
@@ -450,7 +445,6 @@
 
       if(!info || info.type !== 'gift') return;
 
-      // ggf. vorhandenen Pfad dieser Farbe löschen
       clearColorPath(info.color);
 
       drawing = true;
@@ -459,7 +453,6 @@
       currentCssClass = info.cssClass;
       currentPathCells = [];
 
-      // Startzelle hinzufügen
       currentPathCells.push({x,y});
       applyPathClass(x,y,currentColor,currentCssClass);
       target.classList.add('on-path','current-step');
@@ -477,25 +470,21 @@
       const {x,y,el} = cellInfo;
 
       const last = currentPathCells[currentPathCells.length-1];
-      if(last.x === x && last.y === y) return; // schon da
+      if(last.x === x && last.y === y) return;
 
-      // nur Nachbarzellen erlauben
       if(!neighbours(last, {x,y})) return;
 
-      // andere Farbe blockiert dieses Feld?
       const owner = pathOwner[y][x];
       if(owner && owner !== currentColor) return;
 
       const cellData = gridData[y][x];
       if(cellData && cellData.type === 'gift' && cellData.color !== currentColor){
-        return; // fremdes Geschenk
+        return;
       }
 
-      // neue Zelle in Pfad übernehmen
       currentPathCells.push({x,y});
       applyPathClass(x,y,currentColor,currentCssClass);
 
-      // Start- und End-Geschenke auf dem Pfad hervorheben
       const prevEl = gridEl.children[last.y*SIZE+last.x];
       prevEl.classList.remove('current-step');
       el.classList.add('current-step');
@@ -512,7 +501,6 @@
       const info = gridData[last.y][last.x];
 
       if(info && info.type==='gift' && info.color===currentColor){
-        // Haben wir beide Geschenke dieser Farbe im Pfad?
         const pair = GIFT_PAIRS.find(p=>p.id===currentColor);
         const posA = pair.positions[0];
         const posB = pair.positions[1];
@@ -525,11 +513,9 @@
           statusCountEl.textContent = completedColors.size;
           vibrate(30);
         } else {
-          // nicht beide Enden erwischt -> Pfad zurücksetzen
           clearColorPath(currentColor);
         }
       } else {
-        // Kein Geschenk am Ende -> Pfad zurücksetzen
         clearColorPath(currentColor);
       }
 
@@ -539,7 +525,6 @@
       currentCssClass = null;
       currentPathCells = [];
 
-      // aktuelle Hervorhebung entfernen
       Array.from(gridEl.children).forEach(c => c.classList.remove('current-step'));
 
       if(allColorsCompleted()){
@@ -555,16 +540,12 @@
       gridEl.addEventListener('pointercancel', pointerUp, {passive:false});
     }
 
-    // ===============================
-    // INITIALISIERUNG
-    // ===============================
     function init(){
-      initGridData();  // feste Vorlage
-      renderGrid();    // Gitter mit Geschenken
-      resetPaths();    // aber keine Mischung
+      initGridData();
+      renderGrid();
+      resetPaths();
     }
 
-    // Button: nur Wege löschen, kein neues Layout
     resetBtn.addEventListener('click', resetPaths);
 
     addEvents();
