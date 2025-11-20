@@ -3,313 +3,345 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 18 – Wichtel-Logikrätsel</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Tag 13 – Das Wichtel-Wirrwar</title>
+
+  <style>
+    /* ---------- Hintergrund ---------- */
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #0f172a;
+    }
+
+    body.bg-image {
+      background-image: url("assets/dein-weihnachtsbild.jpg"); /* <-- anpassen */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* Hintergrund scrollt NICHT mit */
+    }
+
+    /* ---------- Layout Container ---------- */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .card {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    /* ---------- Header-Kachel ---------- */
+    .header-tile {
+      background: #b91c1c;
+      color: #fff;
+      border-radius: 24px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.35);
+      margin-bottom: 12px;
+    }
+
+    .header-tile .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tile h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .header-tile .emoji {
+      font-size: 1.5rem;
+    }
+
+    .header-tile a {
+      color: #fee2e2;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Kachel-Stack ---------- */
+    .card-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tile {
+      background: rgba(248,250,252,0.95);
+      border-radius: 22px;
+      padding: 16px 18px;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.25);
+      backdrop-filter: blur(4px);
+    }
+
+    /* ---------- Tabellen & Inputs ---------- */
+    .table .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .table .cell.label {
+      flex: 0 0 40%;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .table .cell {
+      flex: 1;
+    }
+
+    .input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    /* ---------- Buttons ---------- */
+    .row.wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #15803d;
+      color: white;
+      box-shadow: 0 8px 18px rgba(22,101,52,0.45);
+    }
+
+    .btn.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    /* ---------- Feedback ---------- */
+    .note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15,23,42,0.85);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    .note.success {
+      background: rgba(22,101,52,0.9);
+    }
+
+    .hidden { display: none; }
+
+    /* ---------- Buchstabe ---------- */
+    #letterBox .letter {
+      margin-top: 6px;
+      font-size: 2.1rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .footer {
+      margin-top: 8px;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
-<!--
-  HINTERGRUNDBILD:
-  Um ein Hintergrundbild zu setzen, kannst du in deiner CSS-Datei (style.css) z.B. ergänzen:
 
-  body.bg-image {
-    background-image: url("../assets/dein-weihnachtsbild.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+<body class="bg-image">
 
-  Und dafür hat das <body>-Element unten die Klasse "bg-image".
--->
-<body class="bg-image" onload="adventEnsureAccess();">
   <div class="container">
     <div class="card">
-      <div class="header">
+
+      <!-- Header-Kachel -->
+      <div class="header-tile">
         <div class="logo">
           <span class="emoji">🎄</span>
           <h1>Tag 13: Das Wichtel-Wirrwar</h1>
         </div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 13.12.</p>
-
-      <h2>Rätsel</h2>
-      <p>
-        Drei Freundinnen treffen sich zum weihnachtlichen Wichteln im „Weihnachtszauberwald“:
-        <strong>Anna</strong>, <strong>Mara</strong> und <strong>Lina</strong>.
-      </p>
-      <p>Sie haben drei Geschenke dabei:</p>
-      <ul>
-        <li>🎁 <strong>Rentier-Tassen-Set</strong></li>
-        <li>🎁 <strong>Lebkuchen-Badebomben</strong></li>
-        <li>🎁 <strong>Schneeflocken-Lichterkette</strong></li>
-      </ul>
-      <p>
-        Jede Freundin hat genau <strong>ein Geschenk gekauft</strong> und jedes Geschenk war für genau
-        <strong>eine Freundin bestimmt</strong>. Durch das Chaos eines überdrehten Weihnachtswichtels
-        sind die Pakete jedoch durcheinandergeraten – am Ende hat aber trotzdem wieder jede
-        ein Geschenk in der Hand.
-      </p>
-      <p><strong>Was du herausfinden sollst:</strong></p>
-      <ol>
-        <li>Wer hat welches Geschenk gekauft?</li>
-        <li>Für wen war welches Geschenk ursprünglich gedacht?</li>
-        <li>Wer hat am Ende welches Geschenk bekommen?</li>
-      </ol>
-
-      <h3>Hinweise aus dem Wichtel-Protokoll</h3>
-      <ul>
-        <li>Anna hat <strong>kein Bade-Produkt</strong> gekauft – die Lebkuchen-Badebomben stammen also nicht von ihr.</li>
-        <li>Die <strong>Lebkuchen-Badebomben</strong> waren eigentlich für die größte Frostbeule der Runde gedacht:
-            für <strong>Anna</strong>.</li>
-        <li>Die <strong>Schneeflocken-Lichterkette</strong> war als Überraschung für <strong>Mara</strong> geplant.</li>
-        <li>Lina liebt Kaffee und Tee, fand es aber „zu offensichtlich“, ihr ein Tassen-Set zu schenken –
-            sie hat das <strong>Rentier-Tassen-Set nicht gekauft</strong>.</li>
-        <li>Am Ende bekam <strong>keine</strong> der drei Freundinnen das Geschenk, das ursprünglich für sie bestimmt war.</li>
-      </ul>
-
-      <div style="height:8px"></div>
-
-      <h3>Zuordnungen</h3>
-      <p><strong>Wähle für jede Freundin und jede Frage das passende Geschenk aus.</strong></p>
-
-      <h4>1) Wer hat welches Geschenk gekauft?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna</div>
-          <div class="cell">
-            <select id="buyer-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Mara</div>
-          <div class="cell">
-            <select id="buyer-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Lina</div>
-          <div class="cell">
-            <select id="buyer-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
+        <a href="../index.html">⬅︎ Zurück</a>
       </div>
 
-      <h4>2) Für wen war welches Geschenk ursprünglich gedacht?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Mara sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Lina sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <p style="color:#e5e7eb; margin-bottom:12px;">Datum: 13.12.</p>
 
-      <h4>3) Wer hat am Ende welches Geschenk bekommen?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
+      <div class="card-stack">
+
+        <!-- Story -->
+        <div class="tile">
+          <h2>Rätsel</h2>
+          <p>Drei Freundinnen treffen sich zum Wichteln …</p>
+
+          <ul>
+            <li>🎁 <strong>Rentier-Tassen-Set</strong></li>
+            <li>🎁 <strong>Lebkuchen-Badebomben</strong></li>
+            <li>🎁 <strong>Schneeflocken-Lichterkette</strong></li>
+          </ul>
+
+          <p><strong>Deine Aufgaben:</strong></p>
+          <ol>
+            <li>Wer hat welches Geschenk gekauft?</li>
+            <li>Für wen war welches Geschenk gedacht?</li>
+            <li>Wer hat am Ende welches Geschenk bekommen?</li>
+          </ol>
+        </div>
+
+        <!-- Hinweise -->
+        <div class="tile">
+          <h3>Hinweise</h3>
+          <ul>
+            <li>Anna hat kein Bade-Produkt gekauft.</li>
+            <li>Badebomben waren für Anna gedacht.</li>
+            <li>Lichterkette war für Mara gedacht.</li>
+            <li>Lina kaufte keine Tassen.</li>
+            <li>Niemand bekam ihr eigentliches Geschenk.</li>
+          </ul>
+        </div>
+
+        <!-- Zuordnungen -->
+        <div class="tile">
+          <h3>Zuordnungen</h3>
+
+          <h4>1) Wer hat welches Geschenk gekauft?</h4>
+          <div class="table">
+            <div class="row"><div class="cell label">Anna</div><div class="cell"><select id="buyer-anna" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Mara</div><div class="cell"><select id="buyer-mara" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Lina</div><div class="cell"><select id="buyer-lina" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+          </div>
+
+          <h4>2) Für wen war welches Geschenk gedacht?</h4>
+          <div class="table">
+            <div class="row"><div class="cell label">Anna</div><div class="cell"><select id="intended-anna" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Mara</div><div class="cell"><select id="intended-mara" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Lina</div><div class="cell"><select id="intended-lina" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+          </div>
+
+          <h4>3) Wer bekam am Ende welches Geschenk?</h4>
+          <div class="table">
+            <div class="row"><div class="cell label">Anna</div><div class="cell"><select id="final-anna" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Mara</div><div class="cell"><select id="final-mara" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
+            <div class="row"><div class="cell label">Lina</div><div class="cell"><select id="final-lina" class="input"><option value="">– auswählen –</option><option value="tassen">Tassen</option><option value="badebomben">Badebomben</option><option value="lichterkette">Lichterkette</option></select></div></div>
           </div>
         </div>
-        <div class="row">
-          <div class="cell label">Mara bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
+
+        <!-- Aktionen -->
+        <div class="tile">
+          <div class="row wrap">
+            <button class="btn" onclick="solve()">Lösen</button>
+            <button class="btn secondary" onclick="showHint()">Hinweis</button>
+            <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+          </div>
+
+          <div id="feedback" class="note hidden"></div>
+          <div id="hintBox" class="note hidden"></div>
+        </div>
+
+        <!-- Buchstabe -->
+        <div class="tile">
+          <div id="letterBox" class="hidden">
+            <p>Geschafft! Der Buchstabe heute ist:</p>
+            <div class="letter">H</div>
+          </div>
+          <div class="footer">
+            <small>Notiere jeden Buchstaben – am 24. entsteht eine Botschaft.</small>
           </div>
         </div>
-        <div class="row">
-          <div class="cell label">Lina bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
-      <div style="height:12px"></div>
-      <div class="row wrap">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-
-      <div id="feedback" class="note hidden"></div>
-      <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
-
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">H</div>
-      </div>
-      <div class="footer">
-        <small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small>
       </div>
     </div>
   </div>
 
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  <!-- ---------- Logik / Rätsellösung ---------- -->
   <script>
-    // Korrekte Zuordnungen
-    // Werte: "tassen" | "badebomben" | "lichterkette"
-    const TODAY_LETTER = "H";
-
     const CORRECT = {
-      buyer: {
-        anna: "tassen",        // Anna hat das Rentier-Tassen-Set gekauft
-        mara: "badebomben",    // Mara hat die Lebkuchen-Badebomben gekauft
-        lina: "lichterkette"   // Lina hat die Schneeflocken-Lichterkette gekauft
-      },
-      intended: {
-        anna: "badebomben",    // Für Anna waren die Badebomben gedacht
-        mara: "lichterkette",  // Für Mara war die Lichterkette gedacht
-        lina: "tassen"         // Für Lina waren die Tassen gedacht
-      },
-      final: {
-        anna: "tassen",        // Am Ende hat Anna das Tassen-Set
-        mara: "badebomben",    // Mara hat die Badebomben
-        lina: "lichterkette"   // Lina hat die Lichterkette
-      }
+      buyer:   { anna: "tassen", mara: "badebomben", lina: "lichterkette" },
+      intended:{ anna: "badebomben", mara: "lichterkette", lina: "tassen" },
+      final:   { anna: "tassen", mara: "badebomben", lina: "lichterkette" }
     };
 
-    // Hinweise (werden nacheinander angezeigt)
     const HINTS = [
-      "Hinweis 1: Schau dir zuerst genau an, welche Geschenke jede Freundin auf keinen Fall gekauft hat.",
-      "Hinweis 2: Die Person, die das Rentier-Tassen-Set gekauft hat, hatte es am Ende auch vor sich stehen.",
-      "Hinweis 3: Mara saß am Ende mit den Lebkuchen-Badebomben da – und jede packt letztlich das Geschenk aus, das sie selbst gekauft hat."
+      "Hinweis 1: Schau, wer etwas NICHT gekauft hat.",
+      "Hinweis 2: Die Käuferin der Tassen hatte sie am Ende auch.",
+      "Hinweis 3: Jede bekam am Ende das Geschenk, das sie selbst gekauft hat."
     ];
     let hintIndex = 0;
 
-    function showLetter() {
-      document.getElementById('letterBox').classList.remove('hidden');
-      if (typeof fireConfetti === "function") {
-        fireConfetti();
-      }
-    }
-
-    function setFeedback(msg, ok) {
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if (ok) {
-        box.classList.add('success');
-      } else {
-        box.classList.remove('success');
-      }
-    }
-
-    function showHint() {
-      const box = document.getElementById('hintBox');
-      if (hintIndex < HINTS.length) {
-        box.textContent = HINTS[hintIndex];
-        box.classList.remove('hidden');
-        hintIndex++;
-      } else {
-        box.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
-        box.classList.remove('hidden');
-      }
-    }
-
-    function getSelectValue(id) {
-      const el = document.getElementById(id);
-      return el ? el.value : "";
+    function getValue(id) {
+      return document.getElementById(id).value;
     }
 
     function allCorrect() {
       return (
-        getSelectValue("buyer-anna")  === CORRECT.buyer.anna  &&
-        getSelectValue("buyer-mara")  === CORRECT.buyer.mara  &&
-        getSelectValue("buyer-lina")  === CORRECT.buyer.lina  &&
-        getSelectValue("intended-anna") === CORRECT.intended.anna &&
-        getSelectValue("intended-mara") === CORRECT.intended.mara &&
-        getSelectValue("intended-lina") === CORRECT.intended.lina &&
-        getSelectValue("final-anna") === CORRECT.final.anna &&
-        getSelectValue("final-mara") === CORRECT.final.mara &&
-        getSelectValue("final-lina") === CORRECT.final.lina
+        getValue("buyer-anna")  === CORRECT.buyer.anna &&
+        getValue("buyer-mara")  === CORRECT.buyer.mara &&
+        getValue("buyer-lina")  === CORRECT.buyer.lina &&
+        getValue("intended-anna") === CORRECT.intended.anna &&
+        getValue("intended-mara") === CORRECT.intended.mara &&
+        getValue("intended-lina") === CORRECT.intended.lina &&
+        getValue("final-anna") === CORRECT.final.anna &&
+        getValue("final-mara") === CORRECT.final.mara &&
+        getValue("final-lina") === CORRECT.final.lina
       );
+    }
+
+    function setFeedback(msg, ok) {
+      const box = document.getElementById("feedback");
+      box.textContent = msg;
+      box.classList.remove("hidden");
+      ok ? box.classList.add("success") : box.classList.remove("success");
     }
 
     function solve() {
       if (allCorrect()) {
-        setFeedback("Richtig! Alle Zuordnungen stimmen. 💫", true);
-        showLetter();
+        setFeedback("Alles richtig! 🎉", true);
+        document.getElementById("letterBox").classList.remove("hidden");
       } else {
-        setFeedback("Noch nicht ganz richtig. Überprüfe deine Zuordnungen. ❄️", false);
+        setFeedback("Noch nicht ganz richtig. ❄️", false);
       }
     }
 
-    function reveal() {
-      // Setze alle Selects auf die korrekten Werte
-      document.getElementById("buyer-anna").value     = CORRECT.buyer.anna;
-      document.getElementById("buyer-mara").value     = CORRECT.buyer.mara;
-      document.getElementById("buyer-lina").value     = CORRECT.buyer.lina;
-      document.getElementById("intended-anna").value  = CORRECT.intended.anna;
-      document.getElementById("intended-mara").value  = CORRECT.intended.mara;
-      document.getElementById("intended-lina").value  = CORRECT.intended.lina;
-      document.getElementById("final-anna").value     = CORRECT.final.anna;
-      document.getElementById("final-mara").value     = CORRECT.final.mara;
-      document.getElementById("final-lina").value     = CORRECT.final.lina;
+    function showHint() {
+      const box = document.getElementById("hintBox");
+      if (hintIndex < HINTS.length) {
+        box.textContent = HINTS[hintIndex++];
+      } else {
+        box.textContent = "Keine weiteren Hinweise.";
+      }
+      box.classList.remove("hidden");
+    }
 
-      setFeedback("Die richtige Lösung wurde eingetragen. ✅", true);
-      showLetter();
+    function reveal() {
+      document.getElementById("buyer-anna").value = CORRECT.buyer.anna;
+      document.getElementById("buyer-mara").value = CORRECT.buyer.mara;
+      document.getElementById("buyer-lina").value = CORRECT.buyer.lina;
+
+      document.getElementById("intended-anna").value = CORRECT.intended.anna;
+      document.getElementById("intended-mara").value = CORRECT.intended.mara;
+      document.getElementById("intended-lina").value = CORRECT.intended.lina;
+
+      document.getElementById("final-anna").value = CORRECT.final.anna;
+      document.getElementById("final-mara").value = CORRECT.final.mara;
+      document.getElementById("final-lina").value = CORRECT.final.lina;
+
+      setFeedback("Lösung eingetragen. ✓", true);
+      document.getElementById("letterBox").classList.remove("hidden");
     }
   </script>
+
 </body>
 </html>
