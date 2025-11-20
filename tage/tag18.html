@@ -33,13 +33,13 @@
       background-attachment: fixed; /* Hintergrund bleibt stehen */
     }
 
-    /* Auf dem Handy: Bild nicht so stark herangezoomt, komplett(er) sichtbar */
+    /* Auf dem Handy: Bild möglichst komplett sichtbar und fixiert */
     @media (max-width: 720px) {
       body.bg-image {
         background-size: contain;
         background-position: top center;
-        background-attachment: scroll; /* fixed macht auf Mobile oft Probleme */
-        background-color: #000;        /* Hintergrundfarbe für Ränder */
+        background-attachment: fixed;
+        background-color: #000; /* Hintergrundfarbe für Ränder */
       }
     }
 
@@ -231,6 +231,7 @@
       cursor: grab;
       user-select: none;
       white-space: nowrap;
+      touch-action: none; /* hilft bei Touch-Drag */
     }
 
     .gift-card:active {
@@ -300,21 +301,79 @@
       display: none;
     }
 
-    #letterBox .letter {
-      margin-top: 6px;
-      font-size: 2.1rem;
-      font-weight: 800;
-      text-align: center;
-      color: #fef3c7;
-      text-shadow: 0 0 12px rgba(252, 211, 77, 0.8);
-    }
-
     .footer {
       margin-top: 8px;
       text-align: center;
       color: #e5e7eb;
       font-size: 0.8rem;
       opacity: 0.9;
+    }
+
+    /* ---------- Party-Overlay für den Buchstaben ---------- */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(248, 250, 252, 0.15), rgba(15, 23, 42, 0.95));
+      z-index: 9999;
+    }
+
+    .party-overlay.hidden {
+      display: none;
+    }
+
+    .party-content {
+      text-align: center;
+      padding: 24px 32px;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .party-content p {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .party-letter {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #fef3c7;
+      text-shadow: 0 0 16px rgba(252, 211, 77, 0.9);
+      animation: party-pop 0.9s ease-out forwards, party-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes party-pop {
+      0% { transform: scale(0.2); opacity: 0; }
+      40% { transform: scale(1.15); opacity: 1; }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes party-glow {
+      0% { text-shadow: 0 0 10px rgba(252, 211, 77, 0.8); }
+      100% { text-shadow: 0 0 24px rgba(252, 211, 77, 1); }
+    }
+
+    /* einfache Confetti-Dots */
+    .confetti-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #facc15;
+      animation: confetti-fall 1.4s ease-out forwards;
+      opacity: 0.9;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20px); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(80px); opacity: 0; }
     }
   </style>
 </head>
@@ -362,7 +421,7 @@
           </ol>
         </div>
 
-        <!-- Hinweis-Kachel (kompliziertere Hinweise) -->
+        <!-- Hinweis-Kachel -->
         <div class="tile">
           <h3>Hinweise aus dem Wichtel-Protokoll</h3>
           <ul>
@@ -486,19 +545,15 @@
           <div class="row wrap">
             <button class="btn" onclick="solve()">Lösen</button>
             <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
-            <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+            <!-- Button „Lösung anzeigen“ entfernt -->
           </div>
 
           <div id="feedback" class="note hidden"></div>
           <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
         </div>
 
-        <!-- Buchstabe / Footer -->
+        <!-- Footer -->
         <div class="tile">
-          <div id="letterBox" class="hidden">
-            <p>Geschafft! Der Buchstabe für heute ist:</p>
-            <div class="letter">H</div>
-          </div>
           <div class="footer">
             <small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small>
           </div>
@@ -508,7 +563,15 @@
     </div>
   </div>
 
-  <!-- ---------- Logik & Drag-and-Drop ---------- -->
+  <!-- Party-Overlay für den Buchstaben -->
+  <div id="letterOverlay" class="party-overlay hidden">
+    <div class="party-content">
+      <p>Geschafft! Der Buchstabe für heute ist:</p>
+      <div class="party-letter">H</div>
+    </div>
+  </div>
+
+  <!-- ---------- Logik & Drag-and-Drop + Touch ---------- -->
   <script>
     const CORRECT = {
       buyer: {
@@ -541,8 +604,14 @@
     function initDragAndDrop() {
       const cards = document.querySelectorAll(".gift-card");
       cards.forEach(card => {
+        // Maus-Drag
         card.addEventListener("dragstart", onDragStart);
         card.addEventListener("dragend", onDragEnd);
+
+        // Touch-„Drag“
+        card.addEventListener("touchstart", onTouchStart, { passive: false });
+        card.addEventListener("touchmove", onTouchMove, { passive: false });
+        card.addEventListener("touchend", onTouchEnd);
       });
 
       const dropzones = document.querySelectorAll(".dropzone, .gift-pool");
@@ -553,13 +622,11 @@
       });
     }
 
+    /* ---------- Maus-Drag ---------- */
     function onDragStart(e) {
       draggedCard = e.target;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", e.target.id);
-      setTimeout(() => {
-        // optional visuelle Anpassung
-      }, 0);
     }
 
     function onDragEnd() {
@@ -588,33 +655,37 @@
       const card = document.getElementById(cardId);
       if (!card) return;
 
-      if (target.classList.contains("dropzone") || target.classList.contains("gift-pool")) {
-        if (target.classList.contains("dropzone")) {
-          target.classList.remove("dragover");
-        }
+      moveCardToTarget(card, target);
+    }
 
-        // In Dropzones darf nur eine Karte liegen
-        if (target.classList.contains("dropzone") && target.firstElementChild) {
-          const existing = target.firstElementChild;
-          const poolId = "pool-" + target.dataset.question;
-          const pool = document.getElementById(poolId);
-          if (pool) {
-            pool.appendChild(existing);
-            updateEmptyState(pool);
-          }
-        }
+    function moveCardToTarget(card, target) {
+      if (!(target.classList.contains("dropzone") || target.classList.contains("gift-pool"))) return;
 
-        const oldParent = card.parentElement;
-        target.appendChild(card);
-        updateEmptyState(target);
-        if (oldParent && (oldParent.classList.contains("dropzone") || oldParent.classList.contains("gift-pool"))) {
-          updateEmptyState(oldParent);
+      if (target.classList.contains("dropzone")) {
+        target.classList.remove("dragover");
+      }
+
+      // In Dropzones darf nur eine Karte liegen
+      if (target.classList.contains("dropzone") && target.firstElementChild && target.firstElementChild !== card) {
+        const existing = target.firstElementChild;
+        const poolId = "pool-" + target.dataset.question;
+        const pool = document.getElementById(poolId);
+        if (pool) {
+          pool.appendChild(existing);
+          updateEmptyState(pool);
         }
+      }
+
+      const oldParent = card.parentElement;
+      target.appendChild(card);
+      updateEmptyState(target);
+      if (oldParent && (oldParent.classList.contains("dropzone") || oldParent.classList.contains("gift-pool"))) {
+        updateEmptyState(oldParent);
       }
     }
 
     function updateEmptyState(container) {
-      if (container.classList.contains("dropzone")) {
+      if (container && container.classList.contains("dropzone")) {
         if (container.children.length === 0) {
           container.classList.add("empty");
         } else {
@@ -656,7 +727,25 @@
     }
 
     function showLetter() {
-      document.getElementById("letterBox").classList.remove("hidden");
+      const overlay = document.getElementById("letterOverlay");
+      overlay.classList.remove("hidden");
+
+      // kleine Confetti-Punkte erzeugen
+      const content = overlay.querySelector(".party-content");
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement("span");
+        dot.className = "confetti-dot";
+        dot.style.left = Math.random() * 100 + "%";
+        dot.style.top = (Math.random() * 30) + "%";
+        content.appendChild(dot);
+        // nach Animation wieder entfernen
+        setTimeout(() => dot.remove(), 1500);
+      }
+
+      // Overlay schließen bei Klick
+      overlay.addEventListener("click", () => {
+        overlay.classList.add("hidden");
+      }, { once: true });
     }
 
     function solve() {
@@ -668,55 +757,98 @@
       }
     }
 
+    // Hinweise: bleiben stehen, neuer Hinweis kommt unten dazu
     function showHint() {
       const box = document.getElementById("hintBox");
+      box.classList.remove("hidden");
+
+      const p = document.createElement("p");
       if (hintIndex < HINTS.length) {
-        box.textContent = HINTS[hintIndex];
+        p.textContent = HINTS[hintIndex];
         hintIndex++;
       } else {
-        box.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
+        p.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
       }
-      box.classList.remove("hidden");
+      box.appendChild(p);
     }
 
-    function reveal() {
-      // Alle Karten in die passenden Slots verschieben
-      const mapping = [
-        { id: "gift-buyer-ausstecher",   target: "buyer-sarah" },
-        { id: "gift-buyer-socken",       target: "buyer-lisa" },
-        { id: "gift-buyer-motchi",       target: "buyer-nicole" },
+    /* ---------- Touch-Drag (vereinfacht) ---------- */
+    let touchCard = null;
+    let touchOriginalParent = null;
+    let touchOriginalStyles = {};
 
-        { id: "gift-intended-motchi",    target: "intended-sarah" },
-        { id: "gift-intended-ausstecher",target: "intended-lisa" },
-        { id: "gift-intended-socken",    target: "intended-nicole" },
+    function onTouchStart(e) {
+      if (e.touches.length > 1) return; // keine Multi-Touch-Drags
+      touchCard = e.currentTarget;
+      touchOriginalParent = touchCard.parentElement;
+      touchOriginalStyles = {
+        position: touchCard.style.position,
+        left: touchCard.style.left,
+        top: touchCard.style.top,
+        zIndex: touchCard.style.zIndex,
+        transition: touchCard.style.transition
+      };
+      touchCard.style.position = "fixed";
+      touchCard.style.zIndex = "9999";
+      touchCard.style.transition = "none";
 
-        { id: "gift-final-socken",       target: "final-sarah" },
-        { id: "gift-final-motchi",       target: "final-lisa" },
-        { id: "gift-final-ausstecher",   target: "final-nicole" }
-      ];
+      const touch = e.touches[0];
+      moveCardToTouchPosition(touch);
+      e.preventDefault();
+    }
 
-      mapping.forEach(m => {
-        const card = document.getElementById(m.id);
-        const target = document.getElementById(m.target);
-        if (card && target) {
-          // Wenn im Ziel schon etwas liegt, zurück in den passenden Pool
-          if (target.firstElementChild && target.firstElementChild !== card) {
-            const poolId = "pool-" + target.dataset.question;
-            const pool = document.getElementById(poolId);
-            if (pool) {
-              pool.appendChild(target.firstElementChild);
-              updateEmptyState(pool);
-            }
-          }
-          const oldParent = card.parentElement;
-          target.appendChild(card);
-          updateEmptyState(target);
-          if (oldParent) updateEmptyState(oldParent);
-        }
-      });
+    function moveCardToTouchPosition(touch) {
+      if (!touchCard) return;
+      const rect = touchCard.getBoundingClientRect();
+      touchCard.style.left = (touch.clientX - rect.width / 2) + "px";
+      touchCard.style.top = (touch.clientY - rect.height / 2) + "px";
+    }
 
-      setFeedback("Die richtige Lösung wurde eingetragen. ✅", true);
-      showLetter();
+    function onTouchMove(e) {
+      if (!touchCard) return;
+      const touch = e.touches[0];
+      moveCardToTouchPosition(touch);
+
+      // Dropzone visuell hervorheben
+      document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!el) return;
+      const dz = el.closest(".dropzone");
+      if (dz) dz.classList.add("dragover");
+
+      e.preventDefault();
+    }
+
+    function onTouchEnd(e) {
+      if (!touchCard) return;
+      const touch = e.changedTouches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
+
+      // ursprüngliche Styles zurücksetzen
+      touchCard.style.position = touchOriginalStyles.position;
+      touchCard.style.left = touchOriginalStyles.left;
+      touchCard.style.top = touchOriginalStyles.top;
+      touchCard.style.zIndex = touchOriginalStyles.zIndex;
+      touchCard.style.transition = touchOriginalStyles.transition;
+
+      let target = null;
+      if (el) {
+        const dz = el.closest(".dropzone");
+        const pool = el.closest(".gift-pool");
+        target = dz || pool;
+      }
+
+      if (target) {
+        moveCardToTarget(touchCard, target);
+      } else if (touchOriginalParent) {
+        // Falls auf nichts Sinnvolles losgelassen: zurücklegen
+        touchOriginalParent.appendChild(touchCard);
+        updateEmptyState(touchOriginalParent);
+      }
+
+      touchCard = null;
+      touchOriginalParent = null;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
