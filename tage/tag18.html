@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Tag 18: Geschenkchaos</title>
+  <title>Tag 13: Wichtel-Wirrwar</title>
 
   <style>
     :root{
@@ -97,6 +97,8 @@
       border:1px solid rgba(0,0,0,.08);
       box-shadow:0 8px 20px rgba(0,0,0,.18);
       padding:1rem 1.2rem;
+      width:100%;
+      box-sizing:border-box;
     }
 
     .card h2{
@@ -120,74 +122,41 @@
       color:#444;
     }
 
-    .grid{
-      user-select:none;
-      touch-action:none;
-      display:grid;
-      grid-template-columns:repeat(var(--size),1fr);
-      grid-template-rows:repeat(var(--size),1fr);
-      width:min(92vw,520px);
-      aspect-ratio:1/1;
-      background:#0c5731;
-      border-radius:14px;
-      overflow:hidden;
-      box-shadow:0 10px 25px rgba(0,0,0,.35);
+    .grid-label{
+      font-weight:600;
+      margin-top:.4rem;
+      margin-bottom:.3rem;
+      font-size:1rem;
+      color:#b4382c;
     }
 
-    .cell{
-      position:relative;
+    .table{
+      width:100%;
+      border-spacing:0;
+      margin-bottom:.6rem;
+    }
+    .row{
       display:flex;
       align-items:center;
-      justify-content:center;
+      margin-bottom:.25rem;
+      gap:.5rem;
+    }
+    .cell{
+      flex:1;
+    }
+    .cell.label{
+      flex:0 0 55%;
+      font-size:.95rem;
+    }
+
+    select.input{
+      width:100%;
+      padding:.35rem .4rem;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,.18);
+      font-size:.9rem;
       background:#fffdf7;
-      box-shadow:
-        inset 0 1px 0 rgba(0,0,0,.2),
-        inset 1px 0 0 rgba(0,0,0,.2);
-      transition: background .12s ease, transform .12s ease;
-      font-size:0;
-    }
-
-    .cell.gift::after{
-      content:"";
-      position:absolute;
-      inset:10%;
-      border-radius:9px;
-      border:2px solid rgba(0,0,0,.12);
-      box-shadow:0 3px 6px rgba(0,0,0,.15);
-      background:#fff;
-    }
-
-    .gift-icon{
-      position:relative;
-      width:70%;
-      height:70%;
-      object-fit:contain;
-      z-index:1;
-    }
-
-    /* Pfad-Farben */
-    .path-red    { background:#ffe0e0; }
-    .path-blue   { background:#e0ecff; }
-    .path-yellow { background:#fff9dc; }
-    .path-purple { background:#f4e6ff; }
-    .path-orange { background:#ffe9d6; }
-    .path-pink   { background:#ffe0f4; }
-    .path-white  { background:#f2f2f2; }
-
-    .cell.gift.on-path{
-      transform:scale(1.04);
-    }
-
-    .cell.current-step{
-      box-shadow:
-        inset 0 0 0 3px rgba(0,0,0,.3),
-        0 0 0 3px rgba(255,255,255,.5);
-    }
-
-    .success-msg{
-      margin-top:.8rem;
-      font-weight:700;
-      color:var(--found);
+      box-sizing:border-box;
     }
 
     .btn{
@@ -201,9 +170,32 @@
       font-weight:700;
       box-shadow:0 4px 14px rgba(0,0,0,.28);
       margin-top:.5rem;
+      margin-right:.4rem;
+      font-size:.9rem;
+    }
+    .btn.secondary{
+      background:#ffffffdd;
+      color:#b4382c;
+      box-shadow:0 3px 10px rgba(0,0,0,.18);
+      border:1px solid rgba(0,0,0,.05);
     }
 
-    /* === PARTY-OVERLAY === */
+    .note{
+      margin-top:.6rem;
+      padding:.55rem .7rem;
+      border-radius:10px;
+      background:#fff9dc;
+      border:1px solid rgba(0,0,0,.08);
+      font-size:.9rem;
+    }
+    .note.success{
+      background:#e3f7eb;
+      border-color:#61b883;
+      color:#13552f;
+    }
+    .hidden{ display:none; }
+
+    /* === PARTY-OVERLAY === (wie Tag 11) === */
     .party-overlay{
       position:fixed;
       inset:0;
@@ -297,367 +289,278 @@
 
 <body>
   <header>
-    <h1>Tag 11: Geschenkchaos</h1>
+    <h1>Tag 13: Wichtel-Wirrwar</h1>
   </header>
 
   <section class="story">
     <p>
-      Die Geschenkproduktion ist in vollem Gange. Leider hat sich Gerd der Fuchs in die Geschenkefabrik vom Weihnachtsmann
-      hereingeschlichen und bringt alle Geschenke durcheinander.
-      Damit das Chaos nicht vollkommen ausbricht, musst du die Geschenke retten!
+      Drei Freundinnen – <strong>Anna</strong>, <strong>Mara</strong> und <strong>Lina</strong> – treffen sich
+      im Weihnachtszauberwald zum gemütlichen Wichteln. Jede hat ein Geschenk besorgt, und jedes Geschenk war
+      eigentlich für eine der drei gedacht.
     </p>
     <p>
-      Verbinde immer zwei Geschenke <strong>derselben Farbe</strong> miteinander, indem du mit dem Finger
-      (oder der Maus) einen Weg über die Felder zeichnest. Aber Vorsicht: Wege
-      dürfen sich nicht kreuzen, und jedes Kästchen darf nur von <strong>einer</strong> Farbe benutzt werden.
+      Die drei Geschenke sind:
     </p>
+    <ul>
+      <li><strong>Rentier-Tassen-Set</strong></li>
+      <li><strong>Lebkuchen-Badebomben</strong></li>
+      <li><strong>Schneeflocken-Lichterkette</strong></li>
+    </ul>
+    <p>
+      Doch ein frecher Weihnachtswichtel bringt alles durcheinander. Am Ende hat zwar jede ein Paket in der Hand – aber keines
+      scheint bei der Person zu sein, für die es gedacht war.
+    </p>
+    <p>
+      Kannst du herausfinden:
+    </p>
+    <ol>
+      <li>Wer welches Geschenk gekauft hat,</li>
+      <li>für wen welches Geschenk ursprünglich gedacht war und</li>
+      <li>wer am Ende welches Geschenk bekommen hat?</li>
+    </ol>
   </section>
 
   <main>
     <div class="wrap">
 
       <section class="card rules">
-        <h2>So funktioniert’s</h2>
+        <h2>Hinweise</h2>
         <ul>
-          <li>Ziehe mit dem Finger (oder der Maus) von Feld zu Feld – nur oben, unten, links oder rechts.</li>
-          <li>Erreiche das zweite Geschenk derselben Farbe, ohne andere Wege zu berühren.</li>
-          <li>Wenn eine Farbe falsch verbunden wurde, tippe eines ihrer Geschenke an, um den Weg zu löschen.</li>
+          <li>Anna hat <strong>kein Bade-Produkt</strong> gekauft – die Lebkuchen-Badebomben stammen also nicht von ihr.</li>
+          <li>Die <strong>Lebkuchen-Badebomben</strong> waren eigentlich für die größte Frostbeule der Runde gedacht:
+              für <strong>Anna</strong>.</li>
+          <li>Die <strong>Schneeflocken-Lichterkette</strong> war als Überraschung für <strong>Mara</strong> geplant.</li>
+          <li>Lina liebt Kaffee und Tee, fand es aber „zu offensichtlich“, ihr ein Tassen-Set zu schenken –
+              sie hat das <strong>Rentier-Tassen-Set nicht gekauft</strong>.</li>
+          <li>Am Ende bekam <strong>keine</strong> der drei Freundinnen das Geschenk, das ursprünglich für sie bestimmt war.</li>
         </ul>
+
         <p class="status-line">
-          Verbundene Farben: <span id="statusCount">0</span>/<span id="statusTotal">0</span>
+          Wenn alle Zuordnungen stimmen, erscheint dein heutiger Buchstabe.
         </p>
-        <button class="btn" id="resetBtn">Alle Wege löschen</button>
-        <div class="success-msg" id="successMsg"></div>
+
+        <button class="btn" id="solveBtn">Lösen</button>
+        <button class="btn secondary" id="hintBtn">Hinweis anzeigen</button>
+        <button class="btn secondary" id="revealBtn">Lösung anzeigen</button>
+
+        <div id="feedback" class="note hidden"></div>
+        <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
       </section>
 
       <section class="card">
-        <div id="grid" class="grid" aria-label="Geschenke verbinden"></div>
+        <h2>Zuordnungen</h2>
+        <p><strong>Wähle für jede Freundin und jede Frage das passende Geschenk aus.</strong></p>
+
+        <div class="grid-label">1) Wer hat welches Geschenk gekauft?</div>
+        <div class="table">
+          <div class="row">
+            <div class="cell label">Anna hat gekauft …</div>
+            <div class="cell">
+              <select id="buyer-anna" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Mara hat gekauft …</div>
+            <div class="cell">
+              <select id="buyer-mara" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Lina hat gekauft …</div>
+            <div class="cell">
+              <select id="buyer-lina" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-label">2) Für wen war welches Geschenk ursprünglich gedacht?</div>
+        <div class="table">
+          <div class="row">
+            <div class="cell label">Anna sollte bekommen …</div>
+            <div class="cell">
+              <select id="intended-anna" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Mara sollte bekommen …</div>
+            <div class="cell">
+              <select id="intended-mara" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Lina sollte bekommen …</div>
+            <div class="cell">
+              <select id="intended-lina" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-label">3) Wer hat am Ende welches Geschenk bekommen?</div>
+        <div class="table">
+          <div class="row">
+            <div class="cell label">Anna hat am Ende …</div>
+            <div class="cell">
+              <select id="final-anna" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Mara hat am Ende …</div>
+            <div class="cell">
+              <select id="final-mara" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell label">Lina hat am Ende …</div>
+            <div class="cell">
+              <select id="final-lina" class="input">
+                <option value="">– auswählen –</option>
+                <option value="tassen">Rentier-Tassen-Set</option>
+                <option value="badebomben">Lebkuchen-Badebomben</option>
+                <option value="lichterkette">Schneeflocken-Lichterkette</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </section>
 
     </div>
   </main>
 
-  <!-- PARTY-OVERLAY -->
+  <!-- PARTY-OVERLAY mit Geschenk-Regen -->
   <div id="partyOverlay" class="party-overlay" aria-hidden="true">
     <div class="party-box">
-      <h2>Hurra! Du hast alle Geschenke gerettet!</h2>
+      <h2>Hurra! Du hast das Geschenkchaos gelöst!</h2>
       <p class="party-letter">
         Dein heutiger Buchstabe ist:
-        <span>e</span>
+        <span>H</span>
       </p>
-      <p class="party-sub">Tippe irgendwo, um weiterzuspielen.</p>
+      <p class="party-sub">Tippe irgendwo, um weiterzumachen.</p>
     </div>
-    <!-- fallende Geschenke werden per JavaScript hier eingefügt -->
   </div>
 
   <script>
-    const SIZE = 8;
-    const gridEl = document.getElementById('grid');
-    const statusCountEl = document.getElementById('statusCount');
-    const statusTotalEl = document.getElementById('statusTotal');
-    const successMsgEl = document.getElementById('successMsg');
-    const resetBtn = document.getElementById('resetBtn');
+    // Korrekte Zuordnung (eine logische Lösung, passend zu den Hinweisen)
+    const CORRECT = {
+      buyer: {
+        anna: "tassen",        // Anna hat das Rentier-Tassen-Set gekauft
+        mara: "badebomben",    // Mara hat die Lebkuchen-Badebomben gekauft
+        lina: "lichterkette"   // Lina hat die Schneeflocken-Lichterkette gekauft
+      },
+      intended: {
+        anna: "badebomben",    // Für Anna waren die Badebomben gedacht
+        mara: "lichterkette",  // Für Mara war die Lichterkette gedacht
+        lina: "tassen"         // Für Lina waren die Tassen gedacht
+      },
+      final: {
+        anna: "tassen",        // Am Ende hat Anna das Tassen-Set
+        mara: "badebomben",    // Mara hat die Badebomben
+        lina: "lichterkette"   // Lina hat die Lichterkette
+      }
+    };
+
+    // Hinweise – werden in der Reihenfolge immer konkreter
+    const HINTS = [
+      "Hinweis 1: Überlege zuerst, wer welches Geschenk auf keinen Fall gekauft haben kann (Anna kein Bade-Produkt, Lina kein Tassen-Set).",
+      "Hinweis 2: Die Lebkuchen-Badebomben sollten zur Frostbeule Anna – also waren sie ursprünglich für sie gedacht.",
+      "Hinweis 3: Am Ende sitzt jede mit dem Geschenk da, das sie selbst gekauft hat – und Anna war diejenige, die das Rentier-Tassen-Set besorgt hat."
+    ];
+    let hintIndex = 0;
+
+    const feedbackEl = document.getElementById('feedback');
+    const hintBoxEl = document.getElementById('hintBox');
     const partyOverlay = document.getElementById('partyOverlay');
 
-    // Koordinaten: (x,y) intern 0–7, 0 = links/oben
-    const GIFT_PAIRS = [
-      {
-        id: 'red',
-        cssClass: 'path-red',
-        img: 'assets/gift.png',
-        // Nutzer: (2,8) und (7,8)
-        positions: [ {x:1,y:7}, {x:6,y:7} ]
-      },
-      {
-        id: 'blue',
-        cssClass: 'path-blue',
-        img: 'assets/gift_blue.png',
-        // Nutzer: (3,3) und (8,6)
-        positions: [ {x:2,y:2}, {x:7,y:5} ]
-      },
-
-      {
-        id: 'yellow',
-        cssClass: 'path-yellow',
-        img: 'assets/gift_yellow.png',
-        // Nutzer: (1,8) und (4,6)
-        positions: [ {x:0,y:7}, {x:3,y:5} ]
-      },
-      {
-        id: 'purple',
-        cssClass: 'path-purple',
-        img: 'assets/gift_purple.png',
-        // Nutzer: (2,1) und (3,5)
-        positions: [ {x:1,y:0}, {x:2,y:4} ]
-      },
-      {
-        id: 'orange',
-        cssClass: 'path-orange',
-        img: 'assets/gift_orange.png',
-        // Nutzer: (4,2) und (7,2)
-        positions: [ {x:3,y:1}, {x:6,y:1} ]
-      },
-      {
-        id: 'pink',
-        cssClass: 'path-pink',
-        img: 'assets/gift_pink.png',
-        // Nutzer: (8,5) und (8,8)
-        positions: [ {x:7,y:4}, {x:7,y:7} ]
-      },
-      {
-        id: 'white',
-        cssClass: 'path-white',
-        img: 'assets/gift_white.png',
-        // Nutzer: (2,7) und (4,5)
-        positions: [ {x:1,y:6}, {x:3,y:4} ]
-      }
-    ];
-
-    let gridData;
-    let pathOwner;
-    let completedColors;
-    let partyShown = false;
-
-    let drawing = false;
-    let currentColor = null;
-    let currentCssClass = null;
-    let currentPathCells = [];
-
-    function initGridData(){
-      gridData = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
-
-      for(const pair of GIFT_PAIRS){
-        for(const pos of pair.positions){
-          gridData[pos.y][pos.x] = {
-            type:'gift',
-            color: pair.id,
-            cssClass: pair.cssClass,
-            img: pair.img
-          };
-        }
-      }
-    }
-
-    function renderGrid(){
-      gridEl.innerHTML = '';
-      gridEl.style.setProperty('--size', SIZE);
-
-      for(let y=0;y<SIZE;y++){
-        for(let x=0;x<SIZE;x++){
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          cell.dataset.x = x;
-          cell.dataset.y = y;
-
-          const info = gridData[y][x];
-          if(info && info.type === 'gift'){
-            cell.classList.add('gift');
-            const img = document.createElement('img');
-            img.src = info.img;
-            img.alt = info.color + 'es Geschenk';
-            img.className = 'gift-icon';
-            cell.appendChild(img);
-          }
-          gridEl.appendChild(cell);
-        }
-      }
-    }
-
-    function resetPaths(){
-      pathOwner = Array.from({length:SIZE}, ()=>Array(SIZE).fill(null));
-      completedColors = new Set();
-      partyShown = false;
-      statusCountEl.textContent = '0';
-      statusTotalEl.textContent = GIFT_PAIRS.length;
-      successMsgEl.textContent = '';
-
-      Array.from(gridEl.children).forEach(cell => {
-        cell.classList.remove(
-          'path-red','path-blue',
-          'path-yellow','path-purple','path-orange',
-          'path-pink','path-white',
-          'on-path','current-step'
-        );
-      });
-
-      // Party-Overlay zurücksetzen
-      hideParty();
-    }
-
-    function vibrate(ms){
-      try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){}
-    }
-
-    function cellFromPointerEvent(e){
-      const rect = gridEl.getBoundingClientRect();
-      const cw = rect.width / SIZE;
-      const ch = rect.height / SIZE;
-      let gx = Math.floor((e.clientX - rect.left)/cw);
-      let gy = Math.floor((e.clientY - rect.top)/ch);
-      if(isNaN(gx) || isNaN(gy)) return null;
-      gx = Math.max(0, Math.min(SIZE-1, gx));
-      gy = Math.max(0, Math.min(SIZE-1, gy));
-      const el = gridEl.children[gy*SIZE + gx];
-      return {x:gx,y:gy,el};
-    }
-
-    function neighbours(a,b){
-      const dx = Math.abs(a.x - b.x);
-      const dy = Math.abs(a.y - b.y);
-      return (dx + dy === 1);
-    }
-
-    function clearColorPath(colorId){
-      for(let y=0;y<SIZE;y++){
-        for(let x=0;x<SIZE;x++){
-          if(pathOwner[y][x] === colorId){
-            pathOwner[y][x] = null;
-            const cellEl = gridEl.children[y*SIZE+x];
-            const pairConf = GIFT_PAIRS.find(p=>p.id===colorId);
-            if(pairConf){
-              cellEl.classList.remove(pairConf.cssClass,'on-path','current-step');
-            }
-          }
-        }
-      }
-      completedColors.delete(colorId);
-      statusCountEl.textContent = completedColors.size;
-    }
-
-    function applyPathClass(x,y,colorId,cssClass){
-      const cellEl = gridEl.children[y*SIZE+x];
-      cellEl.classList.add(cssClass);
-      pathOwner[y][x] = colorId;
-    }
-
-    function allColorsCompleted(){
-      return completedColors.size === GIFT_PAIRS.length;
-    }
-
-    let activePointerId = null;
-
-    function pointerDown(e){
-      if(e.button !== undefined && e.button !== 0) return;
-      const target = e.target.closest('.cell');
-      if(!target) return;
-
-      const x = +target.dataset.x;
-      const y = +target.dataset.y;
-      const info = gridData[y][x];
-
-      if(!info || info.type !== 'gift') return;
-
-      clearColorPath(info.color);
-
-      drawing = true;
-      activePointerId = e.pointerId;
-      currentColor = info.color;
-      currentCssClass = info.cssClass;
-      currentPathCells = [];
-
-      currentPathCells.push({x,y});
-      applyPathClass(x,y,currentColor,currentCssClass);
-      target.classList.add('on-path','current-step');
-      vibrate(15);
-
-      gridEl.setPointerCapture(activePointerId);
-      e.preventDefault();
-    }
-
-    function pointerMove(e){
-      if(!drawing || e.pointerId !== activePointerId) return;
-
-      const cellInfo = cellFromPointerEvent(e);
-      if(!cellInfo) return;
-      const {x,y,el} = cellInfo;
-
-      const last = currentPathCells[currentPathCells.length-1];
-      if(last.x === x && last.y === y) return;
-
-      if(!neighbours(last, {x,y})) return;
-
-      const owner = pathOwner[y][x];
-      if(owner && owner !== currentColor) return;
-
-      const cellData = gridData[y][x];
-      if(cellData && cellData.type === 'gift' && cellData.color !== currentColor){
-        return;
-      }
-
-      currentPathCells.push({x,y});
-      applyPathClass(x,y,currentColor,currentCssClass);
-
-      const prevEl = gridEl.children[last.y*SIZE+last.x];
-      prevEl.classList.remove('current-step');
-      el.classList.add('current-step');
-      if(cellData && cellData.type==='gift'){
-        el.classList.add('on-path');
-      }
-    }
-
-    function pointerUp(e){
-      if(!drawing || e.pointerId !== activePointerId) return;
-      gridEl.releasePointerCapture(activePointerId);
-
-      const last = currentPathCells[currentPathCells.length-1];
-      const info = gridData[last.y][last.x];
-
-      if(info && info.type==='gift' && info.color===currentColor){
-        const pair = GIFT_PAIRS.find(p=>p.id===currentColor);
-        const posA = pair.positions[0];
-        const posB = pair.positions[1];
-
-        const foundA = currentPathCells.some(c=>c.x===posA.x && c.y===posA.y);
-        const foundB = currentPathCells.some(c=>c.x===posB.x && c.y===posB.y);
-
-        if(foundA && foundB){
-          completedColors.add(currentColor);
-          statusCountEl.textContent = completedColors.size;
-          vibrate(30);
-        } else {
-          clearColorPath(currentColor);
-        }
+    function setFeedback(msg, ok){
+      feedbackEl.textContent = msg;
+      feedbackEl.classList.remove('hidden');
+      if(ok){
+        feedbackEl.classList.add('success');
       } else {
-        clearColorPath(currentColor);
-      }
-
-      drawing = false;
-      activePointerId = null;
-      currentColor = null;
-      currentCssClass = null;
-      currentPathCells = [];
-
-      Array.from(gridEl.children).forEach(c => c.classList.remove('current-step'));
-
-      if(allColorsCompleted() && !partyShown){
-        successMsgEl.textContent =
-          'Hurra! Alle Geschenke sind verbunden. Geschenkdieb Gerd hat keine Chance mehr! Dein heutiger Buchstabe ist: e';
-        partyShown = true;
-        startParty();
+        feedbackEl.classList.remove('success');
       }
     }
 
-    function addEvents(){
-      gridEl.addEventListener('pointerdown', pointerDown, {passive:false});
-      gridEl.addEventListener('pointermove', pointerMove, {passive:false});
-      gridEl.addEventListener('pointerup',   pointerUp,   {passive:false});
-      gridEl.addEventListener('pointercancel', pointerUp, {passive:false});
-
-      partyOverlay.addEventListener('click', hideParty);
+    function getSelectValue(id){
+      const el = document.getElementById(id);
+      return el ? el.value : "";
     }
 
-    function init(){
-      initGridData();
-      renderGrid();
-      resetPaths();
+    function allCorrect(){
+      return (
+        getSelectValue("buyer-anna")  === CORRECT.buyer.anna  &&
+        getSelectValue("buyer-mara")  === CORRECT.buyer.mara  &&
+        getSelectValue("buyer-lina")  === CORRECT.buyer.lina  &&
+        getSelectValue("intended-anna") === CORRECT.intended.anna &&
+        getSelectValue("intended-mara") === CORRECT.intended.mara &&
+        getSelectValue("intended-lina") === CORRECT.intended.lina &&
+        getSelectValue("final-anna") === CORRECT.final.anna &&
+        getSelectValue("final-mara") === CORRECT.final.mara &&
+        getSelectValue("final-lina") === CORRECT.final.lina
+      );
     }
 
-    resetBtn.addEventListener('click', resetPaths);
+    function showHint(){
+      if(hintIndex < HINTS.length){
+        hintBoxEl.textContent = HINTS[hintIndex];
+        hintBoxEl.classList.remove('hidden');
+        hintIndex++;
+      } else {
+        hintBoxEl.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
+        hintBoxEl.classList.remove('hidden');
+      }
+    }
 
-    // === PARTY-FUNKTIONEN ===
+    // === Party-Effekt (leicht angepasste Version von Tag 11) ===
     function createGiftRain(count = 28){
-      const urls = GIFT_PAIRS.map(p => p.img);
-      // vorhandene Geschenke entfernen, falls noch welche da sind
+      const urls = [
+        'assets/gift.png',
+        'assets/gift_blue.png',
+        'assets/gift_yellow.png',
+        'assets/gift_purple.png',
+        'assets/gift_orange.png',
+        'assets/gift_pink.png',
+        'assets/gift_white.png'
+      ];
       partyOverlay.querySelectorAll('.party-gift').forEach(g => g.remove());
 
       for(let i=0;i<count;i++){
@@ -682,17 +585,45 @@
       partyOverlay.setAttribute('aria-hidden','false');
     }
 
-    function hideParty(){
+    function hideOverlay(){
       partyOverlay.classList.remove('visible');
       partyOverlay.setAttribute('aria-hidden','true');
-      // fallende Geschenke wieder entfernen, damit beim nächsten Mal neu gestartet wird
       setTimeout(()=>{
         partyOverlay.querySelectorAll('.party-gift').forEach(g => g.remove());
       }, 400);
     }
 
-    addEvents();
-    init();
+    function solve(){
+      if(allCorrect()){
+        setFeedback("Richtig! Alle Zuordnungen stimmen. 💫", true);
+        startParty();
+      } else {
+        setFeedback("Noch nicht ganz richtig. Überprüfe deine Zuordnungen. ❄️", false);
+      }
+    }
+
+    function reveal(){
+      document.getElementById("buyer-anna").value     = CORRECT.buyer.anna;
+      document.getElementById("buyer-mara").value     = CORRECT.buyer.mara;
+      document.getElementById("buyer-lina").value     = CORRECT.buyer.lina;
+
+      document.getElementById("intended-anna").value  = CORRECT.intended.anna;
+      document.getElementById("intended-mara").value  = CORRECT.intended.mara;
+      document.getElementById("intended-lina").value  = CORRECT.intended.lina;
+
+      document.getElementById("final-anna").value     = CORRECT.final.anna;
+      document.getElementById("final-mara").value     = CORRECT.final.mara;
+      document.getElementById("final-lina").value     = CORRECT.final.lina;
+
+      setFeedback("Die richtige Lösung wurde eingetragen. ✅", true);
+      startParty();
+    }
+
+    // Event-Listener
+    document.getElementById('solveBtn').addEventListener('click', solve);
+    document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('revealBtn').addEventListener('click', reveal);
+    partyOverlay.addEventListener('click', hideOverlay);
   </script>
 </body>
 </html>
