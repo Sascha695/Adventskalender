@@ -33,6 +33,16 @@
       background-attachment: fixed; /* Hintergrund bleibt stehen */
     }
 
+    /* Auf dem Handy: Bild nicht so stark herangezoomt, komplett(er) sichtbar */
+    @media (max-width: 720px) {
+      body.bg-image {
+        background-size: contain;
+        background-position: top center;
+        background-attachment: scroll; /* fixed macht auf Mobile oft Probleme */
+        background-color: #000;        /* Hintergrundfarbe für Ränder */
+      }
+    }
+
     .container {
       max-width: 900px;
       margin: 0 auto;
@@ -331,15 +341,16 @@
             Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt. 
             Doch diesmal wollten sie es spannender machen: Der Zufall sollte entscheiden.
           </p>
-          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit - sorgfältig verpackt, mit Schleifen verziert, 
+          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit – sorgfältig verpackt, mit Schleifen verziert, 
             aber ohne Namen, ohne Hinweis, für wen es eigentlich gedacht war.
-            </p>
+          </p>
           <p>Nur eines stand fest:
-            Jede Freundin hatte <strong>ein Geschenk gekauft</strong> und möchte dieses an <strong>eine Freundin verschenken</strong>
+            Jede Freundin hatte <strong>ein Geschenk gekauft</strong> und möchte dieses an <strong>eine Freundin verschenken</strong>.
             Auf dem Tisch lagen:
+          </p>
           <ul>
-            <li>🎁 <strong>Eine Motchi Packung</strong></li>
-            <li>🎁 <strong>Ein paar Kuschelsocken</strong></li>
+            <li>🎁 <strong>Eine Motchi-Packung</strong></li>
+            <li>🎁 <strong>Ein Paar Kuschelsocken</strong></li>
             <li>🎁 <strong>Eine Packung Weihnachtsausstecher</strong></li>
           </ul>
           
@@ -351,20 +362,20 @@
           </ol>
         </div>
 
-        <!-- Hinweis-Kachel (NEUE, kompliziertere Hinweise) -->
+        <!-- Hinweis-Kachel (kompliziertere Hinweise) -->
         <div class="tile">
           <h3>Hinweise aus dem Wichtel-Protokoll</h3>
           <ul>
-            <li>Anna findet Motchi zwar lecker, wollte dieses Jahr aber „nichts zum Naschen schenken“ – sie hat die
+            <li>Sarah liebt Motchi, wollte dieses Jahr aber „nichts zum Naschen schenken“ – sie hat die
                 <strong>Motchi-Packung nicht gekauft</strong>.</li>
-            <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Annas Backschublade: Sie wurden von <strong>Anna</strong> gekauft
-                und waren ursprünglich als Geschenk für <strong>Mara</strong> gedacht.</li>
-            <li>Mara liebt praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
+            <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Sarahs Backschublade: Sie wurden von <strong>Sarah</strong> gekauft
+                und waren ursprünglich als Geschenk für <strong>Lisa</strong> gedacht.</li>
+            <li>Lisa mag praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
                 sie kaufte deshalb die <strong>Kuschelsocken</strong>.</li>
             <li>Die <strong>Motchi-Packung</strong> war ursprünglich für die Freundin gedacht, die an Heiligabend am liebsten
-                auf dem Sofa nascht – das ist <strong>Anna</strong>.</li>
+                auf dem Sofa nascht – das ist <strong>Sarah</strong>.</li>
             <li>Am Ende landete die <strong>Motchi-Packung</strong> nicht bei der Person, für die sie gedacht war, sondern bei
-                <strong>Mara</strong>.</li>
+                <strong>Lisa</strong>.</li>
             <li>Zum Schluss bekam zwar jede ein Geschenk, aber <strong>keine</strong> der drei Freundinnen erhielt das Geschenk,
                 das ursprünglich für sie bestimmt war.</li>
           </ul>
@@ -390,16 +401,16 @@
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Anna</div>
-                    <div class="dropzone empty" id="buyer-anna" data-question="buyer" data-person="anna"></div>
+                    <div class="person-label">Sarah</div>
+                    <div class="dropzone empty" id="buyer-sarah" data-question="buyer" data-person="sarah"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Mara</div>
-                    <div class="dropzone empty" id="buyer-mara" data-question="buyer" data-person="mara"></div>
+                    <div class="person-label">Lisa</div>
+                    <div class="dropzone empty" id="buyer-lisa" data-question="buyer" data-person="lisa"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lina</div>
-                    <div class="dropzone empty" id="buyer-lina" data-question="buyer" data-person="lina"></div>
+                    <div class="person-label">Nicole</div>
+                    <div class="dropzone empty" id="buyer-nicole" data-question="buyer" data-person="nicole"></div>
                   </div>
                 </div>
               </div>
@@ -421,16 +432,16 @@
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Anna</div>
-                    <div class="dropzone empty" id="intended-anna" data-question="intended" data-person="anna"></div>
+                    <div class="person-label">Sarah</div>
+                    <div class="dropzone empty" id="intended-sarah" data-question="intended" data-person="sarah"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Mara</div>
-                    <div class="dropzone empty" id="intended-mara" data-question="intended" data-person="mara"></div>
+                    <div class="person-label">Lisa</div>
+                    <div class="dropzone empty" id="intended-lisa" data-question="intended" data-person="lisa"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lina</div>
-                    <div class="dropzone empty" id="intended-lina" data-question="intended" data-person="lina"></div>
+                    <div class="person-label">Nicole</div>
+                    <div class="dropzone empty" id="intended-nicole" data-question="intended" data-person="nicole"></div>
                   </div>
                 </div>
               </div>
@@ -452,16 +463,16 @@
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Anna</div>
-                    <div class="dropzone empty" id="final-anna" data-question="final" data-person="anna"></div>
+                    <div class="person-label">Sarah</div>
+                    <div class="dropzone empty" id="final-sarah" data-question="final" data-person="sarah"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Mara</div>
-                    <div class="dropzone empty" id="final-mara" data-question="final" data-person="mara"></div>
+                    <div class="person-label">Lisa</div>
+                    <div class="dropzone empty" id="final-lisa" data-question="final" data-person="lisa"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lina</div>
-                    <div class="dropzone empty" id="final-lina" data-question="final" data-person="lina"></div>
+                    <div class="person-label">Nicole</div>
+                    <div class="dropzone empty" id="final-nicole" data-question="final" data-person="nicole"></div>
                   </div>
                 </div>
               </div>
@@ -501,27 +512,27 @@
   <script>
     const CORRECT = {
       buyer: {
-        anna: "ausstecher",
-        mara: "socken",
-        lina: "motchi"
+        sarah: "ausstecher",
+        lisa: "socken",
+        nicole: "motchi"
       },
       intended: {
-        anna: "motchi",
-        mara: "ausstecher",
-        lina: "socken"
+        sarah: "motchi",
+        lisa: "ausstecher",
+        nicole: "socken"
       },
       final: {
-        anna: "socken",
-        mara: "motchi",
-        lina: "ausstecher"
+        sarah: "socken",
+        lisa: "motchi",
+        nicole: "ausstecher"
       }
     };
 
     const HINTS = [
-      "Hinweis 1: Die Weihnachtsausstecher wurden von Anna gekauft und waren ursprünglich für Mara bestimmt.",
-      "Hinweis 2: Mara hat das praktische Winter-Geschenk (die Kuschelsocken) ausgesucht.",
-      "Hinweis 3: Die Motchi-Packung war eigentlich für Anna gedacht, landete am Ende aber bei Mara.",
-      "Hinweis 4: Keine der drei Freundinnen bekam das Geschenk, das ursprünglich für sie vorgesehen war."
+      "Hinweis 1: Sarah hat die Motchi-Packung nicht gekauft.",
+      "Hinweis 2: Die Weihnachtsausstecher wurden von Sarah gekauft und waren ursprünglich für Lisa gedacht.",
+      "Hinweis 3: Lisa hat die Kuschelsocken gekauft.",
+      "Hinweis 4: Die Motchi-Packung war ursprünglich für Sarah gedacht, landete am Ende aber bei Lisa. Außerdem bekam keine der drei Freundinnen das Geschenk, das ursprünglich für sie vorgesehen war."
     ];
     let hintIndex = 0;
 
@@ -621,15 +632,15 @@
 
     function allCorrect() {
       return (
-        getAssignedGift("buyer", "anna") === CORRECT.buyer.anna &&
-        getAssignedGift("buyer", "mara") === CORRECT.buyer.mara &&
-        getAssignedGift("buyer", "lina") === CORRECT.buyer.lina &&
-        getAssignedGift("intended", "anna") === CORRECT.intended.anna &&
-        getAssignedGift("intended", "mara") === CORRECT.intended.mara &&
-        getAssignedGift("intended", "lina") === CORRECT.intended.lina &&
-        getAssignedGift("final", "anna") === CORRECT.final.anna &&
-        getAssignedGift("final", "mara") === CORRECT.final.mara &&
-        getAssignedGift("final", "lina") === CORRECT.final.lina
+        getAssignedGift("buyer", "sarah") === CORRECT.buyer.sarah &&
+        getAssignedGift("buyer", "lisa") === CORRECT.buyer.lisa &&
+        getAssignedGift("buyer", "nicole") === CORRECT.buyer.nicole &&
+        getAssignedGift("intended", "sarah") === CORRECT.intended.sarah &&
+        getAssignedGift("intended", "lisa") === CORRECT.intended.lisa &&
+        getAssignedGift("intended", "nicole") === CORRECT.intended.nicole &&
+        getAssignedGift("final", "sarah") === CORRECT.final.sarah &&
+        getAssignedGift("final", "lisa") === CORRECT.final.lisa &&
+        getAssignedGift("final", "nicole") === CORRECT.final.nicole
       );
     }
 
@@ -671,17 +682,17 @@
     function reveal() {
       // Alle Karten in die passenden Slots verschieben
       const mapping = [
-        { id: "gift-buyer-ausstecher",   target: "buyer-anna" },
-        { id: "gift-buyer-socken",       target: "buyer-mara" },
-        { id: "gift-buyer-motchi",       target: "buyer-lina" },
+        { id: "gift-buyer-ausstecher",   target: "buyer-sarah" },
+        { id: "gift-buyer-socken",       target: "buyer-lisa" },
+        { id: "gift-buyer-motchi",       target: "buyer-nicole" },
 
-        { id: "gift-intended-motchi",    target: "intended-anna" },
-        { id: "gift-intended-ausstecher",target: "intended-mara" },
-        { id: "gift-intended-socken",    target: "intended-lina" },
+        { id: "gift-intended-motchi",    target: "intended-sarah" },
+        { id: "gift-intended-ausstecher",target: "intended-lisa" },
+        { id: "gift-intended-socken",    target: "intended-nicole" },
 
-        { id: "gift-final-socken",       target: "final-anna" },
-        { id: "gift-final-motchi",       target: "final-mara" },
-        { id: "gift-final-ausstecher",   target: "final-lina" }
+        { id: "gift-final-socken",       target: "final-sarah" },
+        { id: "gift-final-motchi",       target: "final-lisa" },
+        { id: "gift-final-ausstecher",   target: "final-nicole" }
       ];
 
       mapping.forEach(m => {
