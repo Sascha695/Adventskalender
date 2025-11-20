@@ -3,9 +3,309 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 13 – Das Wichtel-Wirrwar (erschwerte Version)</title>
+  <title>Tag 18 – Das Wichtel-Wirrwar</title>
+
   <style>
-/* --- Styles unverändert gelassen (von dir gewünschter Fokus liegt auf Story/Hinweisen/Geschenken) --- */
+    /* ---------- Grundlayout + Hintergrund ---------- */
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-gold: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+    }
+
+    body.bg-image {
+      background-image: url("assets/freundinnen_wichteln.png"); /* <-- ANPASSEN */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* Hintergrund bleibt stehen */
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .card {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    /* ---------- Glas-Kacheln ---------- */
+    .header-tile {
+      background: linear-gradient(135deg, rgba(185, 28, 28, 0.95), rgba(248, 113, 113, 0.9));
+      color: #fef2f2;
+      border-radius: 24px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
+      margin-bottom: 12px;
+    }
+
+    .header-tile .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tile h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .header-tile .emoji {
+      font-size: 1.6rem;
+    }
+
+    .header-tile a {
+      color: #fef2f2;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(254, 242, 242, 0.5);
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .card-stack {
+      margin-top: 200px; /* oder 60px oder mehr, je nach Wunsch */
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 18px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .tile h2,
+    .tile h3,
+    .tile h4 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .muted {
+      color: #e5e7eb;
+      opacity: 0.85;
+      font-size: 0.9rem;
+      margin: 4px 4px 16px;
+    }
+
+    a {
+      color: #bfdbfe;
+    }
+
+    /* ---------- Adventskalender-Buttons ---------- */
+    .row.wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      position: relative;
+      border-radius: 18px;
+      border: 2px solid var(--accent-gold);
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-image: linear-gradient(135deg, #15803d, #22c55e);
+      color: #fefce8;
+      box-shadow: 0 10px 22px rgba(22, 163, 74, 0.55);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    }
+
+    .btn::before {
+      content: "★";
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .btn.secondary {
+      background-image: linear-gradient(135deg, #b91c1c, #ef4444);
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.55);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 26px rgba(15, 23, 42, 0.7);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    /* ---------- Drag & Drop-Bereich ---------- */
+    .question-block {
+      margin-bottom: 16px;
+    }
+
+    .question-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fefce8;
+    }
+
+    .drag-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 720px) {
+      .drag-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gift-pool-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #e5e7eb;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .gift-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px dashed rgba(148, 163, 184, 0.8);
+      min-height: 56px;
+    }
+
+    .gift-card {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.75);
+      background: radial-gradient(circle at top left, rgba(254, 243, 199, 0.4), rgba(15, 23, 42, 0.9));
+      color: #fefce8;
+      font-size: 0.85rem;
+      cursor: grab;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .gift-card:active {
+      cursor: grabbing;
+    }
+
+    .assignments {
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+    }
+
+    .person-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .person-label {
+      flex: 0 0 76px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .dropzone {
+      flex: 1;
+      min-height: 32px;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.9);
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dropzone.dragover {
+      border-style: solid;
+      border-color: var(--accent-gold);
+      background: rgba(30, 64, 175, 0.25);
+    }
+
+    .dropzone.empty::before {
+      content: "Ziehe ein Geschenk hierher";
+      font-size: 0.75rem;
+      opacity: 0.6;
+      color: #e5e7eb;
+    }
+
+    /* ---------- Feedback / Hinweis / Footer ---------- */
+    .note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    .note.success {
+      background: rgba(22, 163, 74, 0.95);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #letterBox .letter {
+      margin-top: 6px;
+      font-size: 2.1rem;
+      font-weight: 800;
+      text-align: center;
+      color: #fef3c7;
+      text-shadow: 0 0 12px rgba(252, 211, 77, 0.8);
+    }
+
+    .footer {
+      margin-top: 8px;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body class="bg-image">
@@ -16,7 +316,7 @@
       <div class="header-tile">
         <div class="logo">
           <span class="emoji">🎄</span>
-          <h1>Tag 13: Das Wichtel-Wirrwar – schwierigere Version</h1>
+          <h1>Tag 13: Das Wichtel-Wirrwar</h1>
         </div>
         <a href="../index.html">⬅︎ Zurück</a>
       </div>
@@ -26,24 +326,23 @@
         <div class="tile">
           <h2>Rätsel</h2>
           <p>
-            Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>,
-            <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln.
-            Dieses Jahr allerdings sollte es besonders chaotisch werden: Sie beschlossen, die Zuordnung der Geschenke
-            vollständig dem Zufall zu überlassen.
+            Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>, 
+            <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln. 
+            Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt. 
+            Doch diesmal wollten sie es spannender machen: Der Zufall sollte entscheiden.
           </p>
-          <p>
-            Jede brachte daher ein sorgfältig verpacktes Geschenk mit – allerdings ohne Hinweis darauf,
-            wer der Empfänger sein sollte. Nur eines ist sicher:
-            Jede Freundin hat <strong>genau ein Geschenk gekauft</strong> und es war ursprünglich <strong>für eine andere</strong> gedacht.
-          </p>
-
-          <p>Auf dem Tisch lagen:</p>
+          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit - sorgfältig verpackt, mit Schleifen verziert, 
+            aber ohne Namen, ohne Hinweis, für wen es eigentlich gedacht war.
+            </p>
+          <p>Nur eines stand fest:
+            Jede Freundin hatte <strong>ein Geschenk gekauft</strong> und möchte dieses an <strong>eine Freundin verschenken</strong>
+            Auf dem Tisch lagen:
           <ul>
-            <li>🎁 <strong>Eine Motchi‑Packung</strong></li>
-            <li>🎁 <strong>Ein Paar Kuschelsocken</strong></li>
-            <li>🎁 <strong>Ein Satz Weihnachtsausstecher</strong></li>
+            <li>🎁 <strong>Eine Motchi Packung</strong></li>
+            <li>🎁 <strong>Ein paar Kuschelsocken</strong></li>
+            <li>🎁 <strong>Eine Packung Weihnachtsausstecher</strong></li>
           </ul>
-
+          
           <p><strong>Was du herausfinden sollst:</strong></p>
           <ol>
             <li>Wer hat welches Geschenk gekauft?</li>
@@ -52,24 +351,26 @@
           </ol>
         </div>
 
-        <!-- Neue, schwierigere Hinweise -->
+        <!-- Hinweis-Kachel (NEUE, kompliziertere Hinweise) -->
         <div class="tile">
-          <h3>Hinweise aus dem Wichtel-Protokoll (erschwert)</h3>
+          <h3>Hinweise aus dem Wichtel-Protokoll</h3>
           <ul>
-            <li>Nicole hat <strong>nicht</strong> die Motchi-Packung gekauft – und sie war auch <strong>nicht</strong> für sie gedacht.</li>
-            <li>Die <strong>Kuschelsocken</strong> waren ursprünglich für jene Freundin gedacht, die im Winter immer kalte Füße hat –
-                das ist <strong>nicht</strong> Sarah.</li>
-            <li>Lisa kauft grundsätzlich nichts Essbares zu Weihnachten – also stammen die <strong>Weihnachtsausstecher</strong>
-                nicht von ihr.</li>
-            <li>Sarah verpackt ihre Geschenke immer besonders ordentlich; diesmal lag das Geschenk mit der schönsten Schleife
-                vor <strong>Lisa</strong> – aber es war <strong>ursprünglich nicht</strong> für sie bestimmt.</li>
-            <li>Am Ende bekam jede ein Geschenk, aber <strong>keine</strong> von ihnen erhielt das, das sie ursprünglich kaufen wollte.</li>
+            <li>Anna findet Motchi zwar lecker, wollte dieses Jahr aber „nichts zum Naschen schenken“ – sie hat die
+                <strong>Motchi-Packung nicht gekauft</strong>.</li>
+            <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Annas Backschublade: Sie wurden von <strong>Anna</strong> gekauft
+                und waren ursprünglich als Geschenk für <strong>Mara</strong> gedacht.</li>
+            <li>Mara liebt praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
+                sie kaufte deshalb die <strong>Kuschelsocken</strong>.</li>
+            <li>Die <strong>Motchi-Packung</strong> war ursprünglich für die Freundin gedacht, die an Heiligabend am liebsten
+                auf dem Sofa nascht – das ist <strong>Anna</strong>.</li>
+            <li>Am Ende landete die <strong>Motchi-Packung</strong> nicht bei der Person, für die sie gedacht war, sondern bei
+                <strong>Mara</strong>.</li>
+            <li>Zum Schluss bekam zwar jede ein Geschenk, aber <strong>keine</strong> der drei Freundinnen erhielt das Geschenk,
+                das ursprünglich für sie bestimmt war.</li>
           </ul>
         </div>
 
-        <!-- Drag & Drop Bereiche -->
-        <!-- Die IDs und technischen Zuordnungen wurden an die neuen Geschenkarten angepasst -->
-
+        <!-- Zuordnungen-Kachel mit Drag & Drop -->
         <div class="tile">
           <h3>Zuordnungen</h3>
           <p><strong>Ziehe für jede Frage die Geschenke zu den passenden Personen.</strong></p>
@@ -81,24 +382,24 @@
               <div>
                 <div class="gift-pool-label">Geschenke</div>
                 <div class="gift-pool" id="pool-buyer">
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-buyer-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="socken" id="gift-buyer-socken">Kuschelsocken</div>
+                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-buyer-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-buyer-ausstecher">Weihnachtsausstecher</div>
                 </div>
               </div>
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="buyer-sarah" data-question="buyer" data-person="sarah"></div>
+                    <div class="person-label">Anna</div>
+                    <div class="dropzone empty" id="buyer-anna" data-question="buyer" data-person="anna"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="buyer-lisa" data-question="buyer" data-person="lisa"></div>
+                    <div class="person-label">Mara</div>
+                    <div class="dropzone empty" id="buyer-mara" data-question="buyer" data-person="mara"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="buyer-nicole" data-question="buyer" data-person="nicole"></div>
+                    <div class="person-label">Lina</div>
+                    <div class="dropzone empty" id="buyer-lina" data-question="buyer" data-person="lina"></div>
                   </div>
                 </div>
               </div>
@@ -112,24 +413,24 @@
               <div>
                 <div class="gift-pool-label">Geschenke</div>
                 <div class="gift-pool" id="pool-intended">
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-intended-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="socken" id="gift-intended-socken">Kuschelsocken</div>
+                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-intended-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-intended-ausstecher">Weihnachtsausstecher</div>
                 </div>
               </div>
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="intended-sarah" data-question="intended" data-person="sarah"></div>
+                    <div class="person-label">Anna</div>
+                    <div class="dropzone empty" id="intended-anna" data-question="intended" data-person="anna"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="intended-lisa" data-question="intended" data-person="lisa"></div>
+                    <div class="person-label">Mara</div>
+                    <div class="dropzone empty" id="intended-mara" data-question="intended" data-person="mara"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="intended-nicole" data-question="intended" data-person="nicole"></div>
+                    <div class="person-label">Lina</div>
+                    <div class="dropzone empty" id="intended-lina" data-question="intended" data-person="lina"></div>
                   </div>
                 </div>
               </div>
@@ -143,24 +444,24 @@
               <div>
                 <div class="gift-pool-label">Geschenke</div>
                 <div class="gift-pool" id="pool-final">
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-final-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="socken" id="gift-final-socken">Kuschelsocken</div>
+                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-final-motchi">Motchi-Packung</div>
                   <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-final-ausstecher">Weihnachtsausstecher</div>
                 </div>
               </div>
               <div>
                 <div class="assignments">
                   <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="final-sarah" data-question="final" data-person="sarah"></div>
+                    <div class="person-label">Anna</div>
+                    <div class="dropzone empty" id="final-anna" data-question="final" data-person="anna"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="final-lisa" data-question="final" data-person="lisa"></div>
+                    <div class="person-label">Mara</div>
+                    <div class="dropzone empty" id="final-mara" data-question="final" data-person="mara"></div>
                   </div>
                   <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="final-nicole" data-question="final" data-person="nicole"></div>
+                    <div class="person-label">Lina</div>
+                    <div class="dropzone empty" id="final-lina" data-question="final" data-person="lina"></div>
                   </div>
                 </div>
               </div>
@@ -196,44 +497,45 @@
     </div>
   </div>
 
-  <!-- Logik aktualisiert mit neuen korrekten Lösungen -->
+  <!-- ---------- Logik & Drag-and-Drop ---------- -->
   <script>
     const CORRECT = {
       buyer: {
-        sarah: "ausstecher",
-        lisa: "socken",
-        nicole: "motchi"
+        anna: "ausstecher",
+        mara: "socken",
+        lina: "motchi"
       },
       intended: {
-        sarah: "motchi",
-        lisa: "ausstecher",
-        nicole: "socken"
+        anna: "motchi",
+        mara: "ausstecher",
+        lina: "socken"
       },
       final: {
-        sarah: "socken",
-        lisa: "motchi",
-        nicole: "ausstecher"
+        anna: "socken",
+        mara: "motchi",
+        lina: "ausstecher"
       }
     };
 
     const HINTS = [
-      "Hinweis 1: Beginne damit auszuschließen, welche Geschenke garantiert nicht von bestimmten Personen stammen.",
-      "Hinweis 2: Überlege, welche Freundin im Winter immer friert – das hilft bei den Kuschelsocken.",
-      "Hinweis 3: Die schönste Schleife lag vor Lisa, war aber nicht für sie. Das Geschenk stammt außerdem von Sarah.",
-      "Hinweis 4: Niemand erhielt das Geschenk, das ursprünglich für sie vorgesehen war – das hilft bei der Endverteilung."
+      "Hinweis 1: Die Weihnachtsausstecher wurden von Anna gekauft und waren ursprünglich für Mara bestimmt.",
+      "Hinweis 2: Mara hat das praktische Winter-Geschenk (die Kuschelsocken) ausgesucht.",
+      "Hinweis 3: Die Motchi-Packung war eigentlich für Anna gedacht, landete am Ende aber bei Mara.",
+      "Hinweis 4: Keine der drei Freundinnen bekam das Geschenk, das ursprünglich für sie vorgesehen war."
     ];
     let hintIndex = 0;
 
-    /* ---- Drag & Drop Logik (unverändert) ---- */
-
     let draggedCard = null;
+
     function initDragAndDrop() {
-      document.querySelectorAll(".gift-card").forEach(card => {
+      const cards = document.querySelectorAll(".gift-card");
+      cards.forEach(card => {
         card.addEventListener("dragstart", onDragStart);
         card.addEventListener("dragend", onDragEnd);
       });
 
-      document.querySelectorAll(".dropzone, .gift-pool").forEach(zone => {
+      const dropzones = document.querySelectorAll(".dropzone, .gift-pool");
+      dropzones.forEach(zone => {
         zone.addEventListener("dragover", onDragOver);
         zone.addEventListener("dragleave", onDragLeave);
         zone.addEventListener("drop", onDrop);
@@ -244,18 +546,30 @@
       draggedCard = e.target;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", e.target.id);
+      setTimeout(() => {
+        // optional visuelle Anpassung
+      }, 0);
     }
+
     function onDragEnd() {
       draggedCard = null;
       document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
     }
+
     function onDragOver(e) {
       e.preventDefault();
-      if (e.currentTarget.classList.contains("dropzone")) e.currentTarget.classList.add("dragover");
+      e.dataTransfer.dropEffect = "move";
+      if (e.currentTarget.classList.contains("dropzone")) {
+        e.currentTarget.classList.add("dragover");
+      }
     }
+
     function onDragLeave(e) {
-      e.currentTarget.classList.remove("dragover");
+      if (e.currentTarget.classList.contains("dropzone")) {
+        e.currentTarget.classList.remove("dragover");
+      }
     }
+
     function onDrop(e) {
       e.preventDefault();
       const target = e.currentTarget;
@@ -264,46 +578,58 @@
       if (!card) return;
 
       if (target.classList.contains("dropzone") || target.classList.contains("gift-pool")) {
-        if (target.classList.contains("dropzone")) target.classList.remove("dragover");
+        if (target.classList.contains("dropzone")) {
+          target.classList.remove("dragover");
+        }
 
+        // In Dropzones darf nur eine Karte liegen
         if (target.classList.contains("dropzone") && target.firstElementChild) {
           const existing = target.firstElementChild;
           const poolId = "pool-" + target.dataset.question;
-          document.getElementById(poolId).appendChild(existing);
+          const pool = document.getElementById(poolId);
+          if (pool) {
+            pool.appendChild(existing);
+            updateEmptyState(pool);
+          }
         }
 
         const oldParent = card.parentElement;
         target.appendChild(card);
         updateEmptyState(target);
-        updateEmptyState(oldParent);
+        if (oldParent && (oldParent.classList.contains("dropzone") || oldParent.classList.contains("gift-pool"))) {
+          updateEmptyState(oldParent);
+        }
       }
     }
 
     function updateEmptyState(container) {
       if (container.classList.contains("dropzone")) {
-        if (container.children.length === 0) container.classList.add("empty"); else container.classList.remove("empty");
+        if (container.children.length === 0) {
+          container.classList.add("empty");
+        } else {
+          container.classList.remove("empty");
+        }
       }
     }
 
     function getAssignedGift(question, person) {
       const zone = document.getElementById(`${question}-${person}`);
+      if (!zone) return "";
       const card = zone.querySelector(".gift-card");
       return card ? card.dataset.gift : "";
     }
 
     function allCorrect() {
       return (
-        getAssignedGift("buyer", "sarah") === CORRECT.buyer.sarah &&
-        getAssignedGift("buyer", "lisa") === CORRECT.buyer.lisa &&
-        getAssignedGift("buyer", "nicole") === CORRECT.buyer.nicole &&
-
-        getAssignedGift("intended", "sarah") === CORRECT.intended.sarah &&
-        getAssignedGift("intended", "lisa") === CORRECT.intended.lisa &&
-        getAssignedGift("intended", "nicole") === CORRECT.intended.nicole &&
-
-        getAssignedGift("final", "sarah") === CORRECT.final.sarah &&
-        getAssignedGift("final", "lisa") === CORRECT.final.lisa &&
-        getAssignedGift("final", "nicole") === CORRECT.final.nicole
+        getAssignedGift("buyer", "anna") === CORRECT.buyer.anna &&
+        getAssignedGift("buyer", "mara") === CORRECT.buyer.mara &&
+        getAssignedGift("buyer", "lina") === CORRECT.buyer.lina &&
+        getAssignedGift("intended", "anna") === CORRECT.intended.anna &&
+        getAssignedGift("intended", "mara") === CORRECT.intended.mara &&
+        getAssignedGift("intended", "lina") === CORRECT.intended.lina &&
+        getAssignedGift("final", "anna") === CORRECT.final.anna &&
+        getAssignedGift("final", "mara") === CORRECT.final.mara &&
+        getAssignedGift("final", "lina") === CORRECT.final.lina
       );
     }
 
@@ -311,7 +637,11 @@
       const box = document.getElementById("feedback");
       box.textContent = msg;
       box.classList.remove("hidden");
-      if (ok) box.classList.add("success"); else box.classList.remove("success");
+      if (ok) {
+        box.classList.add("success");
+      } else {
+        box.classList.remove("success");
+      }
     }
 
     function showLetter() {
@@ -330,7 +660,8 @@
     function showHint() {
       const box = document.getElementById("hintBox");
       if (hintIndex < HINTS.length) {
-        box.textContent = HINTS[hintIndex++];
+        box.textContent = HINTS[hintIndex];
+        hintIndex++;
       } else {
         box.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
       }
@@ -338,36 +669,48 @@
     }
 
     function reveal() {
+      // Alle Karten in die passenden Slots verschieben
       const mapping = [
-        { id: "gift-buyer-ausstecher", target: "buyer-sarah" },
-        { id: "gift-buyer-socken", target: "buyer-lisa" },
-        { id: "gift-buyer-motchi", target: "buyer-nicole" },
+        { id: "gift-buyer-ausstecher",   target: "buyer-anna" },
+        { id: "gift-buyer-socken",       target: "buyer-mara" },
+        { id: "gift-buyer-motchi",       target: "buyer-lina" },
 
-        { id: "gift-intended-motchi", target: "intended-sarah" },
-        { id: "gift-intended-ausstecher", target: "intended-lisa" },
-        { id: "gift-intended-socken", target: "intended-nicole" },
+        { id: "gift-intended-motchi",    target: "intended-anna" },
+        { id: "gift-intended-ausstecher",target: "intended-mara" },
+        { id: "gift-intended-socken",    target: "intended-lina" },
 
-        { id: "gift-final-socken", target: "final-sarah" },
-        { id: "gift-final-motchi", target: "final-lisa" },
-        { id: "gift-final-ausstecher", target: "final-nicole" }
+        { id: "gift-final-socken",       target: "final-anna" },
+        { id: "gift-final-motchi",       target: "final-mara" },
+        { id: "gift-final-ausstecher",   target: "final-lina" }
       ];
 
       mapping.forEach(m => {
         const card = document.getElementById(m.id);
         const target = document.getElementById(m.target);
-        if (target.firstElementChild && target.firstElementChild !== card) {
-          const poolId = "pool-" + target.dataset.question;
-          document.getElementById(poolId).appendChild(target.firstElementChild);
+        if (card && target) {
+          // Wenn im Ziel schon etwas liegt, zurück in den passenden Pool
+          if (target.firstElementChild && target.firstElementChild !== card) {
+            const poolId = "pool-" + target.dataset.question;
+            const pool = document.getElementById(poolId);
+            if (pool) {
+              pool.appendChild(target.firstElementChild);
+              updateEmptyState(pool);
+            }
+          }
+          const oldParent = card.parentElement;
+          target.appendChild(card);
+          updateEmptyState(target);
+          if (oldParent) updateEmptyState(oldParent);
         }
-        target.appendChild(card);
-        updateEmptyState(target);
       });
 
       setFeedback("Die richtige Lösung wurde eingetragen. ✅", true);
       showLetter();
     }
 
-    document.addEventListener("DOMContentLoaded", initDragAndDrop);
+    document.addEventListener("DOMContentLoaded", () => {
+      initDragAndDrop();
+    });
   </script>
 </body>
 </html>
