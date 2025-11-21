@@ -19,10 +19,15 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      height: 100%;
+    }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #e5e7eb;
+      overflow-y: auto; /* wichtig: Seite kann scrollen */
     }
 
     body.bg-image {
@@ -95,7 +100,7 @@
     }
 
     .card-stack {
-      margin-top: 400px; /* oder 60px oder mehr, je nach Wunsch */
+      margin-top: 400px; /* bei Bedarf anpassen */
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -231,7 +236,7 @@
       cursor: grab;
       user-select: none;
       white-space: nowrap;
-      touch-action: none; /* hilft bei Touch-Drag */
+      /* touch-action entfernt, damit Scrollen funktioniert */
     }
 
     .gift-card:active {
@@ -386,19 +391,20 @@
         <div class="logo">
           <span class="emoji">🎄</span>
           <h1>Tag 18: Das Wichtel-Wirrwar</h1>
-        
+        </div>
+      </div>
 
       <div class="card-stack">
         <!-- Story-Kachel -->
         <div class="tile">
           <h2>Rätsel</h2>
           <p>
-            Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>, 
-            <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln. 
-            Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt. 
+            Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>,
+            <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln.
+            Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt.
             Doch diesmal wollten sie es spannender machen: Der Zufall sollte entscheiden.
           </p>
-          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit – sorgfältig verpackt, mit Schleifen verziert, 
+          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit – sorgfältig verpackt, mit Schleifen verziert,
             aber ohne Namen, ohne Hinweis, für wen es eigentlich gedacht war.
           </p>
           <p>Nur eines stand fest:
@@ -410,7 +416,7 @@
             <li>🎁 <strong>Ein Paar Kuschelsocken</strong></li>
             <li>🎁 <strong>Eine Packung Weihnachtsausstecher</strong></li>
           </ul>
-          
+
           <p><strong>Was du herausfinden sollst:</strong></p>
           <ol>
             <li>Wer hat welches Geschenk gekauft?</li>
@@ -542,7 +548,6 @@
           <div class="row wrap">
             <button class="btn" onclick="solve()">Lösen</button>
             <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
-            <!-- Button „Lösung anzeigen“ entfernt -->
           </div>
 
           <div id="feedback" class="note hidden"></div>
@@ -605,7 +610,7 @@
         card.addEventListener("dragstart", onDragStart);
         card.addEventListener("dragend", onDragEnd);
 
-        // Touch-„Drag“
+        // Touch-„Drag“ mit Scroll-Unterstützung
         card.addEventListener("touchstart", onTouchStart, { passive: false });
         card.addEventListener("touchmove", onTouchMove, { passive: false });
         card.addEventListener("touchend", onTouchEnd);
@@ -769,13 +774,17 @@
       box.appendChild(p);
     }
 
-    /* ---------- Touch-Drag (vereinfacht) ---------- */
+    /* ---------- Touch-Drag mit Scroll-Unterstützung ---------- */
     let touchCard = null;
     let touchOriginalParent = null;
     let touchOriginalStyles = {};
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDragging = false;
 
     function onTouchStart(e) {
       if (e.touches.length > 1) return; // keine Multi-Touch-Drags
+
       touchCard = e.currentTarget;
       touchOriginalParent = touchCard.parentElement;
       touchOriginalStyles = {
@@ -785,13 +794,22 @@
         zIndex: touchCard.style.zIndex,
         transition: touchCard.style.transition
       };
+
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchDragging = false;
+      // kein preventDefault hier -> Scrollen bleibt erstmal erlaubt
+    }
+
+    function startTouchDrag(touch) {
+      touchDragging = true;
+
       touchCard.style.position = "fixed";
       touchCard.style.zIndex = "9999";
       touchCard.style.transition = "none";
 
-      const touch = e.touches[0];
       moveCardToTouchPosition(touch);
-      e.preventDefault();
     }
 
     function moveCardToTouchPosition(touch) {
@@ -804,22 +822,37 @@
     function onTouchMove(e) {
       if (!touchCard) return;
       const touch = e.touches[0];
-      moveCardToTouchPosition(touch);
 
-      // Dropzone visuell hervorheben
-      document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (!el) return;
-      const dz = el.closest(".dropzone");
-      if (dz) dz.classList.add("dragover");
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
 
-      e.preventDefault();
+      if (!touchDragging) {
+        // horizontal dominiert + genug Bewegung -> Drag starten
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+          startTouchDrag(touch);
+          e.preventDefault(); // jetzt übernehmen wir die Kontrolle
+        } else {
+          // eher vertikal oder zu wenig Bewegung -> Browser darf scrollen
+          return;
+        }
+      } else {
+        // wir sind bereits im Drag
+        moveCardToTouchPosition(touch);
+        e.preventDefault();
+
+        // Dropzone visuell hervorheben
+        document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!el) return;
+        const dz = el.closest(".dropzone");
+        if (dz) dz.classList.add("dragover");
+      }
     }
 
     function onTouchEnd(e) {
       if (!touchCard) return;
       const touch = e.changedTouches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+
       document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
 
       // ursprüngliche Styles zurücksetzen
@@ -829,23 +862,31 @@
       touchCard.style.zIndex = touchOriginalStyles.zIndex;
       touchCard.style.transition = touchOriginalStyles.transition;
 
-      let target = null;
-      if (el) {
-        const dz = el.closest(".dropzone");
-        const pool = el.closest(".gift-pool");
-        target = dz || pool;
-      }
+      if (touchDragging) {
+        // wir haben wirklich gezogen -> Drop versuchen
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
 
-      if (target) {
-        moveCardToTarget(touchCard, target);
-      } else if (touchOriginalParent) {
-        // Falls auf nichts Sinnvolles losgelassen: zurücklegen
-        touchOriginalParent.appendChild(touchCard);
-        updateEmptyState(touchOriginalParent);
+        let target = null;
+        if (el) {
+          const dz = el.closest(".dropzone");
+          const pool = el.closest(".gift-pool");
+          target = dz || pool;
+        }
+
+        if (target) {
+          moveCardToTarget(touchCard, target);
+        } else if (touchOriginalParent) {
+          // Falls auf nichts Sinnvolles losgelassen: zurücklegen
+          touchOriginalParent.appendChild(touchCard);
+          updateEmptyState(touchOriginalParent);
+        }
+      } else {
+        // war nur ein Tap oder Scroll-Geste -> nichts verschieben
       }
 
       touchCard = null;
       touchOriginalParent = null;
+      touchDragging = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
