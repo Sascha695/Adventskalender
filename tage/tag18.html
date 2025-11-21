@@ -21,31 +21,42 @@
 
     html, body {
       height: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #e5e7eb;
-      overflow-y: auto; /* wichtig: Seite kann scrollen */
+      overflow-y: auto; /* Inhalt scrollt */
+      background-color: #000; /* Fallback */
     }
 
-    body.bg-image {
+    /* Fixer Hintergrund als eigene Ebene */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
       background-image: url("assets/freundinnen_wichteln.png"); /* <-- ANPASSEN */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-attachment: fixed; /* Hintergrund bleibt stehen */
+      z-index: 0; /* unter dem Inhalt */
     }
 
-    /* Auf dem Handy: Bild möglichst komplett sichtbar und fixiert */
+    /* Auf dem Handy: Bild vollständig zeigen */
     @media (max-width: 720px) {
-      body.bg-image {
+      .bg-layer {
         background-size: contain;
         background-position: top center;
-        background-attachment: fixed;
-        background-color: #000; /* Hintergrundfarbe für Ränder */
+        background-color: #000; /* Ränder schwarz */
       }
+    }
+
+    /* Alles Scrollbare kommt in diese Ebene über dem Hintergrund */
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
     }
 
     .container {
@@ -236,7 +247,7 @@
       cursor: grab;
       user-select: none;
       white-space: nowrap;
-      /* touch-action entfernt, damit Scrollen funktioniert */
+      /* kein touch-action: none -> Scrollen bleibt möglich */
     }
 
     .gift-card:active {
@@ -382,178 +393,191 @@
     }
   </style>
 </head>
-<body class="bg-image">
-  <div class="container">
-    <div class="card">
+<body>
+  <!-- Fester Hintergrund -->
+  <div class="bg-layer"></div>
 
-      <!-- Kopfbereich -->
-      <div class="header-tile">
-        <div class="logo">
-          <span class="emoji">🎄</span>
-          <h1>Tag 18: Das Wichtel-Wirrwar</h1>
-        </div>
-      </div>
+  <!-- Scrollbarer Inhalt -->
+  <div class="page-content">
+    <div class="container">
+      <div class="card">
 
-      <div class="card-stack">
-        <!-- Story-Kachel -->
-        <div class="tile">
-          <h2>Rätsel</h2>
-          <p>
-            Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>,
-            <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln.
-            Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt.
-            Doch diesmal wollten sie es spannender machen: Der Zufall sollte entscheiden.
-          </p>
-          <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit – sorgfältig verpackt, mit Schleifen verziert,
-            aber ohne Namen, ohne Hinweis, für wen es eigentlich gedacht war.
-          </p>
-          <p>Nur eines stand fest:
-            Jede Freundin hatte <strong>ein Geschenk gekauft</strong> und möchte dieses an <strong>eine Freundin verschenken</strong>.
-            Auf dem Tisch lagen:
-          </p>
-          <ul>
-            <li>🎁 <strong>Eine Motchi-Packung</strong></li>
-            <li>🎁 <strong>Ein Paar Kuschelsocken</strong></li>
-            <li>🎁 <strong>Eine Packung Weihnachtsausstecher</strong></li>
-          </ul>
-
-          <p><strong>Was du herausfinden sollst:</strong></p>
-          <ol>
-            <li>Wer hat welches Geschenk gekauft?</li>
-            <li>Für wen war welches Geschenk ursprünglich gedacht?</li>
-            <li>Wer hat am Ende welches Geschenk bekommen?</li>
-          </ol>
+        <!-- Kopfbereich -->
+        <div class="header-tile">
+          <div class="logo">
+            <span class="emoji">🎄</span>
+            <h1>Tag 18: Das Wichtel-Wirrwar</h1>
+          </div>
         </div>
 
-        <!-- Hinweis-Kachel -->
-        <div class="tile">
-          <h3>Hinweise aus dem Wichtel-Protokoll</h3>
-          <ul>
-            <li>Sarah liebt Motchi, wollte dieses Jahr aber „nichts zum Naschen schenken“.</li>
-            <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Sarahs Backschublade: Sie wurden von <strong>Sarah</strong> gekauft
-                und waren ursprünglich als Geschenk für <strong>Lisa</strong> gedacht.</li>
-            <li>Lisa mag praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
-                sie kaufte deshalb die <strong>Kuschelsocken</strong>.</li>
-            <li>Die <strong>Motchi-Packung</strong> war ursprünglich für die Freundin gedacht, die an Heiligabend am liebsten
-                auf dem Sofa nascht – das ist <strong>Sarah</strong>.</li>
-            <li>Am Ende landete die <strong>Motchi-Packung</strong> nicht bei der Person, für die sie gedacht war, sondern bei
-                <strong>Lisa</strong>.</li>
-            <li>Zum Schluss bekam zwar jede ein Geschenk, aber <strong>keine</strong> der drei Freundinnen erhielt das Geschenk,
-                das ursprünglich für sie bestimmt war.</li>
-          </ul>
-        </div>
+        <div class="card-stack">
+          <!-- Story-Kachel -->
+          <div class="tile">
+            <h2>Rätsel</h2>
+            <p>
+              Jedes Jahr in der Vorweihnachtszeit treffen sich die drei Freundinnen <strong>Sarah</strong>,
+              <strong>Lisa</strong> und <strong>Nicole</strong> zu ihrem traditionellen Wichteln.
+              Normalerweise ziehen sie Lose, damit klar ist, wer wem ein Geschenk besorgt.
+              Doch diesmal wollten sie es spannender machen: Der Zufall sollte entscheiden.
+            </p>
+            <p>Also brachte jede ein liebevoll ausgewähltes Geschenk mit – sorgfältig verpackt, mit Schleifen verziert,
+              aber ohne Namen, ohne Hinweis, für wen es eigentlich gedacht war.
+            </p>
+            <p>Nur eines stand fest:
+              Jede Freundin hatte <strong>ein Geschenk gekauft</strong> und möchte dieses an <strong>eine Freundin verschenken</strong>.
+              Auf dem Tisch lagen:
+            </p>
+            <ul>
+              <li>🎁 <strong>Eine Motchi-Packung</strong></li>
+              <li>🎁 <strong>Ein Paar Kuschelsocken</strong></li>
+              <li>🎁 <strong>Eine Packung Weihnachtsausstecher</strong></li>
+            </ul>
 
-        <!-- Zuordnungen-Kachel mit Drag & Drop -->
-        <div class="tile">
-          <h3>Zuordnungen</h3>
-          <p><strong>Ziehe für jede Frage die Geschenke zu den passenden Personen.</strong></p>
+            <p><strong>Was du herausfinden sollst:</strong></p>
+            <ol>
+              <li>Wer hat welches Geschenk gekauft?</li>
+              <li>Für wen war welches Geschenk ursprünglich gedacht?</li>
+              <li>Wer hat am Ende welches Geschenk bekommen?</li>
+            </ol>
+          </div>
 
-          <!-- Frage 1 -->
-          <div class="question-block" data-question="buyer">
-            <div class="question-title">1) Wer hat welches Geschenk <u>gekauft</u>?</div>
-            <div class="drag-layout">
-              <div>
-                <div class="gift-pool-label">Geschenke</div>
-                <div class="gift-pool" id="pool-buyer">
-                  <div class="gift-card" draggable="true" data-gift="socken" id="gift-buyer-socken">Kuschelsocken</div>
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-buyer-motchi">Motchi-Packung</div>
-                  <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-buyer-ausstecher">Weihnachtsausstecher</div>
+          <!-- Hinweis-Kachel -->
+          <div class="tile">
+            <h3>Hinweise aus dem Wichtel-Protokoll</h3>
+            <ul>
+              <li>Sarah liebt Motchi, wollte dieses Jahr aber „nichts zum Naschen schenken“.</li>
+              <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Sarahs Backschublade: Sie wurden von <strong>Sarah</strong> gekauft
+                  und waren ursprünglich als Geschenk für <strong>Lisa</strong> gedacht.</li>
+              <li>Lisa mag praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
+                  sie kaufte deshalb die <strong>Kuschelsocken</strong>.</li>
+              <li>Die <strong>Motchi-Packung</strong> war ursprünglich für die Freundin gedacht, die an Heiligabend am liebsten
+                  auf dem Sofa nascht – das ist <strong>Sarah</strong>.</li>
+              <li>Am Ende landete die <strong>Motchi-Packung</strong> nicht bei der Person, für die sie gedacht war, sondern bei
+                  <strong>Lisa</strong>.</li>
+              <li>Zum Schluss bekam zwar jede ein Geschenk, aber <strong>keine</strong> der drei Freundinnen erhielt das Geschenk,
+                  das ursprünglich für sie bestimmt war.</li>
+            </ul>
+          </div>
+
+          <!-- Zuordnungen-Kachel mit Drag & Drop -->
+          <div class="tile">
+            <h3>Zuordnungen</h3>
+            <p><strong>Ziehe für jede Frage die Geschenke zu den passenden Personen.</strong></p>
+
+            <!-- Frage 1 -->
+            <div class="question-block" data-question="buyer">
+              <div class="question-title">1) Wer hat welches Geschenk <u>gekauft</u>?</div>
+              <div class="drag-layout">
+                <div>
+                  <div class="gift-pool-label">Geschenke</div>
+                  <div class="gift-pool" id="pool-buyer">
+                    <div class="gift-card" draggable="true" data-gift="socken" id="gift-buyer-socken">Kuschelsocken</div>
+                    <div class="gift-card" draggable="true" data-gift="motchi" id="gift-buyer-motchi">Motchi-Packung</div>
+                    <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-buyer-ausstecher">Weihnachtsausstecher</div>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div class="assignments">
-                  <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="buyer-sarah" data-question="buyer" data-person="sarah"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="buyer-lisa" data-question="buyer" data-person="lisa"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="buyer-nicole" data-question="buyer" data-person="nicole"></div>
+                <div>
+                  <div class="assignments">
+                    <div class="person-row">
+                      <div class="person-label">Sarah</div>
+                      <div class="dropzone empty" id="buyer-sarah" data-question="buyer" data-person="sarah"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Lisa</div>
+                      <div class="dropzone empty" id="buyer-lisa" data-question="buyer" data-person="lisa"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Nicole</div>
+                      <div class="dropzone empty" id="buyer-nicole" data-question="buyer" data-person="nicole"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Frage 2 -->
-          <div class="question-block" data-question="intended">
-            <div class="question-title">2) Für wen war welches Geschenk ursprünglich <u>gedacht</u>?</div>
-            <div class="drag-layout">
-              <div>
-                <div class="gift-pool-label">Geschenke</div>
-                <div class="gift-pool" id="pool-intended">
-                  <div class="gift-card" draggable="true" data-gift="socken" id="gift-intended-socken">Kuschelsocken</div>
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-intended-motchi">Motchi-Packung</div>
-                  <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-intended-ausstecher">Weihnachtsausstecher</div>
-                </div>
-              </div>
-              <div>
-                <div class="assignments">
-                  <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="intended-sarah" data-question="intended" data-person="sarah"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="intended-lisa" data-question="intended" data-person="lisa"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="intended-nicole" data-question="intended" data-person="nicole"></div>
+            <!-- Frage 2 -->
+            <div class="question-block" data-question="intended">
+              <div class="question-title">2) Für wen war welches Geschenk ursprünglich <u>gedacht</u>?</div>
+              <div class="drag-layout">
+                <div>
+                  <div class="gift-pool-label">Geschenke</div>
+                  <div class="gift-pool" id="pool-intended">
+                    <div class="gift-card" draggable="true" data-gift="socken" id="gift-intended-socken">Kuschelsocken</div>
+                    <div class="gift-card" draggable="true" data-gift="motchi" id="gift-intended-motchi">Motchi-Packung</div>
+                    <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-intended-ausstecher">Weihnachtsausstecher</div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Frage 3 -->
-          <div class="question-block" data-question="final">
-            <div class="question-title">3) Wer hat am Ende welches Geschenk <u>bekommen</u>?</div>
-            <div class="drag-layout">
-              <div>
-                <div class="gift-pool-label">Geschenke</div>
-                <div class="gift-pool" id="pool-final">
-                  <div class="gift-card" draggable="true" data-gift="socken" id="gift-final-socken">Kuschelsocken</div>
-                  <div class="gift-card" draggable="true" data-gift="motchi" id="gift-final-motchi">Motchi-Packung</div>
-                  <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-final-ausstecher">Weihnachtsausstecher</div>
-                </div>
-              </div>
-              <div>
-                <div class="assignments">
-                  <div class="person-row">
-                    <div class="person-label">Sarah</div>
-                    <div class="dropzone empty" id="final-sarah" data-question="final" data-person="sarah"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Lisa</div>
-                    <div class="dropzone empty" id="final-lisa" data-question="final" data-person="lisa"></div>
-                  </div>
-                  <div class="person-row">
-                    <div class="person-label">Nicole</div>
-                    <div class="dropzone empty" id="final-nicole" data-question="final" data-person="nicole"></div>
+                <div>
+                  <div class="assignments">
+                    <div class="person-row">
+                      <div class="person-label">Sarah</div>
+                      <div class="dropzone empty" id="intended-sarah" data-question="intended" data-person="sarah"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Lisa</div>
+                      <div class="dropzone empty" id="intended-lisa" data-question="intended" data-person="lisa"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Nicole</div>
+                      <div class="dropzone empty" id="intended-nicole" data-question="intended" data-person="nicole"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- Frage 3 -->
+            <div class="question-block" data-question="final">
+              <div class="question-title">3) Wer hat am Ende welches Geschenk <u>bekommen</u>?</div>
+              <div class="drag-layout">
+                <div>
+                  <div class="gift-pool-label">Geschenke</div>
+                  <div class="gift-pool" id="pool-final">
+                    <div class="gift-card" draggable="true" data-gift="socken" id="gift-final-socken">Kuschelsocken</div>
+                    <div class="gift-card" draggable="true" data-gift="motchi" id="gift-final-motchi">Motchi-Packung</div>
+                    <div class="gift-card" draggable="true" data-gift="ausstecher" id="gift-final-ausstecher">Weihnachtsausstecher</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="assignments">
+                    <div class="person-row">
+                      <div class="person-label">Sarah</div>
+                      <div class="dropzone empty" id="final-sarah" data-question="final" data-person="sarah"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Lisa</div>
+                      <div class="dropzone empty" id="final-lisa" data-question="final" data-person="lisa"></div>
+                    </div>
+                    <div class="person-row">
+                      <div class="person-label">Nicole</div>
+                      <div class="dropzone empty" id="final-nicole" data-question="final" data-person="nicole"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Aktionen + Feedback -->
+          <div class="tile">
+            <div class="row wrap">
+              <button class="btn" onclick="solve()">Lösen</button>
+              <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
+            </div>
+
+            <div id="feedback" class="note hidden"></div>
+            <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
+          </div>
+
+          <!-- Footer -->
+          <div class="tile">
+            <div class="footer">
+              <small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small>
+            </div>
           </div>
 
         </div>
-
-        <!-- Aktionen + Feedback -->
-        <div class="tile">
-          <div class="row wrap">
-            <button class="btn" onclick="solve()">Lösen</button>
-            <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
-          </div>
-
-          <div id="feedback" class="note hidden"></div>
-          <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
-        </div>
-
       </div>
     </div>
   </div>
