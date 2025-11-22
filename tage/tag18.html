@@ -247,7 +247,7 @@
       cursor: grab;
       user-select: none;
       white-space: nowrap;
-      /* kein touch-action: none -> Scrollen bleibt möglich */
+      touch-action: manipulation;
     }
 
     .gift-card:active {
@@ -581,7 +581,7 @@
   <div id="letterOverlay" class="party-overlay hidden">
     <div class="party-content">
       <p>Geschafft! Der Buchstabe für heute ist:</p>
-      <div class="party-letter">H</div>
+      <div class="party-letter">l</div>
     </div>
   </div>
 
@@ -590,17 +590,17 @@
     const CORRECT = {
       buyer: {
         sarah: "motchi",
-        lisa: "ausstecher",
-        nicole: "socken"
-      },
-      intended: {
-        sarah: "socken",
-        lisa: "motchi",
+        lisa: "socken",
         nicole: "ausstecher"
       },
-      final: {
+      intended: {
         sarah: "ausstecher",
-        lisa: "socken",
+        lisa: "motchi",
+        nicole: "socken"
+      },
+      final: {
+        sarah: "socken",
+        lisa: "ausstecher",
         nicole: "motchi"
       }
     };
@@ -621,10 +621,11 @@
         card.addEventListener("dragstart", onDragStart);
         card.addEventListener("dragend", onDragEnd);
 
-        // Touch-„Drag“ mit Scroll-Unterstützung
+        // Touch-Drag mit korrekter Positionierung
         card.addEventListener("touchstart", onTouchStart, { passive: false });
         card.addEventListener("touchmove", onTouchMove, { passive: false });
         card.addEventListener("touchend", onTouchEnd);
+        card.addEventListener("touchcancel", onTouchEnd);
       });
 
       const dropzones = document.querySelectorAll(".dropzone, .gift-pool");
@@ -667,7 +668,6 @@
       const cardId = e.dataTransfer.getData("text/plain");
       const card = document.getElementById(cardId);
       if (!card) return;
-
       moveCardToTarget(card, target);
     }
 
@@ -751,7 +751,6 @@
         dot.style.left = Math.random() * 100 + "%";
         dot.style.top = (Math.random() * 30) + "%";
         content.appendChild(dot);
-        // nach Animation wieder entfernen
         setTimeout(() => dot.remove(), 1500);
       }
 
@@ -785,49 +784,63 @@
       box.appendChild(p);
     }
 
-    /* ---------- Touch-Drag mit Scroll-Unterstützung ---------- */
+    /* ---------- Touch-Drag mit korrekter Position & Ziel ---------- */
     let touchCard = null;
     let touchOriginalParent = null;
     let touchOriginalStyles = {};
     let touchStartX = 0;
     let touchStartY = 0;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
     let touchDragging = false;
+    let touchHoverTarget = null;
 
     function onTouchStart(e) {
-      if (e.touches.length > 1) return; // keine Multi-Touch-Drags
+      if (e.touches.length > 1) return;
 
       touchCard = e.currentTarget;
       touchOriginalParent = touchCard.parentElement;
+
+      const rect = touchCard.getBoundingClientRect();
+      const touch = e.touches[0];
+
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+
       touchOriginalStyles = {
         position: touchCard.style.position,
         left: touchCard.style.left,
         top: touchCard.style.top,
         zIndex: touchCard.style.zIndex,
-        transition: touchCard.style.transition
+        transition: touchCard.style.transition,
+        width: touchCard.style.width,
+        pointerEvents: touchCard.style.pointerEvents
       };
 
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
       touchDragging = false;
-      // kein preventDefault hier -> Scrollen bleibt erstmal erlaubt
+      touchHoverTarget = null;
+      // kein preventDefault hier: erst beim echten Drag
     }
 
     function startTouchDrag(touch) {
       touchDragging = true;
 
+      const rect = touchCard.getBoundingClientRect();
       touchCard.style.position = "fixed";
       touchCard.style.zIndex = "9999";
       touchCard.style.transition = "none";
+      touchCard.style.width = rect.width + "px";
+      touchCard.style.pointerEvents = "none"; // wichtig: Dropzone unter dem Finger erwischen
 
       moveCardToTouchPosition(touch);
     }
 
     function moveCardToTouchPosition(touch) {
       if (!touchCard) return;
-      const rect = touchCard.getBoundingClientRect();
-      touchCard.style.left = (touch.clientX - rect.width / 2) + "px";
-      touchCard.style.top = (touch.clientY - rect.height / 2) + "px";
+      touchCard.style.left = (touch.clientX - touchOffsetX) + "px";
+      touchCard.style.top = (touch.clientY - touchOffsetY) + "px";
     }
 
     function onTouchMove(e) {
@@ -836,47 +849,22 @@
 
       const dx = touch.clientX - touchStartX;
       const dy = touch.clientY - touchStartY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (!touchDragging) {
-        // horizontal dominiert + genug Bewegung -> Drag starten
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+        // ab kleiner Bewegung noch scrollen, ab ~8px: Drag starten
+        if (distance > 8) {
           startTouchDrag(touch);
-          e.preventDefault(); // jetzt übernehmen wir die Kontrolle
+          e.preventDefault();
         } else {
-          // eher vertikal oder zu wenig Bewegung -> Browser darf scrollen
           return;
         }
       } else {
-        // wir sind bereits im Drag
         moveCardToTouchPosition(touch);
         e.preventDefault();
 
-        // Dropzone visuell hervorheben
-        document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
+        // Dropzone / Pool unter dem Finger finden
         const el = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (!el) return;
-        const dz = el.closest(".dropzone");
-        if (dz) dz.classList.add("dragover");
-      }
-    }
-
-    function onTouchEnd(e) {
-      if (!touchCard) return;
-      const touch = e.changedTouches[0];
-
-      document.querySelectorAll(".dropzone.dragover").forEach(z => z.classList.remove("dragover"));
-
-      // ursprüngliche Styles zurücksetzen
-      touchCard.style.position = touchOriginalStyles.position;
-      touchCard.style.left = touchOriginalStyles.left;
-      touchCard.style.top = touchOriginalStyles.top;
-      touchCard.style.zIndex = touchOriginalStyles.zIndex;
-      touchCard.style.transition = touchOriginalStyles.transition;
-
-      if (touchDragging) {
-        // wir haben wirklich gezogen -> Drop versuchen
-        const el = document.elementFromPoint(touch.clientX, touch.clientY);
-
         let target = null;
         if (el) {
           const dz = el.closest(".dropzone");
@@ -884,20 +872,53 @@
           target = dz || pool;
         }
 
-        if (target) {
-          moveCardToTarget(touchCard, target);
+        // visuelles Hover-Feedback nur für Dropzones
+        if (touchHoverTarget && touchHoverTarget !== target && touchHoverTarget.classList && touchHoverTarget.classList.contains("dropzone")) {
+          touchHoverTarget.classList.remove("dragover");
+        }
+
+        touchHoverTarget = target;
+
+        if (touchHoverTarget && touchHoverTarget.classList && touchHoverTarget.classList.contains("dropzone")) {
+          touchHoverTarget.classList.add("dragover");
+        }
+      }
+    }
+
+    function restoreTouchCardStyles() {
+      if (!touchCard) return;
+      touchCard.style.position = touchOriginalStyles.position;
+      touchCard.style.left = touchOriginalStyles.left;
+      touchCard.style.top = touchOriginalStyles.top;
+      touchCard.style.zIndex = touchOriginalStyles.zIndex;
+      touchCard.style.transition = touchOriginalStyles.transition;
+      touchCard.style.width = touchOriginalStyles.width;
+      touchCard.style.pointerEvents = touchOriginalStyles.pointerEvents;
+    }
+
+    function onTouchEnd(e) {
+      if (!touchCard) return;
+
+      if (touchHoverTarget && touchHoverTarget.classList && touchHoverTarget.classList.contains("dropzone")) {
+        touchHoverTarget.classList.remove("dragover");
+      }
+
+      if (touchDragging) {
+        // Wenn wir gezogen haben: in die zuletzt gehoverte Zone / Pool legen
+        if (touchHoverTarget && (touchHoverTarget.classList.contains("dropzone") || touchHoverTarget.classList.contains("gift-pool"))) {
+          moveCardToTarget(touchCard, touchHoverTarget);
         } else if (touchOriginalParent) {
-          // Falls auf nichts Sinnvolles losgelassen: zurücklegen
           touchOriginalParent.appendChild(touchCard);
           updateEmptyState(touchOriginalParent);
         }
-      } else {
-        // war nur ein Tap oder Scroll-Geste -> nichts verschieben
       }
+
+      restoreTouchCardStyles();
 
       touchCard = null;
       touchOriginalParent = null;
       touchDragging = false;
+      touchHoverTarget = null;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
