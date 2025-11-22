@@ -445,17 +445,12 @@
           <div class="tile">
             <h3>Hinweise aus dem Wichtel-Protokoll</h3>
             <ul>
-              <li>Sarah liebt Motchi, wollte dieses Jahr aber „nichts zum Naschen schenken“.</li>
-              <li>Die <strong>Weihnachtsausstecher</strong> stammen aus Sarahs Backschublade: Sie wurden von <strong>Sarah</strong> gekauft
-                  und waren ursprünglich als Geschenk für <strong>Lisa</strong> gedacht.</li>
-              <li>Lisa mag praktische Sachen für den Winter und hatte sich etwas „zum Anziehen“ überlegt –
-                  sie kaufte deshalb die <strong>Kuschelsocken</strong>.</li>
-              <li>Die <strong>Motchi-Packung</strong> war ursprünglich für die Freundin gedacht, die an Heiligabend am liebsten
-                  auf dem Sofa nascht – das ist <strong>Sarah</strong>.</li>
-              <li>Am Ende landete die <strong>Motchi-Packung</strong> nicht bei der Person, für die sie gedacht war, sondern bei
-                  <strong>Lisa</strong>.</li>
-              <li>Zum Schluss bekam zwar jede ein Geschenk, aber <strong>keine</strong> der drei Freundinnen erhielt das Geschenk,
-                  das ursprünglich für sie bestimmt war.</li>
+              <li><strong>Sarah</strong> hat <strong>nicht</strong> die Weihnachtsausstecher gekauft.</li>
+              <li><strong>Nicole</strong> hat <strong>nicht</strong> die Motchi-Packung gekauft.</li>
+              <li>Die <strong>Motchi-Packung</strong> war ursprünglich für <strong>Lisa</strong> gedacht, landete aber am Ende <strong>nicht</strong> bei ihr.</li>
+              <li>Niemand hat ein Geschenk für die Person gekauft, für die es ursprünglich gedacht war.</li>
+              <li>Am Ende bekam <strong>Nicole</strong> die <strong>Motchi-Packung</strong>.</li>
+              <li>Die <strong>Weihnachtsausstecher</strong> waren ursprünglich für <strong>Sarah</strong> gedacht.</li>
             </ul>
           </div>
 
@@ -594,27 +589,26 @@
   <script>
     const CORRECT = {
       buyer: {
-        sarah: "ausstecher",
-        lisa: "socken",
-        nicole: "motchi"
-      },
-      intended: {
         sarah: "motchi",
         lisa: "ausstecher",
         nicole: "socken"
       },
-      final: {
+      intended: {
         sarah: "socken",
         lisa: "motchi",
         nicole: "ausstecher"
+      },
+      final: {
+        sarah: "ausstecher",
+        lisa: "socken",
+        nicole: "motchi"
       }
     };
 
     const HINTS = [
-      "Hinweis 1: Sarah hat die Motchi-Packung nicht gekauft.",
-      "Hinweis 2: Die Weihnachtsausstecher wurden von Sarah gekauft und waren ursprünglich für Lisa gedacht.",
-      "Hinweis 3: Lisa hat die Kuschelsocken gekauft.",
-      "Hinweis 4: Die Motchi-Packung war ursprünglich für Sarah gedacht, landete am Ende aber bei Lisa. Außerdem bekam keine der drei Freundinnen das Geschenk, das ursprünglich für sie vorgesehen war."
+      "Schau dir zuerst an, wer welches Geschenk gekauft haben könnte. Sarah hat die Weihnachtsausstecher nicht gekauft.",
+      "Denk daran: Keine der drei Freundinnen hat ihr eigenes Geschenk gekauft und Nicole hat weder die Motchi-Packung gekauft noch war sie ursprünglich für sie bestimmt.",
+      "Die Motchi-Packung war ursprünglich für Lisa gedacht, landete am Ende aber bei Nicole. Und niemand bekam das Geschenk, das ursprünglich für sie vorgesehen war."
     ];
     let hintIndex = 0;
 
