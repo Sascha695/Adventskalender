@@ -247,7 +247,8 @@
       cursor: grab;
       user-select: none;
       white-space: nowrap;
-      touch-action: manipulation;
+      /* wichtig: Scrollen beim Drag unterbinden */
+      touch-action: none;
     }
 
     .gift-card:active {
@@ -558,11 +559,13 @@
           <div class="tile">
             <div class="row wrap">
               <button class="btn" onclick="solve()">Lösen</button>
+              <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
             </div>
 
             <div id="feedback" class="note hidden"></div>
             <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
           </div>
+
         </div>
       </div>
     </div>
@@ -573,6 +576,7 @@
     <div class="party-content">
       <p>Geschafft! Der Buchstabe für heute ist:</p>
       <div class="party-letter">l</div>
+      <p>(also ein kleines L)</p>
     </div>
   </div>
 
@@ -612,7 +616,7 @@
         card.addEventListener("dragstart", onDragStart);
         card.addEventListener("dragend", onDragEnd);
 
-        // Touch-Drag mit korrekter Positionierung
+        // Touch-Drag
         card.addEventListener("touchstart", onTouchStart, { passive: false });
         card.addEventListener("touchmove", onTouchMove, { passive: false });
         card.addEventListener("touchend", onTouchEnd);
@@ -775,7 +779,7 @@
       box.appendChild(p);
     }
 
-    /* ---------- Touch-Drag mit korrekter Position & Ziel ---------- */
+    /* ---------- Touch-Drag: Position stabil + Scroll gesperrt ---------- */
     let touchCard = null;
     let touchOriginalParent = null;
     let touchOriginalStyles = {};
@@ -785,6 +789,7 @@
     let touchOffsetY = 0;
     let touchDragging = false;
     let touchHoverTarget = null;
+    let bodyOverflowBeforeDrag = "";
 
     function onTouchStart(e) {
       if (e.touches.length > 1) return;
@@ -795,6 +800,7 @@
       const rect = touchCard.getBoundingClientRect();
       const touch = e.touches[0];
 
+      // Finger-Offset relativ zur Karte merken -> Karte bleibt unter dem Finger
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
       touchOffsetX = touch.clientX - rect.left;
@@ -812,11 +818,15 @@
 
       touchDragging = false;
       touchHoverTarget = null;
-      // kein preventDefault hier: erst beim echten Drag
+      // Scroll darf zunächst noch passieren – wir entscheiden in touchmove
     }
 
     function startTouchDrag(touch) {
       touchDragging = true;
+
+      // Seite während des Draggens nicht scrollen
+      bodyOverflowBeforeDrag = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
 
       const rect = touchCard.getBoundingClientRect();
       touchCard.style.position = "fixed";
@@ -843,14 +853,16 @@
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (!touchDragging) {
-        // ab kleiner Bewegung noch scrollen, ab ~8px: Drag starten
+        // erst ab einer gewissen Bewegung in den Drag-Modus
         if (distance > 8) {
           startTouchDrag(touch);
           e.preventDefault();
         } else {
+          // noch „nur“ Tippen – Browser darf scrollen
           return;
         }
       } else {
+        // wir sind bereits im Drag
         moveCardToTouchPosition(touch);
         e.preventDefault();
 
@@ -876,19 +888,11 @@
       }
     }
 
-    function restoreTouchCardStyles() {
-      if (!touchCard) return;
-      touchCard.style.position = touchOriginalStyles.position;
-      touchCard.style.left = touchOriginalStyles.left;
-      touchCard.style.top = touchOriginalStyles.top;
-      touchCard.style.zIndex = touchOriginalStyles.zIndex;
-      touchCard.style.transition = touchOriginalStyles.transition;
-      touchCard.style.width = touchOriginalStyles.width;
-      touchCard.style.pointerEvents = touchOriginalStyles.pointerEvents;
-    }
-
     function onTouchEnd(e) {
       if (!touchCard) return;
+
+      // Scroll wieder erlauben
+      document.body.style.overflow = bodyOverflowBeforeDrag;
 
       if (touchHoverTarget && touchHoverTarget.classList && touchHoverTarget.classList.contains("dropzone")) {
         touchHoverTarget.classList.remove("dragover");
@@ -904,7 +908,14 @@
         }
       }
 
-      restoreTouchCardStyles();
+      // ursprüngliche Styles wiederherstellen
+      touchCard.style.position = touchOriginalStyles.position;
+      touchCard.style.left = touchOriginalStyles.left;
+      touchCard.style.top = touchOriginalStyles.top;
+      touchCard.style.zIndex = touchOriginalStyles.zIndex;
+      touchCard.style.transition = touchOriginalStyles.transition;
+      touchCard.style.width = touchOriginalStyles.width;
+      touchCard.style.pointerEvents = touchOriginalStyles.pointerEvents;
 
       touchCard = null;
       touchOriginalParent = null;
