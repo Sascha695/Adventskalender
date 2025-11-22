@@ -3,64 +3,628 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 19 – Sprichwort-Ergänzung</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Tag 19 – Das verschobene Weihnachtsbild</title>
+
+  <style>
+    /* ---------- Grundlayout + Hintergrund ---------- */
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-gold: #facc15;
+
+      /* Bild für das Schiebepuzzle: HIER anpassen */
+      --puzzle-image: url("assets/ski_couple.png");
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+      overflow-y: auto;
+      background-color: #000; /* Fallback */
+    }
+
+    /* Fixer Hintergrund als eigene Ebene */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-image: url("assets/tag19_hintergrund.png"); /* <-- ANPASSEN */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+    }
+
+    @media (max-width: 720px) {
+      .bg-layer {
+        background-size: contain;
+        background-position: top center;
+        background-color: #000;
+      }
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .card {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    /* ---------- Glas-Kacheln ---------- */
+    .header-tile {
+      background: linear-gradient(135deg, rgba(21, 128, 61, 0.95), rgba(34, 197, 94, 0.9));
+      color: #f0fdf4;
+      border-radius: 24px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
+      margin-bottom: 12px;
+    }
+
+    .header-tile .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tile h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .header-tile .emoji {
+      font-size: 1.6rem;
+    }
+
+    .header-tile a {
+      color: #f0fdf4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(240, 253, 244, 0.5);
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .card-stack {
+      margin-top: 400px; /* bei Bedarf anpassen */
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 18px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .tile h2,
+    .tile h3,
+    .tile h4 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .muted {
+      color: #e5e7eb;
+      opacity: 0.85;
+      font-size: 0.9rem;
+      margin: 4px 4px 16px;
+    }
+
+    a {
+      color: #bfdbfe;
+    }
+
+    .row.wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      position: relative;
+      border-radius: 18px;
+      border: 2px solid var(--accent-gold);
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-image: linear-gradient(135deg, #15803d, #22c55e);
+      color: #fefce8;
+      box-shadow: 0 10px 22px rgba(22, 163, 74, 0.55);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    }
+
+    .btn::before {
+      content: "★";
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .btn.secondary {
+      background-image: linear-gradient(135deg, #b91c1c, #ef4444);
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.55);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 26px rgba(15, 23, 42, 0.7);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    .note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    .note.success {
+      background: rgba(22, 163, 74, 0.95);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      margin-top: 8px;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    /* ---------- Schiebepuzzle ---------- */
+    .puzzle-wrapper {
+      margin: 12px auto 0;
+      max-width: 360px;
+    }
+
+    .puzzle-grid {
+      position: relative;
+      width: 100%;
+      /* Quadrat herstellen */
+      padding-bottom: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.8);
+      touch-action: none; /* wichtig für sauberen Touch */
+    }
+
+    .puzzle-tile {
+      position: absolute;
+      width: 25%;
+      height: 25%;
+      box-sizing: border-box;
+      border: 1px solid rgba(15, 23, 42, 0.5);
+      background-image: var(--puzzle-image);
+      background-size: 400% 400%;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      transition: transform 0.08s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: none;
+    }
+
+    .puzzle-tile:active {
+      transform: scale(0.97);
+    }
+
+    .puzzle-tile.empty {
+      background: transparent;
+      cursor: default;
+      border: none;
+    }
+
+    .puzzle-label {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      text-align: center;
+    }
+
+    /* ---------- Party-Overlay für den Buchstaben ---------- */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(248, 250, 252, 0.15), rgba(15, 23, 42, 0.95));
+      z-index: 9999;
+    }
+
+    .party-overlay.hidden {
+      display: none;
+    }
+
+    .party-content {
+      text-align: center;
+      padding: 24px 32px;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .party-content p {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .party-letter {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #fef3c7;
+      text-shadow: 0 0 16px rgba(252, 211, 77, 0.9);
+      animation: party-pop 0.9s ease-out forwards, party-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes party-pop {
+      0% { transform: scale(0.2); opacity: 0; }
+      40% { transform: scale(1.15); opacity: 1; }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes party-glow {
+      0% { text-shadow: 0 0 10px rgba(252, 211, 77, 0.8); }
+      100% { text-shadow: 0 0 24px rgba(252, 211, 77, 1); }
+    }
+
+    .confetti-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #facc15;
+      animation: confetti-fall 1.4s ease-out forwards;
+      opacity: 0.9;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20px); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(80px); opacity: 0; }
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">⭐</span><h1>Tag 19: Sprichwort-Ergänzung</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+<body>
+  <!-- Fester Hintergrund -->
+  <div class="bg-layer"></div>
+
+  <!-- Scrollbarer Inhalt -->
+  <div class="page-content">
+    <div class="container">
+      <div class="card">
+
+        <!-- Kopfbereich -->
+        <div class="header-tile">
+          <div class="logo">
+            <span class="emoji">🧩</span>
+            <h1>Tag 19: Das verschobene Weihnachtsbild</h1>
+          </div>
+        </div>
+
+        <div class="card-stack">
+          <!-- Story-Kachel -->
+          <div class="tile">
+            <h2>Rätsel</h2>
+            <p>
+              In diesem Jahr wollten Sarah, Lisa und Nicole ein ganz besonderes Erinnerungsfoto in ihren
+              Adventskalender einbauen: ein winterliches Weihnachtsbild, das sie gemeinsam auf dem Weihnachtsmarkt zeigt.
+            </p>
+            <p>
+              Doch beim Ausdrucken ist etwas schiefgelaufen: Das Bild wurde in <strong>16 kleine Kacheln</strong> zerschnitten
+              und wie bei einem klassischen Schiebepuzzle durcheinander auf das Feld gelegt – mit
+              <strong>einem freien Feld</strong>, damit man die Teile verschieben kann.
+            </p>
+            <p>
+              Dein Ziel: <strong>Bringe das Bild wieder in die richtige Reihenfolge!</strong>
+            </p>
+            <ul>
+              <li>Das Puzzle besteht aus einem <strong>4×4-Feld</strong>.</li>
+              <li>Es gibt <strong>15 Bildkacheln</strong> und <strong>1 leeres Feld</strong>.</li>
+              <li>Verschiebe die Kacheln so, dass wieder das ursprüngliche Bild entsteht.</li>
+            </ul>
+          </div>
+
+          <!-- Anleitung-Kachel -->
+          <div class="tile">
+            <h3>So funktioniert das Schiebepuzzle</h3>
+            <ul>
+              <li>Du kannst eine Kachel nur verschieben, wenn sie <strong>direkt neben</strong> dem freien Feld liegt
+                (oben, unten, links oder rechts).</li>
+              <li>Auf dem <strong>Touchscreen</strong>: Mache einen <strongkleinen Swipe> in die Richtung</strong>, in die sich die Kachel bewegen soll.</li>
+              <li>Am Computer kannst du die Kachel auch einfach <strong>anklicken</strong>, um sie ins freie Feld zu schieben.</li>
+              <li>Das Puzzle startet immer in <strong>derselben Anordnung</strong> – nicht zufällig. So kannst du es
+                auch mehrmals ausprobieren oder mit anderen um die Wette knobeln.</li>
+            </ul>
+            <p class="muted">
+              Tipp: Merke dir zuerst, wie das richtige Bild aussehen sollte – und arbeite dich dann Zeile für Zeile vor.
+            </p>
+          </div>
+
+          <!-- Puzzle-Kachel -->
+          <div class="tile">
+            <h3>Schiebepuzzle</h3>
+            <p><strong>Ordne die Kacheln so, dass das Bild wieder vollständig ist.</strong></p>
+
+            <div class="puzzle-wrapper">
+              <div id="puzzle" class="puzzle-grid"></div>
+            </div>
+            <div class="puzzle-label">
+              Tippe / wische eine benachbarte Kachel in Richtung des freien Feldes.
+            </div>
+
+            <div class="row wrap" style="margin-top:12px;">
+              <button class="btn secondary" id="resetButton">Neu starten</button>
+            </div>
+
+            <div id="feedback" class="note hidden"></div>
+          </div>
+        </div>
+
+        <div class="footer">
+          Tag 19 – Adventskalender-Rätsel
+        </div>
       </div>
-      <p class="muted">Datum: 19.12.</p>
-      <h2>Rätsel</h2>
-      <p>Vervollständige: „Auf immer und ____.“</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">E</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
+  <!-- Party-Overlay für den Buchstaben -->
+  <div id="letterOverlay" class="party-overlay hidden">
+    <div class="party-content">
+      <p>Geschafft! Der Buchstabe für heute ist:</p>
+      <div class="party-letter">a</div>
+      <p>(wie „Advent“ 🎄)</p>
+    </div>
+  </div>
+
+  <!-- ---------- Schiebepuzzle-Logik ---------- -->
   <script>
-    const ANSWERS = "ewig";
-    const TODAY_LETTER = "E";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    const PUZZLE_SIZE = 4;
+    const TILE_COUNT = PUZZLE_SIZE * PUZZLE_SIZE;
+
+    // 0 = leeres Feld
+    // Feste Startanordnung, NICHT zufällig:
+    // (hier ist nur die letzte Reihe leicht vertauscht)
+    const INITIAL_STATE = [
+      1,  2,  3,  4,
+      5,  6,  7,  8,
+      9, 10, 11, 12,
+      13, 15, 14, 0
+    ];
+
+    let state = INITIAL_STATE.slice();
+
+    function indexToRowCol(index) {
+      return {
+        row: Math.floor(index / PUZZLE_SIZE),
+        col: index % PUZZLE_SIZE
+      };
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
+
+    function rowColToIndex(row, col) {
+      return row * PUZZLE_SIZE + col;
+    }
+
+    function isSolved() {
+      for (let i = 0; i < TILE_COUNT - 1; i++) {
+        if (state[i] !== i + 1) return false;
+      }
+      return state[TILE_COUNT - 1] === 0;
+    }
+
+    function showLetter() {
+      const overlay = document.getElementById("letterOverlay");
+      overlay.classList.remove("hidden");
+
+      const content = overlay.querySelector(".party-content");
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement("span");
+        dot.className = "confetti-dot";
+        dot.style.left = Math.random() * 100 + "%";
+        dot.style.top = (Math.random() * 30) + "%";
+        content.appendChild(dot);
+        setTimeout(() => dot.remove(), 1500);
+      }
+
+      overlay.addEventListener("click", () => {
+        overlay.classList.add("hidden");
+      }, { once: true });
+    }
+
+    function setFeedback(msg, ok) {
+      const box = document.getElementById("feedback");
       box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+      box.classList.remove("hidden");
+      if (ok) {
+        box.classList.add("success");
+      } else {
+        box.classList.remove("success");
+      }
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
+
+    function tryMoveTile(positionIndex, direction) {
+      const emptyIndex = state.indexOf(0);
+      if (emptyIndex === -1) return;
+
+      const { row: tileRow, col: tileCol } = indexToRowCol(positionIndex);
+      const { row: emptyRow, col: emptyCol } = indexToRowCol(emptyIndex);
+
+      const diffRow = emptyRow - tileRow;
+      const diffCol = emptyCol - tileCol;
+
+      // muss direkt angrenzend sein
+      if (Math.abs(diffRow) + Math.abs(diffCol) !== 1) return;
+
+      // Wenn eine Richtung vorgegeben ist (Swipe), muss sie passen
+      if (direction) {
+        if (direction === "left"  && !(diffRow === 0 && diffCol === -1)) return;
+        if (direction === "right" && !(diffRow === 0 && diffCol ===  1)) return;
+        if (direction === "up"    && !(diffRow === -1 && diffCol === 0)) return;
+        if (direction === "down"  && !(diffRow ===  1 && diffCol === 0)) return;
+      }
+
+      // Tausch
+      const temp = state[positionIndex];
+      state[positionIndex] = state[emptyIndex];
+      state[emptyIndex] = temp;
+
+      renderPuzzle();
+
+      if (isSolved()) {
+        setFeedback("Super! Du hast das Weihnachtsbild wieder zusammengesetzt. 💫", true);
         showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
+      } else {
+        setFeedback("Weiter so – das Bild ist noch nicht ganz vollständig.", false);
+      }
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function renderPuzzle() {
+      const puzzleEl = document.getElementById("puzzle");
+      puzzleEl.innerHTML = "";
+
+      for (let i = 0; i < TILE_COUNT; i++) {
+        const value = state[i];
+        const { row, col } = indexToRowCol(i);
+
+        const tile = document.createElement("div");
+        tile.classList.add("puzzle-tile");
+        tile.style.left = (col * 25) + "%";
+        tile.style.top = (row * 25) + "%";
+        tile.dataset.pos = i; // aktuelle Position
+
+        if (value === 0) {
+          tile.classList.add("empty");
+        } else {
+          // Ursprüngliche Zielposition des Teilchens
+          const originalIndex = value - 1;
+          const { row: orRow, col: orCol } = indexToRowCol(originalIndex);
+
+          const bgX = (orCol / (PUZZLE_SIZE - 1)) * 100;
+          const bgY = (orRow / (PUZZLE_SIZE - 1)) * 100;
+          tile.style.backgroundPosition = bgX + "% " + bgY + "%";
+        }
+
+        // Klick-Handling (Desktop)
+        tile.addEventListener("click", () => {
+          if (!tile.classList.contains("empty")) {
+            const pos = parseInt(tile.dataset.pos, 10);
+            tryMoveTile(pos, null);
+          }
+        });
+
+        // Touch-Handling (Swipe)
+        let touchStartX = null;
+        let touchStartY = null;
+
+        tile.addEventListener("touchstart", (e) => {
+          if (tile.classList.contains("empty")) return;
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+        }, { passive: true });
+
+        tile.addEventListener("touchend", (e) => {
+          if (tile.classList.contains("empty")) return;
+          const touch = e.changedTouches[0];
+          const dx = touch.clientX - touchStartX;
+          const dy = touch.clientY - touchStartY;
+
+          const absX = Math.abs(dx);
+          const absY = Math.abs(dy);
+          const threshold = 20; // kleiner Swipe reicht
+
+          let direction = null;
+
+          if (absX < threshold && absY < threshold) {
+            // Sehr kurzer „Swipe“ – wie ein Tap: Richtung nicht nötig
+            const pos = parseInt(tile.dataset.pos, 10);
+            tryMoveTile(pos, null);
+            return;
+          }
+
+          if (absX > absY) {
+            direction = dx > 0 ? "right" : "left";
+          } else {
+            direction = dy > 0 ? "down" : "up";
+          }
+
+          const pos = parseInt(tile.dataset.pos, 10);
+          tryMoveTile(pos, direction);
+        }, { passive: true });
+
+        puzzleEl.appendChild(tile);
+      }
     }
+
+    function resetPuzzle() {
+      state = INITIAL_STATE.slice();
+      renderPuzzle();
+      const box = document.getElementById("feedback");
+      box.classList.add("hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderPuzzle();
+
+      const resetButton = document.getElementById("resetButton");
+      if (resetButton) {
+        resetButton.addEventListener("click", resetPuzzle);
+      }
+    });
   </script>
 </body>
 </html>
