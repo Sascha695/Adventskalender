@@ -15,7 +15,7 @@
       --accent-gold: #facc15;
 
       /* Bild für das Socken-Rätsel: HIER anpassen */
-      --socks-image: url("assets/socks_puzzle.png");
+      --socks-image: url("assets/sockenbild.png");
     }
 
     * {
@@ -39,7 +39,7 @@
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/washing_machine.png"); /* <-- Hintergrund bei Bedarf anpassen */
+      background-image: url("assets/sarah_backflip.png"); /* <-- Hintergrund bei Bedarf anpassen */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -227,8 +227,8 @@
     .socks-frame {
       position: relative;
       width: 100%;
-      /* Seitenverhältnis je nach Bild. 130% ist ein guter Startwert. */
-      padding-bottom: 130%;
+      /* Seitenverhältnis des Originalbildes (701x1067 ≈ 1.52) */
+      padding-bottom: 152%;
       border-radius: 18px;
       overflow: hidden;
       box-shadow: 0 12px 28px rgba(15, 23, 42, 0.7);
@@ -248,7 +248,6 @@
       user-select: none;
       -webkit-user-drag: none;
       touch-action: manipulation;
-      /* unsichtbare, aber gut klickbare Fläche */
       background-color: rgba(15, 23, 42, 0.0);
     }
 
@@ -376,20 +375,20 @@
           <div class="tile">
             <h2>Rätsel</h2>
             <p>
-              Bevor wir an unserem Ski-Wochenende in die frischen Socken schlüpfen können, gibt es ein kleines
-              <strong>Socken-Chaos</strong> zu lösen. Auf dem Bild siehst du ganz viele bunte Weihnachtssocken.
+              Die Waschmaschine hat mal wieder zugeschlagen – und zwei Socken verschwinden lassen! Auf dem Bild
+              hängen ganz viele bunte Weihnachtssocken an den Leinen.
             </p>
             <p>
               Fast alle Socken haben einen <strong>Zwilling</strong>, also eine Socke, die genauso aussieht.
-              Aber zwei freche Socken haben sich verirrt – sie haben <strong>keinen Partner</strong>.
+              Aber zwei freche Socken haben sich verirrt – sie haben <strong>kein Gegenstück</strong>.
             </p>
             <p>
-              <strong>Deine Aufgabe:</strong> Tippe auf dem Bild auf genau die zwei Socken, die keinen Zwilling haben.
-              Wenn du dir unsicher bist, kannst du deine Auswahl jederzeit zurücksetzen.
+              <strong>Deine Aufgabe:</strong> Tippe auf dem Bild auf genau die zwei Socken, von denen das
+              Gegenstück fehlt. Wenn du dir unsicher bist, kannst du deine Auswahl jederzeit zurücksetzen.
             </p>
             <p class="muted">
-              Tipp: Am Handy kannst du die Socken einfach direkt antippen. Sobald du glaubst, die beiden Einzelgänger gefunden
-              zu haben, drücke auf <strong>Auswahl prüfen</strong>.
+              Tipp: Am Handy kannst du die Socken einfach direkt antippen. Sobald du glaubst, die beiden Einzelgänger
+              gefunden zu haben, drücke auf <strong>Auswahl prüfen</strong>.
             </p>
           </div>
 
@@ -435,28 +434,36 @@
 
   <script>
     // ---------- Konfiguration für das Sockenbild ----------
-    // HINWEIS:
-    // - Passe die Koordinaten unten an dein tatsächliches Bild an.
-    // - Alle Werte sind Prozentangaben relativ zum Bild (socks-frame).
-    // - Jede Socke sollte grob mit einem Hotspot überdeckt sein.
-    // - Genau zwei Socken sollten isOdd: true haben (die ohne Zwilling).
+    // Grobe Hotspots über jeder Socke (Prozentangaben).
+    // Reihen von oben nach unten, links nach rechts.
+    // Genau zwei Socken haben isOdd: true:
+    //  - s1  = 1. Reihe, 1. Socke (blaue Wellen-Socke)
+    //  - s12 = 3. Reihe, letzte Socke (orange Socke mit Smiley)
 
     const SOCKS_DATA = [
-      // id, links, oben, breite, höhe, ob sie keinen Zwilling hat
-      { id: "s1",  left:  8, top: 10, width: 18, height: 22, isOdd: false },
-      { id: "s2",  left: 30, top: 12, width: 18, height: 22, isOdd: false },
-      { id: "s3",  left: 52, top: 10, width: 18, height: 22, isOdd: false },
-      { id: "s4",  left: 72, top: 14, width: 18, height: 22, isOdd: true  }, // EINZELGÄNGER
+      // Reihe 1
+      { id: "s1",  left: 14, top: 20, width: 14, height: 18, isOdd: true  }, // EINZELGÄNGER
+      { id: "s2",  left: 32, top: 20, width: 14, height: 18, isOdd: false },
+      { id: "s3",  left: 52, top: 20, width: 14, height: 18, isOdd: false },
+      { id: "s4",  left: 72, top: 20, width: 14, height: 18, isOdd: false },
 
-      { id: "s5",  left: 12, top: 40, width: 18, height: 22, isOdd: false },
-      { id: "s6",  left: 34, top: 42, width: 18, height: 22, isOdd: false },
-      { id: "s7",  left: 56, top: 40, width: 18, height: 22, isOdd: false },
-      { id: "s8",  left: 76, top: 44, width: 18, height: 22, isOdd: false },
+      // Reihe 2
+      { id: "s5",  left: 14, top: 40, width: 14, height: 18, isOdd: false },
+      { id: "s6",  left: 32, top: 40, width: 14, height: 18, isOdd: false },
+      { id: "s7",  left: 52, top: 40, width: 14, height: 18, isOdd: false },
+      { id: "s8",  left: 72, top: 40, width: 14, height: 18, isOdd: false },
 
-      { id: "s9",  left: 10, top: 68, width: 18, height: 22, isOdd: false },
-      { id: "s10", left: 30, top: 70, width: 18, height: 22, isOdd: false },
-      { id: "s11", left: 52, top: 68, width: 18, height: 22, isOdd: true  }, // EINZELGÄNGER
-      { id: "s12", left: 74, top: 72, width: 18, height: 22, isOdd: false },
+      // Reihe 3
+      { id: "s9",  left: 14, top: 60, width: 14, height: 18, isOdd: false },
+      { id: "s10", left: 32, top: 60, width: 14, height: 18, isOdd: false },
+      { id: "s11", left: 52, top: 60, width: 14, height: 18, isOdd: false },
+      { id: "s12", left: 72, top: 60, width: 14, height: 18, isOdd: true  }, // EINZELGÄNGER
+
+      // Reihe 4
+      { id: "s13", left: 14, top: 80, width: 14, height: 18, isOdd: false },
+      { id: "s14", left: 32, top: 80, width: 14, height: 18, isOdd: false },
+      { id: "s15", left: 52, top: 80, width: 14, height: 18, isOdd: false },
+      { id: "s16", left: 72, top: 80, width: 14, height: 18, isOdd: false },
     ];
 
     const ODD_SOCK_IDS = SOCKS_DATA.filter(s => s.isOdd).map(s => s.id);
@@ -484,7 +491,6 @@
             el.classList.remove("selected");
           } else {
             if (selectedSockIds.size >= 2) {
-              // maximal zwei Socken gleichzeitig
               setFeedback("Du kannst höchstens zwei Socken auswählen. Tippe eine ausgewählte Socke an, um sie wieder abzuwählen.", false);
               return;
             }
@@ -628,3 +634,4 @@
   </script>
 </body>
 </html>
+
