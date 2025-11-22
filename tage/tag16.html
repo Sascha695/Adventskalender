@@ -3,64 +3,628 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 16 – Häufigkeit im Deutschen</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Tag 16 – Die verlorenen Sockenzwillinge</title>
+
+  <style>
+    /* ---------- Grundlayout + Hintergrund ---------- */
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-gold: #facc15;
+
+      /* Bild für das Socken-Rätsel: HIER anpassen */
+      --socks-image: url("assets/socks_puzzle.png");
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+      overflow-y: auto;
+      background-color: #000; /* Fallback */
+    }
+
+    /* Fixer Hintergrund als eigene Ebene */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-image: url("assets/sarah_backflip.png"); /* <-- Hintergrund bei Bedarf anpassen */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+    }
+
+    @media (max-width: 720px) {
+      .bg-layer {
+        background-size: contain;
+        background-position: top center;
+        background-color: #000;
+      }
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .card {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    /* ---------- Glas-Kacheln ---------- */
+    .header-tile {
+      background: linear-gradient(135deg, rgba(21, 128, 61, 0.95), rgba(34, 197, 94, 0.9));
+      color: #f0fdf4;
+      border-radius: 24px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
+      margin-bottom: 12px;
+    }
+
+    .header-tile .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-tile h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .header-tile .emoji {
+      font-size: 1.6rem;
+    }
+
+    .header-tile a {
+      color: #f0fdf4;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(240, 253, 244, 0.5);
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .card-stack {
+      margin-top: 400px; /* bei Bedarf anpassen */
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 18px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .tile h2,
+    .tile h3,
+    .tile h4 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .muted {
+      color: #e5e7eb;
+      opacity: 0.85;
+      font-size: 0.9rem;
+      margin: 4px 4px 16px;
+    }
+
+    a {
+      color: #bfdbfe;
+    }
+
+    .row.wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      position: relative;
+      border-radius: 18px;
+      border: 2px solid var(--accent-gold);
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background-image: linear-gradient(135deg, #15803d, #22c55e);
+      color: #fefce8;
+      box-shadow: 0 10px 22px rgba(22, 163, 74, 0.55);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    }
+
+    .btn::before {
+      content: "★";
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+
+    .btn.secondary {
+      background-image: linear-gradient(135deg, #b91c1c, #ef4444);
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.55);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 26px rgba(15, 23, 42, 0.7);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    .note {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    .note.success {
+      background: rgba(22, 163, 74, 0.95);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      margin-top: 8px;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    /* ---------- Socken-Rätsel ---------- */
+    .socks-wrapper {
+      margin: 12px auto 0;
+      max-width: 380px;
+    }
+
+    .socks-frame {
+      position: relative;
+      width: 100%;
+      /* Seitenverhältnis je nach Bild. 130% ist ein guter Startwert. */
+      padding-bottom: 130%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.7);
+      background-image: var(--socks-image);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      touch-action: none;
+    }
+
+    .sock-hotspot {
+      position: absolute;
+      border-radius: 18px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.08s ease-out, border-color 0.1s ease-out, background-color 0.1s ease-out;
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: manipulation;
+      /* unsichtbare, aber gut klickbare Fläche */
+      background-color: rgba(15, 23, 42, 0.0);
+    }
+
+    .sock-hotspot::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: inherit;
+      border: 2px dashed rgba(248, 250, 252, 0.0);
+      pointer-events: none;
+    }
+
+    .sock-hotspot.selected {
+      border-color: var(--accent-gold);
+      background-color: rgba(250, 204, 21, 0.18);
+    }
+
+    .sock-hotspot.selected::after {
+      border-color: rgba(248, 250, 252, 0.8);
+    }
+
+    .sock-hotspot.correct {
+      border-color: var(--accent-green);
+      background-color: rgba(22, 163, 74, 0.25);
+    }
+
+    .sock-hotspot.wrong {
+      border-color: var(--accent-red);
+      background-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .socks-label {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      text-align: center;
+    }
+
+    /* ---------- Party-Overlay für den Buchstaben ---------- */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(248, 250, 252, 0.15), rgba(15, 23, 42, 0.95));
+      z-index: 9999;
+    }
+
+    .party-overlay.hidden {
+      display: none;
+    }
+
+    .party-content {
+      text-align: center;
+      padding: 24px 32px;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .party-content p {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .party-letter {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #fef3c7;
+      text-shadow: 0 0 16px rgba(252, 211, 77, 0.9);
+      animation: party-pop 0.9s ease-out forwards, party-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes party-pop {
+      0% { transform: scale(0.2); opacity: 0; }
+      40% { transform: scale(1.15); opacity: 1; }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes party-glow {
+      0% { text-shadow: 0 0 10px rgba(252, 211, 77, 0.8); }
+      100% { text-shadow: 0 0 24px rgba(252, 211, 77, 1); }
+    }
+
+    .confetti-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #facc15;
+      animation: confetti-fall 1.4s ease-out forwards;
+      opacity: 0.9;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20px); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(80px); opacity: 0; }
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">💖</span><h1>Tag 16: Häufigkeit im Deutschen</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+<body>
+  <!-- Fester Hintergrund -->
+  <div class="bg-layer"></div>
+
+  <!-- Scrollbarer Inhalt -->
+  <div class="page-content">
+    <div class="container">
+      <div class="card">
+
+        <!-- Kopfbereich -->
+        <div class="header-tile">
+          <div class="logo">
+            <span class="emoji">🧦</span>
+            <h1>Tag 16: Die verlorenen Sockenzwillinge</h1>
+          </div>
+        </div>
+
+        <div class="card-stack">
+          <!-- Story-Kachel -->
+          <div class="tile">
+            <h2>Rätsel</h2>
+            <p>
+              Bevor wir an unserem Ski-Wochenende in die frischen Socken schlüpfen können, gibt es ein kleines
+              <strong>Socken-Chaos</strong> zu lösen. Auf dem Bild siehst du ganz viele bunte Weihnachtssocken.
+            </p>
+            <p>
+              Fast alle Socken haben einen <strong>Zwilling</strong>, also eine Socke, die genauso aussieht.
+              Aber zwei freche Socken haben sich verirrt – sie haben <strong>keinen Partner</strong>.
+            </p>
+            <p>
+              <strong>Deine Aufgabe:</strong> Tippe auf dem Bild auf genau die zwei Socken, die keinen Zwilling haben.
+              Wenn du dir unsicher bist, kannst du deine Auswahl jederzeit zurücksetzen.
+            </p>
+            <p class="muted">
+              Tipp: Am Handy kannst du die Socken einfach direkt antippen. Sobald du glaubst, die beiden Einzelgänger gefunden
+              zu haben, drücke auf <strong>Auswahl prüfen</strong>.
+            </p>
+          </div>
+
+          <!-- Socken-Rätsel-Kachel -->
+          <div class="tile">
+            <h3>Socken-Rätsel</h3>
+
+            <div class="socks-wrapper">
+              <div id="socksFrame" class="socks-frame">
+                <!-- Hotspots werden per JavaScript eingefügt -->
+              </div>
+            </div>
+            <div class="socks-label">
+              Tippe auf genau zwei Socken, die keinen Zwilling haben.
+            </div>
+
+            <div class="row wrap" style="margin-top:12px;">
+              <button class="btn secondary" id="resetButton">Zurücksetzen</button>
+              <button class="btn" id="checkButton">Auswahl prüfen</button>
+              <button class="btn" id="solutionButton" style="background-image:linear-gradient(135deg,#1d4ed8,#3b82f6);box-shadow:0 10px 22px rgba(37,99,235,0.55);">
+                Lösung anzeigen
+              </button>
+            </div>
+
+            <div id="feedback" class="note hidden"></div>
+          </div>
+        </div>
+
+        <div class="footer">
+          Tag 16 – Adventskalender-Rätsel
+        </div>
       </div>
-      <p class="muted">Datum: 16.12.</p>
-      <h2>Rätsel</h2>
-      <p>Welcher Buchstabe ist nach dem E der zweithäufigste im Deutschen? (Ein Buchstabe)</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">N</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
+  <!-- Party-Overlay für den Buchstaben -->
+  <div id="letterOverlay" class="party-overlay hidden">
+    <div class="party-content">
+      <p>Geschafft! Der Buchstabe für heute ist:</p>
+      <div class="party-letter">n</div> <!-- <-- Buchstaben bei Bedarf anpassen -->
+    </div>
+  </div>
+
   <script>
-    const ANSWERS = "n";
-    const TODAY_LETTER = "N";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
-    }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+    // ---------- Konfiguration für das Sockenbild ----------
+    // HINWEIS:
+    // - Passe die Koordinaten unten an dein tatsächliches Bild an.
+    // - Alle Werte sind Prozentangaben relativ zum Bild (socks-frame).
+    // - Jede Socke sollte grob mit einem Hotspot überdeckt sein.
+    // - Genau zwei Socken sollten isOdd: true haben (die ohne Zwilling).
+
+    const SOCKS_DATA = [
+      // id, links, oben, breite, höhe, ob sie keinen Zwilling hat
+      { id: "s1",  left:  8, top: 10, width: 18, height: 22, isOdd: false },
+      { id: "s2",  left: 30, top: 12, width: 18, height: 22, isOdd: false },
+      { id: "s3",  left: 52, top: 10, width: 18, height: 22, isOdd: false },
+      { id: "s4",  left: 72, top: 14, width: 18, height: 22, isOdd: true  }, // EINZELGÄNGER
+
+      { id: "s5",  left: 12, top: 40, width: 18, height: 22, isOdd: false },
+      { id: "s6",  left: 34, top: 42, width: 18, height: 22, isOdd: false },
+      { id: "s7",  left: 56, top: 40, width: 18, height: 22, isOdd: false },
+      { id: "s8",  left: 76, top: 44, width: 18, height: 22, isOdd: false },
+
+      { id: "s9",  left: 10, top: 68, width: 18, height: 22, isOdd: false },
+      { id: "s10", left: 30, top: 70, width: 18, height: 22, isOdd: false },
+      { id: "s11", left: 52, top: 68, width: 18, height: 22, isOdd: true  }, // EINZELGÄNGER
+      { id: "s12", left: 74, top: 72, width: 18, height: 22, isOdd: false },
+    ];
+
+    const ODD_SOCK_IDS = SOCKS_DATA.filter(s => s.isOdd).map(s => s.id);
+
+    let selectedSockIds = new Set();
+
+    function renderSocksHotspots() {
+      const frame = document.getElementById("socksFrame");
+      frame.innerHTML = "";
+
+      SOCKS_DATA.forEach(sock => {
+        const el = document.createElement("div");
+        el.classList.add("sock-hotspot");
+        el.style.left = sock.left + "%";
+        el.style.top = sock.top + "%";
+        el.style.width = sock.width + "%";
+        el.style.height = sock.height + "%";
+        el.dataset.sockId = sock.id;
+
+        const toggleSelection = () => {
+          const id = sock.id;
+
+          if (selectedSockIds.has(id)) {
+            selectedSockIds.delete(id);
+            el.classList.remove("selected");
+          } else {
+            if (selectedSockIds.size >= 2) {
+              // maximal zwei Socken gleichzeitig
+              setFeedback("Du kannst höchstens zwei Socken auswählen. Tippe eine ausgewählte Socke an, um sie wieder abzuwählen.", false);
+              return;
+            }
+            selectedSockIds.add(id);
+            el.classList.add("selected");
+          }
+        };
+
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          toggleSelection();
+        });
+
+        el.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          toggleSelection();
+        }, { passive: false });
+
+        frame.appendChild(el);
       });
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
+
+    function setFeedback(msg, ok) {
+      const box = document.getElementById("feedback");
+      box.textContent = msg;
+      box.classList.remove("hidden");
+      if (ok) {
+        box.classList.add("success");
+      } else {
+        box.classList.remove("success");
+      }
+    }
+
+    function clearFeedback() {
+      const box = document.getElementById("feedback");
+      box.classList.add("hidden");
+      box.classList.remove("success");
+      box.textContent = "";
+    }
+
+    function resetSelection() {
+      selectedSockIds = new Set();
+      document.querySelectorAll(".sock-hotspot").forEach(el => {
+        el.classList.remove("selected", "correct", "wrong");
+      });
+      clearFeedback();
+    }
+
+    function showLetter() {
+      const overlay = document.getElementById("letterOverlay");
+      overlay.classList.remove("hidden");
+
+      const content = overlay.querySelector(".party-content");
+
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement("span");
+        dot.className = "confetti-dot";
+        dot.style.left = Math.random() * 100 + "%";
+        dot.style.top = (Math.random() * 30) + "%";
+        content.appendChild(dot);
+        setTimeout(() => dot.remove(), 1500);
+      }
+
+      overlay.addEventListener("click", () => {
+        overlay.classList.add("hidden");
+      }, { once: true });
+    }
+
+    function checkSelection() {
+      // Entferne vorherige Markierungen
+      document.querySelectorAll(".sock-hotspot").forEach(el => {
+        el.classList.remove("correct", "wrong");
+      });
+
+      if (selectedSockIds.size !== 2) {
+        setFeedback("Bitte wähle genau zwei Socken aus, bevor du deine Auswahl prüfst.", false);
+        return;
+      }
+
+      const chosen = Array.from(selectedSockIds).sort();
+      const correct = ODD_SOCK_IDS.slice().sort();
+
+      const isCorrect =
+        chosen.length === correct.length &&
+        chosen[0] === correct[0] &&
+        chosen[1] === correct[1];
+
+      // Markiere Auswahl
+      document.querySelectorAll(".sock-hotspot").forEach(el => {
+        const id = el.dataset.sockId;
+        if (selectedSockIds.has(id)) {
+          if (ODD_SOCK_IDS.includes(id)) {
+            el.classList.add("correct");
+          } else {
+            el.classList.add("wrong");
+          }
+        }
+      });
+
+      if (isCorrect) {
+        setFeedback("Perfekt! Du hast die zwei einsamen Socken gefunden. 🧦✨", true);
+        showLetter();
+      } else {
+        setFeedback("Fast! Mindestens eine der gewählten Socken hat doch einen Zwilling. Versuch es noch einmal.", false);
+      }
+    }
+
+    function showSolution() {
+      resetSelection();
+
+      // Markiere automatisch die richtigen Socken
+      document.querySelectorAll(".sock-hotspot").forEach(el => {
+        const id = el.dataset.sockId;
+        if (ODD_SOCK_IDS.includes(id)) {
+          el.classList.add("selected", "correct");
+          selectedSockIds.add(id);
+        }
+      });
+
+      setFeedback("Hier sind die zwei Socken ohne Zwilling. 🌟", true);
       showLetter();
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderSocksHotspots();
+
+      const resetButton = document.getElementById("resetButton");
+      const checkButton = document.getElementById("checkButton");
+      const solutionButton = document.getElementById("solutionButton");
+
+      if (resetButton) {
+        resetButton.addEventListener("click", resetSelection);
+      }
+      if (checkButton) {
+        checkButton.addEventListener("click", checkSelection);
+      }
+      if (solutionButton) {
+        solutionButton.addEventListener("click", showSolution);
+      }
+    });
   </script>
 </body>
 </html>
