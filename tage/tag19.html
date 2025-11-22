@@ -432,227 +432,229 @@
 
   <!-- ---------- Schiebepuzzle-Logik ---------- -->
   <script>
-    const PUZZLE_SIZE = 4;
-    const TILE_COUNT = PUZZLE_SIZE * PUZZLE_SIZE;
+  const PUZZLE_SIZE = 4;
+  const TILE_COUNT = PUZZLE_SIZE * PUZZLE_SIZE;
 
-    // 0 = leeres Feld
-    // Feste Startanordnung, NICHT zufällig:
-    // (hier ist nur die letzte Reihe leicht vertauscht)
-    const INITIAL_STATE = [
-      0,  9,  12,  4,
-      3,  1,  11,  8,
-      10, 13, 5, 7,
-      2, 14, 6, 15
-    ];
+  // 0 = leeres Feld
+  // Feste Startanordnung, NICHT zufällig:
+  // (dieser Zustand ist ein paar Züge vom gelösten Bild entfernt)
+  //
+  //  1  2  3  4
+  //  9  5  7  8
+  // 13  0 10 12
+  // 14  6 11 15
+  const INITIAL_STATE = [
+    1,  2,  3,  4,
+    9,  5,  7,  8,
+    13, 0, 10, 12,
+    14, 6, 11, 15
+  ];
 
-    // Optimale Lösungsschritte (40 Schritte):
-// Jede Zahl steht für die Kachel, die bewegt wird.
-const SOLUTION_MOVES = [
-  9, 1, 11, 12, 4, 8, 12, 5, 6, 14,
-  13, 11, 3, 9, 1, 3, 11, 13, 14, 6,
-  10, 2, 9, 1, 3, 5, 2, 10, 14, 11,
-  7, 12, 8, 4, 3, 2, 6, 7, 11, 15
-];
+  // Diese Lösungsschritte passen GENAU zu obiger Start-Anordnung.
+  // Jede Zahl = Kachel, die in das freie Feld geschoben wird.
+  const SOLUTION_MOVES = [
+    6, 14, 13, 9, 5, 6, 10, 11, 15
+  ];
 
+  let state = INITIAL_STATE.slice();
 
-    let state = INITIAL_STATE.slice();
+  function indexToRowCol(index) {
+    return {
+      row: Math.floor(index / PUZZLE_SIZE),
+      col: index % PUZZLE_SIZE
+    };
+  }
 
-    function indexToRowCol(index) {
-      return {
-        row: Math.floor(index / PUZZLE_SIZE),
-        col: index % PUZZLE_SIZE
-      };
+  function rowColToIndex(row, col) {
+    return row * PUZZLE_SIZE + col;
+  }
+
+  function isSolved() {
+    for (let i = 0; i < TILE_COUNT - 1; i++) {
+      if (state[i] !== i + 1) return false;
+    }
+    return state[TILE_COUNT - 1] === 0;
+  }
+
+  function showLetter() {
+    const overlay = document.getElementById("letterOverlay");
+    overlay.classList.remove("hidden");
+
+    const content = overlay.querySelector(".party-content");
+    for (let i = 0; i < 20; i++) {
+      const dot = document.createElement("span");
+      dot.className = "confetti-dot";
+      dot.style.left = Math.random() * 100 + "%";
+      dot.style.top = (Math.random() * 30) + "%";
+      content.appendChild(dot);
+      setTimeout(() => dot.remove(), 1500);
     }
 
-    function rowColToIndex(row, col) {
-      return row * PUZZLE_SIZE + col;
+    overlay.addEventListener("click", () => {
+      overlay.classList.add("hidden");
+    }, { once: true });
+  }
+
+  function setFeedback(msg, ok) {
+    const box = document.getElementById("feedback");
+    box.textContent = msg;
+    box.classList.remove("hidden");
+    if (ok) {
+      box.classList.add("success");
+    } else {
+      box.classList.remove("success");
+    }
+  }
+
+  function tryMoveTile(positionIndex, direction) {
+    const emptyIndex = state.indexOf(0);
+    if (emptyIndex === -1) return;
+
+    const { row: tileRow, col: tileCol } = indexToRowCol(positionIndex);
+    const { row: emptyRow, col: emptyCol } = indexToRowCol(emptyIndex);
+
+    const diffRow = emptyRow - tileRow;
+    const diffCol = emptyCol - tileCol;
+
+    // muss direkt angrenzend sein
+    if (Math.abs(diffRow) + Math.abs(diffCol) !== 1) return;
+
+    // Wenn eine Richtung vorgegeben ist (Swipe), muss sie passen
+    if (direction) {
+      if (direction === "left"  && !(diffRow === 0 && diffCol === -1)) return;
+      if (direction === "right" && !(diffRow === 0 && diffCol ===  1)) return;
+      if (direction === "up"    && !(diffRow === -1 && diffCol === 0)) return;
+      if (direction === "down"  && !(diffRow ===  1 && diffCol === 0)) return;
     }
 
-    function isSolved() {
-      for (let i = 0; i < TILE_COUNT - 1; i++) {
-        if (state[i] !== i + 1) return false;
-      }
-      return state[TILE_COUNT - 1] === 0;
+    // Tausch
+    const temp = state[positionIndex];
+    state[positionIndex] = state[emptyIndex];
+    state[emptyIndex] = temp;
+
+    renderPuzzle();
+
+    if (isSolved()) {
+      setFeedback("Super! Du hast das Weihnachtsbild wieder zusammengesetzt. 💫", true);
+      showLetter();
+    } else {
+      setFeedback("Weiter so – das Bild ist noch nicht ganz vollständig.", false);
     }
+  }
 
-    function showLetter() {
-      const overlay = document.getElementById("letterOverlay");
-      overlay.classList.remove("hidden");
+  function renderPuzzle() {
+    const puzzleEl = document.getElementById("puzzle");
+    puzzleEl.innerHTML = "";
 
-      const content = overlay.querySelector(".party-content");
-      for (let i = 0; i < 20; i++) {
-        const dot = document.createElement("span");
-        dot.className = "confetti-dot";
-        dot.style.left = Math.random() * 100 + "%";
-        dot.style.top = (Math.random() * 30) + "%";
-        content.appendChild(dot);
-        setTimeout(() => dot.remove(), 1500);
-      }
+    for (let i = 0; i < TILE_COUNT; i++) {
+      const value = state[i];
+      const { row, col } = indexToRowCol(i);
 
-      overlay.addEventListener("click", () => {
-        overlay.classList.add("hidden");
-      }, { once: true });
-    }
+      const tile = document.createElement("div");
+      tile.classList.add("puzzle-tile");
+      tile.style.left = (col * 25) + "%";
+      tile.style.top = (row * 25) + "%";
+      tile.dataset.pos = i; // aktuelle Position
 
-    function setFeedback(msg, ok) {
-      const box = document.getElementById("feedback");
-      box.textContent = msg;
-      box.classList.remove("hidden");
-      if (ok) {
-        box.classList.add("success");
+      if (value === 0) {
+        tile.classList.add("empty");
       } else {
-        box.classList.remove("success");
-      }
-    }
+        // Ursprüngliche Zielposition des Teilchens
+        const originalIndex = value - 1;
+        const { row: orRow, col: orCol } = indexToRowCol(originalIndex);
 
-    function tryMoveTile(positionIndex, direction) {
-      const emptyIndex = state.indexOf(0);
-      if (emptyIndex === -1) return;
-
-      const { row: tileRow, col: tileCol } = indexToRowCol(positionIndex);
-      const { row: emptyRow, col: emptyCol } = indexToRowCol(emptyIndex);
-
-      const diffRow = emptyRow - tileRow;
-      const diffCol = emptyCol - tileCol;
-
-      // muss direkt angrenzend sein
-      if (Math.abs(diffRow) + Math.abs(diffCol) !== 1) return;
-
-      // Wenn eine Richtung vorgegeben ist (Swipe), muss sie passen
-      if (direction) {
-        if (direction === "left"  && !(diffRow === 0 && diffCol === -1)) return;
-        if (direction === "right" && !(diffRow === 0 && diffCol ===  1)) return;
-        if (direction === "up"    && !(diffRow === -1 && diffCol === 0)) return;
-        if (direction === "down"  && !(diffRow ===  1 && diffCol === 0)) return;
+        const bgX = (orCol / (PUZZLE_SIZE - 1)) * 100;
+        const bgY = (orRow / (PUZZLE_SIZE - 1)) * 100;
+        tile.style.backgroundPosition = bgX + "% " + bgY + "%";
       }
 
-      // Tausch
-      const temp = state[positionIndex];
-      state[positionIndex] = state[emptyIndex];
-      state[emptyIndex] = temp;
+      // Klick-Handling (Desktop)
+      tile.addEventListener("click", () => {
+        if (!tile.classList.contains("empty")) {
+          const pos = parseInt(tile.dataset.pos, 10);
+          tryMoveTile(pos, null);
+        }
+      });
 
-      renderPuzzle();
+      // Touch-Handling (Swipe)
+      let touchStartX = null;
+      let touchStartY = null;
 
-      if (isSolved()) {
-        setFeedback("Super! Du hast das Weihnachtsbild wieder zusammengesetzt. 💫", true);
-        showLetter();
-      } else {
-        setFeedback("Weiter so – das Bild ist noch nicht ganz vollständig.", false);
-      }
-    }
+      tile.addEventListener("touchstart", (e) => {
+        if (tile.classList.contains("empty")) return;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
 
-    function renderPuzzle() {
-      const puzzleEl = document.getElementById("puzzle");
-      puzzleEl.innerHTML = "";
+      tile.addEventListener("touchend", (e) => {
+        if (tile.classList.contains("empty")) return;
+        const touch = e.changedTouches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
 
-      for (let i = 0; i < TILE_COUNT; i++) {
-        const value = state[i];
-        const { row, col } = indexToRowCol(i);
+        const absX = Math.abs(dx);
+        const absY = Math.abs(dy);
+        const threshold = 20; // kleiner Swipe reicht
 
-        const tile = document.createElement("div");
-        tile.classList.add("puzzle-tile");
-        tile.style.left = (col * 25) + "%";
-        tile.style.top = (row * 25) + "%";
-        tile.dataset.pos = i; // aktuelle Position
+        let direction = null;
 
-        if (value === 0) {
-          tile.classList.add("empty");
-        } else {
-          // Ursprüngliche Zielposition des Teilchens
-          const originalIndex = value - 1;
-          const { row: orRow, col: orCol } = indexToRowCol(originalIndex);
-
-          const bgX = (orCol / (PUZZLE_SIZE - 1)) * 100;
-          const bgY = (orRow / (PUZZLE_SIZE - 1)) * 100;
-          tile.style.backgroundPosition = bgX + "% " + bgY + "%";
+        if (absX < threshold && absY < threshold) {
+          // Sehr kurzer „Swipe“ – wie ein Tap: Richtung nicht nötig
+          const pos = parseInt(tile.dataset.pos, 10);
+          tryMoveTile(pos, null);
+          return;
         }
 
-        // Klick-Handling (Desktop)
-        tile.addEventListener("click", () => {
-          if (!tile.classList.contains("empty")) {
-            const pos = parseInt(tile.dataset.pos, 10);
-            tryMoveTile(pos, null);
-          }
-        });
+        if (absX > absY) {
+          direction = dx > 0 ? "right" : "left";
+        } else {
+          direction = dy > 0 ? "down" : "up";
+        }
 
-        // Touch-Handling (Swipe)
-        let touchStartX = null;
-        let touchStartY = null;
+        const pos = parseInt(tile.dataset.pos, 10);
+        tryMoveTile(pos, direction);
+      }, { passive: true });
 
-        tile.addEventListener("touchstart", (e) => {
-          if (tile.classList.contains("empty")) return;
-          const touch = e.touches[0];
-          touchStartX = touch.clientX;
-          touchStartY = touch.clientY;
-        }, { passive: true });
-
-        tile.addEventListener("touchend", (e) => {
-          if (tile.classList.contains("empty")) return;
-          const touch = e.changedTouches[0];
-          const dx = touch.clientX - touchStartX;
-          const dy = touch.clientY - touchStartY;
-
-          const absX = Math.abs(dx);
-          const absY = Math.abs(dy);
-          const threshold = 20; // kleiner Swipe reicht
-
-          let direction = null;
-
-          if (absX < threshold && absY < threshold) {
-            // Sehr kurzer „Swipe“ – wie ein Tap: Richtung nicht nötig
-            const pos = parseInt(tile.dataset.pos, 10);
-            tryMoveTile(pos, null);
-            return;
-          }
-
-          if (absX > absY) {
-            direction = dx > 0 ? "right" : "left";
-          } else {
-            direction = dy > 0 ? "down" : "up";
-          }
-
-          const pos = parseInt(tile.dataset.pos, 10);
-          tryMoveTile(pos, direction);
-        }, { passive: true });
-
-        puzzleEl.appendChild(tile);
-      }
+      puzzleEl.appendChild(tile);
     }
+  }
 
-    function resetPuzzle() {
-      state = INITIAL_STATE.slice();
-      renderPuzzle();
-      const box = document.getElementById("feedback");
-      box.classList.add("hidden");
-    }
-    
-    function playSolution() {
-  let delay = 0;
-  const stepTime = 250; // Geschwindigkeit pro Zug (ms)
+  function resetPuzzle() {
+    state = INITIAL_STATE.slice();
+    renderPuzzle();
+    const box = document.getElementById("feedback");
+    box.classList.add("hidden");
+  }
 
-  SOLUTION_MOVES.forEach(tileValue => {
-    setTimeout(() => {
-      const pos = state.indexOf(tileValue);
-      tryMoveTile(pos, null); 
-    }, delay);
-    delay += stepTime;
-  });
+  function playSolution() {
+    let delay = 0;
+    const stepTime = 250; // Geschwindigkeit pro Zug (ms)
 
-  setTimeout(() => {
-    setFeedback("Das Puzzle wurde automatisch gelöst! 🌟", true);
-    showLetter();
-  }, SOLUTION_MOVES.length * stepTime + 300);
-}
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-      renderPuzzle();
-
-      const resetButton = document.getElementById("resetButton");
-      if (resetButton) {
-        resetButton.addEventListener("click", resetPuzzle);
-      }
+    SOLUTION_MOVES.forEach(tileValue => {
+      setTimeout(() => {
+        const pos = state.indexOf(tileValue);
+        if (pos !== -1) {
+          tryMoveTile(pos, null);
+        }
+      }, delay);
+      delay += stepTime;
     });
-  </script>
+
+    setTimeout(() => {
+      setFeedback("Das Puzzle wurde automatisch gelöst! 🌟", true);
+      showLetter();
+    }, SOLUTION_MOVES.length * stepTime + 300);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderPuzzle();
+
+    const resetButton = document.getElementById("resetButton");
+    if (resetButton) {
+      resetButton.addEventListener("click", resetPuzzle);
+    }
+  });
+</script>
 </body>
 </html>
