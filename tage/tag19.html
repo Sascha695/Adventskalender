@@ -411,6 +411,9 @@
               <button class="btn secondary" id="resetButton">Neu starten</button>
             </div>
 
+            <button class="btn" onclick="playSolution()">Lösung abspielen</button>
+
+
             <div id="feedback" class="note hidden"></div>
           </div>
         </div>
@@ -445,6 +448,16 @@
       10, 13, 5, 7,
       2, 14, 6, 15
     ];
+
+    // Optimale Lösungsschritte (40 Schritte):
+// Jede Zahl steht für die Kachel, die bewegt wird.
+const SOLUTION_MOVES = [
+  9, 1, 11, 12, 4, 8, 12, 5, 6, 14,
+  13, 11, 3, 9, 1, 3, 11, 13, 14, 6,
+  10, 2, 9, 1, 3, 5, 2, 10, 14, 11,
+  7, 12, 8, 4, 3, 2, 6, 7, 11, 15
+];
+
 
     let state = INITIAL_STATE.slice();
 
@@ -616,6 +629,25 @@
       const box = document.getElementById("feedback");
       box.classList.add("hidden");
     }
+    
+    function playSolution() {
+  let delay = 0;
+  const stepTime = 250; // Geschwindigkeit pro Zug (ms)
+
+  SOLUTION_MOVES.forEach(tileValue => {
+    setTimeout(() => {
+      const pos = state.indexOf(tileValue);
+      tryMoveTile(pos, null); 
+    }, delay);
+    delay += stepTime;
+  });
+
+  setTimeout(() => {
+    setFeedback("Das Puzzle wurde automatisch gelöst! 🌟", true);
+    showLetter();
+  }, SOLUTION_MOVES.length * stepTime + 300);
+}
+
 
     document.addEventListener("DOMContentLoaded", () => {
       renderPuzzle();
