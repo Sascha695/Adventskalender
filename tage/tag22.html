@@ -3,243 +3,140 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 22 – Das Matrix-Rätsel</title>
+  <title>Kerzen-Matrix-Rätsel</title>
 
   <style>
-    /* ---------- Grundlayout + Hintergrund ---------- */
     :root {
       --glass-bg: rgba(15, 23, 42, 0.35);
       --glass-border: rgba(248, 250, 252, 0.6);
-      --accent-green: #22c55e;
-      --accent-red: #ef4444;
-      --accent-gold: #facc15;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; }
 
     body {
+      margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
       color: #e5e7eb;
-      overflow-y: auto;
-      background-color: #000; /* Fallback */
     }
 
-    /* Fixer Hintergrund als eigene Ebene */
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/tag22_bg.png"); /* <-- Nach Wunsch anpassen */
+      background-image: url("assets/tag22_bg.png"); /* falls du einen Hintergrund willst */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       z-index: 0;
-    }
-
-    @media (max-width: 720px) {
-      .bg-layer {
-        background-size: contain;
-        background-position: top center;
-        background-color: #000;
-      }
+      opacity: 0.5;
     }
 
     .page-content {
       position: relative;
       z-index: 1;
       min-height: 100vh;
+      padding: 20px 12px 40px;
     }
 
     .container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 24px 16px 64px;
-    }
-
-    .card {
-      background: transparent;
-      box-shadow: none;
-      border-radius: 0;
-      padding: 0;
-    }
-
-    /* ---------- Glas-Kacheln ---------- */
-    .header-tile {
-      background: linear-gradient(135deg, rgba(21, 128, 61, 0.95), rgba(34, 197, 94, 0.9));
-      color: #f0fdf4;
-      border-radius: 24px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
-      margin-bottom: 12px;
-    }
-
-    .header-tile .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-tile h1 {
-      font-size: 1.3rem;
-      margin: 0;
-    }
-
-    .header-tile .emoji {
-      font-size: 1.6rem;
-    }
-
-    .header-tile a {
-      color: #f0fdf4;
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(240, 253, 244, 0.5);
-      background: rgba(248, 250, 252, 0.1);
-    }
-
-    .card-stack {
-      margin-top: 400px; /* bei Bedarf anpassen wie bei Tag 19 */
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
     }
 
     .tile {
       background: var(--glass-bg);
       border-radius: 22px;
-      padding: 16px 18px;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.6);
+      padding: 16px 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
+      margin-bottom: 16px;
     }
 
-    .tile h2,
-    .tile h3,
-    .tile h4 {
+    h1, h2, h3 {
       margin-top: 0;
       color: #fefce8;
     }
 
-    .muted {
-      color: #e5e7eb;
-      opacity: 0.85;
-      font-size: 0.9rem;
-      margin: 4px 4px 16px;
-    }
+    .muted { opacity: 0.85; font-size: 0.9rem; }
 
-    a {
-      color: #bfdbfe;
-    }
-
-    .row.wrap {
+    /* -------- Kerzen-Palette -------- */
+    .palette {
       display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
-      gap: 10px;
     }
 
-    .btn {
-      position: relative;
-      border-radius: 18px;
-      border: 2px solid var(--accent-gold);
-      padding: 10px 18px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      background-image: linear-gradient(135deg, #15803d, #22c55e);
-      color: #fefce8;
-      box-shadow: 0 10px 22px rgba(22, 163, 74, 0.55);
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    .candle-source-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
     }
 
-    .btn::before {
-      content: "★";
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.75rem;
-      opacity: 0.85;
+    .candle-source-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 130px;
     }
 
-    .btn.secondary {
-      background-image: linear-gradient(135deg, #b91c1c, #ef4444);
-      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.55);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 13px 26px rgba(15, 23, 42, 0.7);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
-    }
-
-    .note {
-      margin-top: 8px;
-      padding: 10px 12px;
+    .candle-source {
+      width: 64px;
+      height: 90px;
       border-radius: 16px;
       background: rgba(15, 23, 42, 0.9);
-      color: #e5e7eb;
-      font-size: 0.9rem;
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
     }
 
-    .note.success {
-      background: rgba(22, 163, 74, 0.95);
+    .candle {
+      width: 80%;
+      height: 80%;
+      background-image: url("assets/candle.png"); /* <-- HIER dein Kerzenbild eintragen */
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
     }
 
-    .hidden {
-      display: none;
+    /* das „fliegende“ Kerzenbild beim Touch-Drag */
+    .dragging-candle {
+      position: fixed;
+      width: 64px;
+      height: 90px;
+      pointer-events: none;
+      z-index: 9999;
     }
 
-    .footer {
-      margin-top: 8px;
-      text-align: center;
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      opacity: 0.9;
-    }
-
-    /* ---------- Matrix-Rätsel (7x9) ---------- */
+    /* -------- Matrix 7x9 -------- */
     .matrix-wrapper {
-      margin: 12px auto 0;
+      margin: 0 auto;
       max-width: 500px;
     }
 
     .matrix-grid {
       display: grid;
-      grid-template-columns: repeat(9, 1fr); /* 9 Spalten */
-      grid-auto-rows: 0;
+      grid-template-columns: repeat(9, 1fr);
       gap: 2px;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.7);
-      background: rgba(15, 23, 42, 0.85);
       padding: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 18px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.8);
     }
 
     .matrix-cell {
       position: relative;
       padding-top: 100%; /* Quadrat */
-      background: rgba(15, 23, 42, 0.95);
       border-radius: 6px;
       overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.95);
     }
 
     .matrix-cell-inner {
@@ -248,209 +145,88 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
     }
 
-    .matrix-input {
-      width: 80%;
-      height: 80%;
-      text-align: center;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
+    .fixed-number {
+      background: #1d4ed8;
+      color: #e0f2fe;
+    }
+
+    .dropzone {
+      cursor: pointer;
+    }
+
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border-radius: 18px;
+      padding: 8px 16px;
+      border: 2px solid #facc15;
+      background-image: linear-gradient(135deg, #15803d, #22c55e);
       color: #fefce8;
       font-weight: 600;
-      font-size: 1rem;
-      text-transform: uppercase;
-      outline: none;
-    }
-
-    .matrix-input.fixed {
-      cursor: default;
-    }
-
-    .matrix-input::placeholder {
-      color: rgba(148, 163, 184, 0.7);
-    }
-
-    .matrix-cell.fixed {
-      background: rgba(30, 64, 175, 0.9);
-      border-color: rgba(191, 219, 254, 0.9);
-    }
-
-    .matrix-cell.highlight {
-      background: rgba(180, 83, 9, 0.95);
-      border-color: rgba(251, 191, 36, 0.9);
-    }
-
-    .matrix-label {
-      margin-top: 10px;
       font-size: 0.9rem;
-      opacity: 0.9;
-      text-align: center;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
     }
 
-    /* ---------- Party-Overlay für den Buchstaben ---------- */
-    .party-overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at top, rgba(248, 250, 252, 0.15), rgba(15, 23, 42, 0.95));
-      z-index: 9999;
-    }
-
-    .party-overlay.hidden {
-      display: none;
-    }
-
-    .party-content {
-      text-align: center;
-      padding: 24px 32px;
-      border-radius: 24px;
-      background: rgba(15, 23, 42, 0.9);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .party-content p {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-
-    .party-letter {
-      font-size: 3.5rem;
-      font-weight: 900;
-      color: #fef3c7;
-      text-shadow: 0 0 16px rgba(252, 211, 77, 0.9);
-      animation: party-pop 0.9s ease-out forwards, party-glow 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes party-pop {
-      0% { transform: scale(0.2); opacity: 0; }
-      40% { transform: scale(1.15); opacity: 1; }
-      70% { transform: scale(0.95); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes party-glow {
-      0% { text-shadow: 0 0 10px rgba(252, 211, 77, 0.8); }
-      100% { text-shadow: 0 0 24px rgba(252, 211, 77, 1); }
-    }
-
-    .confetti-dot {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #facc15;
-      animation: confetti-fall 1.4s ease-out forwards;
-      opacity: 0.9;
-    }
-
-    @keyframes confetti-fall {
-      0% { transform: translateY(-20px); opacity: 0; }
-      20% { opacity: 1; }
-      100% { transform: translateY(80px); opacity: 0; }
+    .btn.secondary {
+      background-image: linear-gradient(135deg, #b91c1c, #ef4444);
     }
   </style>
 </head>
 <body>
-  <!-- Fester Hintergrund -->
   <div class="bg-layer"></div>
 
-  <!-- Scrollbarer Inhalt -->
   <div class="page-content">
     <div class="container">
-      <div class="card">
 
-        <!-- Kopfbereich -->
-        <div class="header-tile">
-          <div class="logo">
-            <span class="emoji">🧠</span>
-            <h1>Tag 22: Das verschobene Zahlen- & Buchstabenfeld</h1>
+      <div class="tile">
+        <h2>Kerzen aufstellen</h2>
+        <p>
+          Ziehe eine Kerze aus dem Kasten auf ein Feld.  
+          Du kannst so viele Kerzen setzen, wie du möchtest. Einmal gesetzte Kerzen bleiben fix,
+          bis du auf <strong>Neu starten</strong> klickst.
+        </p>
+      </div>
+
+      <div class="tile">
+        <div class="palette">
+          <div class="candle-source-wrapper">
+            <div id="candleSource" class="candle-source" draggable="true">
+              <div class="candle"></div>
+            </div>
+            <div class="candle-source-label">
+              Kerze greifen und auf das Feld ziehen
+            </div>
           </div>
         </div>
 
-        <div class="card-stack">
-          <!-- Story-Kachel -->
-          <div class="tile">
-            <h2>Rätsel</h2>
-            <p>
-              Heute wartet ein kleines <strong>Matrix-Rätsel</strong> auf dich. Vor dir liegt ein Feld aus
-              <strong>7 Reihen</strong> und <strong>9 Spalten</strong>, so wie auf dem Bild, das du bekommen hast.
-            </p>
-            <p>
-              Trage die passenden Buchstaben / Zahlen so in das Feld ein, wie es im Rätsel beschrieben ist.
-              Wenn du nicht mehr weiter weißt oder das Rätsel einfach nur genießen willst, kannst du dir mit
-              <strong>Lösung anzeigen</strong> das fertig ausgefüllte Feld einblenden lassen.
-            </p>
-            <p class="muted">
-              Hinweis: Die Startbuchstaben sind schon im Feld eingetragen. Ergänze die übrigen Felder Schritt für Schritt –
-              genau wie in deinem abfotografierten Rätsel.
-            </p>
-          </div>
-
-          <!-- Matrix-Kachel -->
-          <div class="tile">
-            <h3>7 × 9 Matrix</h3>
-
-            <div class="matrix-wrapper">
-              <div id="matrix" class="matrix-grid"></div>
-            </div>
-            <div class="matrix-label">
-              Klicke in die freien Felder und trage die passenden Buchstaben/Zahlen ein.
-            </div>
-
-            <div class="row wrap" style="margin-top:12px;">
-              <button class="btn secondary" id="resetButton">Neu starten</button>
-              <button class="btn" id="solutionButton">Lösung anzeigen</button>
-            </div>
-
-            <div id="feedback" class="note hidden"></div>
-          </div>
+        <div class="matrix-wrapper">
+          <div id="matrix" class="matrix-grid"></div>
         </div>
 
-        <div class="footer">
-          Tag 22 – Adventskalender-Rätsel
+        <div class="controls">
+          <button id="resetButton" class="btn secondary">Neu starten</button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Party-Overlay für den Buchstaben -->
-  <div id="letterOverlay" class="party-overlay hidden">
-    <div class="party-content">
-      <p>Geschafft! Der Buchstabe für heute ist:</p>
-      <!-- HIER den Buchstaben für Tag 22 eintragen -->
-      <div class="party-letter">x</div>
-    </div>
-  </div>
-
-  <!-- ---------- Matrix-Rätsel-Logik ---------- -->
   <script>
-    /*
-      WICHTIG FÜR DICH:
-
-      Unten findest du zwei 7x9-Matrizen:
-        - PUZZLE_DATA: so sieht das Start-Rätsel aus
-        - SOLUTION_DATA: so sieht die fertige Lösung aus
-
-      Jede der 7 Zeilen hat 9 Einträge.
-      - ""  (leerer String)  => leeres, vom Spieler auszufüllendes Feld
-      - "A" (oder anderer Buchstabe/Zahl) => vorgegebener, fest eingetragener Wert
-
-      Du kannst PUZZLE_DATA und SOLUTION_DATA 1:1 an das Foto deines Rätsels und an die
-      Lösung anpassen.
-    */
-
     const ROWS = 7;
     const COLS = 9;
 
-    // ---------------------------------------------
-    // HIER: Start-Zustand deines Rätsels eintragen
-    // ---------------------------------------------
+    // Zahlen wie in deinem PUZZLE_DATA
     const PUZZLE_DATA = [
       ["", "", "", "1", "", "1", "", "", ""],
       ["", "2", "1", "", "", "", "2", "", ""],
@@ -461,190 +237,134 @@
       ["0", "", "", "", "", "", "", "", ""]
     ];
 
-    // ---------------------------------------------
-    // HIER: fertige Lösung deines Rätsels eintragen
-    // ---------------------------------------------
-    const SOLUTION_DATA = [
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""],
-      ["", "", "", "", "", "", "", "", ""]
-    ];
-
-    // Optional: bestimmte Felder optisch hervorheben (z.B. Lösungswort)
-    // Liste von {row, col} (0-basiert)
-    const HIGHLIGHT_CELLS = [
-      // Beispiel: { row: 3, col: 2 },
-      // Diese kannst du anpassen oder leer lassen.
-    ];
-
-    let showingSolution = false;
-
-    function cellShouldBeFixed(row, col) {
-      // Ein Feld ist "fixed", wenn im Start-Rätsel schon ein Wert steht
-      return !!PUZZLE_DATA[row][col];
+    function createCandleElement() {
+      const c = document.createElement("div");
+      c.classList.add("candle");
+      return c;
     }
 
-    function cellShouldBeHighlighted(row, col) {
-      return HIGHLIGHT_CELLS.some(c => c.row === row && c.col === col);
+    function placeCandleInCell(cell) {
+      // Kerze bleibt fix – wir überschreiben einfach den Inhalt der Zelle,
+      // wenn dort noch keine Kerze ist.
+      if (!cell.querySelector(".candle")) {
+        cell.innerHTML = "";
+        const inner = document.createElement("div");
+        inner.classList.add("matrix-cell-inner");
+        inner.appendChild(createCandleElement());
+        cell.appendChild(inner);
+      }
     }
 
     function renderMatrix() {
-      const matrixEl = document.getElementById("matrix");
-      matrixEl.innerHTML = "";
+      const matrix = document.getElementById("matrix");
+      matrix.innerHTML = "";
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
+          const value = PUZZLE_DATA[r][c];
           const cell = document.createElement("div");
           cell.classList.add("matrix-cell");
 
           const inner = document.createElement("div");
           inner.classList.add("matrix-cell-inner");
 
-          const input = document.createElement("input");
-          input.maxLength = 1;
-          input.setAttribute("autocomplete", "off");
-          input.setAttribute("autocorrect", "off");
-          input.setAttribute("spellcheck", "false");
-          input.classList.add("matrix-input");
-
-          const fixed = cellShouldBeFixed(r, c);
-          const highlight = cellShouldBeHighlighted(r, c);
-
-          if (fixed) {
-            cell.classList.add("fixed");
-            input.classList.add("fixed");
-          }
-          if (highlight) {
-            cell.classList.add("highlight");
-          }
-
-          // Anfangs immer PUZZLE_DATA anzeigen
-          const startValue = PUZZLE_DATA[r][c] || "";
-          input.value = startValue;
-
-          if (fixed) {
-            input.readOnly = true;
+          if (value !== "") {
+            cell.classList.add("fixed-number");
+            inner.textContent = value;
           } else {
-            // Eingabe immer in Großbuchstaben
-            input.addEventListener("input", () => {
-              input.value = input.value.toUpperCase();
-              checkIfSolved();
+            cell.classList.add("dropzone");
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+
+            // HTML5 Drag & Drop
+            cell.addEventListener("dragover", (e) => {
+              e.preventDefault();
+            });
+
+            cell.addEventListener("drop", (e) => {
+              e.preventDefault();
+              const type = e.dataTransfer.getData("text/plain");
+              if (type === "candle") {
+                placeCandleInCell(cell);
+              }
+            });
+
+            // Tap: einfaches Tippen auf eine freie Zelle setzt direkt eine Kerze
+            cell.addEventListener("click", () => {
+              placeCandleInCell(cell);
             });
           }
 
-          inner.appendChild(input);
           cell.appendChild(inner);
-          matrixEl.appendChild(cell);
+          matrix.appendChild(cell);
         }
       }
     }
 
-    function resetMatrix() {
-      showingSolution = false;
-      const feedback = document.getElementById("feedback");
-      feedback.classList.add("hidden");
+    // --- Drag-Logik für die Kerzenquelle (Maus + Touch) ---
 
-      // Buttons zurücksetzen
-      const solutionButton = document.getElementById("solutionButton");
-      solutionButton.textContent = "Lösung anzeigen";
+    const candleSource = document.getElementById("candleSource");
 
-      renderMatrix();
-    }
-
-    function showSolution() {
-      const cells = document.querySelectorAll("#matrix .matrix-cell");
-      cells.forEach((cell, index) => {
-        const r = Math.floor(index / COLS);
-        const c = index % COLS;
-        const input = cell.querySelector(".matrix-input");
-        const val = SOLUTION_DATA[r][c] || "";
-
-        input.value = val.toUpperCase();
-        input.readOnly = true; // bei Lösung alles fix
-      });
-
-      const feedback = document.getElementById("feedback");
-      feedback.textContent = "Hier siehst du die vollständige Lösung des Matrix-Rätsels. 🌟";
-      feedback.classList.remove("hidden");
-      feedback.classList.add("success");
-
-      showingSolution = true;
-      const solutionButton = document.getElementById("solutionButton");
-      solutionButton.textContent = "Zurück zum Rätsel";
-      showLetter();
-    }
-
-    function showPuzzleAgain() {
-      resetMatrix();
-    }
-
-    function checkIfSolved() {
-      // Wenn noch nicht die Lösung eingeblendet ist, prüfen, ob alle Felder wie in SOLUTION_DATA gefüllt sind
-      if (showingSolution) return;
-
-      const cells = document.querySelectorAll("#matrix .matrix-cell");
-      let allMatch = true;
-
-      cells.forEach((cell, index) => {
-        const r = Math.floor(index / COLS);
-        const c = index % COLS;
-        const input = cell.querySelector(".matrix-input");
-        const target = (SOLUTION_DATA[r][c] || "").toUpperCase();
-        const current = (input.value || "").toUpperCase();
-
-        if (target && current !== target) {
-          allMatch = false;
-        }
-        // Falls in der Lösung ein leeres Feld vorgesehen ist, ist egal, was drin steht
-      });
-
-      if (allMatch) {
-        const feedback = document.getElementById("feedback");
-        feedback.textContent = "Super! Du hast das Matrix-Rätsel gelöst. 💫";
-        feedback.classList.remove("hidden");
-        feedback.classList.add("success");
-        showLetter();
-      }
-    }
-
-    function showLetter() {
-      const overlay = document.getElementById("letterOverlay");
-      overlay.classList.remove("hidden");
-
-      const content = overlay.querySelector(".party-content");
-      for (let i = 0; i < 20; i++) {
-        const dot = document.createElement("span");
-        dot.className = "confetti-dot";
-        dot.style.left = Math.random() * 100 + "%";
-        dot.style.top = (Math.random() * 30) + "%";
-        content.appendChild(dot);
-        setTimeout(() => dot.remove(), 1500);
-      }
-
-      overlay.addEventListener("click", () => {
-        overlay.classList.add("hidden");
-      }, { once: true });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      renderMatrix();
-
-      const resetButton = document.getElementById("resetButton");
-      resetButton.addEventListener("click", resetMatrix);
-
-      const solutionButton = document.getElementById("solutionButton");
-      solutionButton.addEventListener("click", () => {
-        if (!showingSolution) {
-          showSolution();
-        } else {
-          showPuzzleAgain();
-        }
-      });
+    // Desktop-Drag
+    candleSource.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", "candle");
     });
+
+    // Touch-Drag (eigene Implementierung)
+    let touchDraggingEl = null;
+
+    candleSource.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      touchDraggingEl = document.createElement("div");
+      touchDraggingEl.classList.add("dragging-candle");
+      const inner = createCandleElement();
+      touchDraggingEl.appendChild(inner);
+      document.body.appendChild(touchDraggingEl);
+
+      moveDraggingCandle(touch);
+      e.preventDefault();
+    }, { passive: false });
+
+    candleSource.addEventListener("touchmove", (e) => {
+      if (!touchDraggingEl) return;
+      const touch = e.touches[0];
+      moveDraggingCandle(touch);
+      e.preventDefault();
+    }, { passive: false });
+
+    candleSource.addEventListener("touchend", (e) => {
+      if (!touchDraggingEl) return;
+      const touch = e.changedTouches[0];
+
+      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (dropTarget) {
+        const cell = dropTarget.closest(".dropzone");
+        if (cell) {
+          placeCandleInCell(cell);
+        }
+      }
+
+      touchDraggingEl.remove();
+      touchDraggingEl = null;
+      e.preventDefault();
+    }, { passive: false });
+
+    function moveDraggingCandle(touch) {
+      const x = touch.clientX;
+      const y = touch.clientY;
+      const offsetX = 32;
+      const offsetY = 45;
+      touchDraggingEl.style.left = (x - offsetX) + "px";
+      touchDraggingEl.style.top = (y - offsetY) + "px";
+    }
+
+    // Reset
+    document.getElementById("resetButton").addEventListener("click", () => {
+      renderMatrix();
+    });
+
+    // Initiales Rendern
+    renderMatrix();
   </script>
 </body>
 </html>
