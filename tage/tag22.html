@@ -18,12 +18,13 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #000;
       color: #e5e7eb;
+      overflow-x: hidden;
     }
 
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/tag22_bg.png"); /* falls du einen Hintergrund willst */
+      background-image: url("assets/tag22_bg.png"); /* optionaler Hintergrund */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -99,7 +100,7 @@
     .candle {
       width: 80%;
       height: 80%;
-      background-image: url("assets/candle.png"); /* <-- HIER dein Kerzenbild eintragen */
+      background-image: url("assets/candle.png"); /* Kerzenbild */
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
@@ -181,6 +182,85 @@
     .btn.secondary {
       background-image: linear-gradient(135deg, #b91c1c, #ef4444);
     }
+
+    /* -------- Party-Overlay -------- */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(250, 250, 250, 0.2), rgba(15, 23, 42, 0.95));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9990;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .party-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .party-message {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #facc15;
+      text-shadow: 0 0 16px rgba(250, 204, 21, 0.9);
+    }
+
+    .party-sub {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .party-close-btn {
+      margin-top: 28px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 2px solid #facc15;
+      background: rgba(22, 163, 74, 0.85);
+      color: #fefce8;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* Fallende Kerzen */
+    .falling-candle {
+      position: fixed;
+      top: -100px;
+      width: 40px;
+      height: 60px;
+      background-image: url("assets/candle.png");
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+      pointer-events: none;
+      z-index: 9998;
+      animation-name: candle-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes candle-fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(120vh) rotate(20deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -194,9 +274,9 @@
         <p>
           Sind die Lichter angezündet? Bei diesem Rätsel sollen alle weißen Felder 
           mit Kerzen beleuchtet werden. Eine Kerze beleuchtet jedes weiße Feld in 
-          der Reihe und der Spalte, in der sie sich befindet - außer ein blaues Feld 
+          der Reihe und der Spalte, in der sie sich befindet – außer ein blaues Feld 
           blockiert das Licht. Die Zahlen in den blauen Feldern geben an, wie viele 
-          Kerzen waagerecht oder senkrecht an das Feld grenzen. Reine Rerze darf eine 
+          Kerzen waagerecht oder senkrecht an das Feld grenzen. Keine Kerze darf eine 
           andere beleuchten. Wo müssen die Kerzen aufgestellt werden?
         </p>
       </div>
@@ -208,7 +288,7 @@
               <div class="candle"></div>
             </div>
             <div class="candle-source-label">
-              Kerze greifen und auf das Feld ziehen
+              Kerze greifen oder Feld antippen,<br>um eine Kerze zu setzen/entfernen.
             </div>
           </div>
         </div>
@@ -223,6 +303,16 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- Party-Overlay -->
+  <div id="partyOverlay" class="party-overlay">
+    <div class="party-message">HERZLICHEN GLÜCKWUNSCH!</div>
+    <div class="party-sub">
+      Du hast alle Kerzen richtig platziert und jedes Feld beleuchtet. <br>
+      Genieß die kleine Kerzen-Party! 🕯✨
+    </div>
+    <button id="partyClose" class="party-close-btn">Weiter spielen</button>
   </div>
 
   <script>
@@ -240,22 +330,93 @@
       ["0", "", "", "", "", "", "", "", ""]
     ];
 
+    // Einzig richtige Lösungs-Konfiguration (0-basierte Zeilen/Spalten)
+    // Gefunden unter Berücksichtigung aller Regeln (Zahlen, Beleuchtung, keine Kerze sieht eine andere)
+    const SOLUTION_CELLS = [
+      { row: 0, col: 2 },
+      { row: 0, col: 8 },
+      { row: 1, col: 0 },
+      { row: 1, col: 5 },
+      { row: 1, col: 7 },
+      { row: 2, col: 1 },
+      { row: 3, col: 4 },
+      { row: 4, col: 1 },
+      { row: 5, col: 3 },
+      { row: 6, col: 2 }
+    ];
+
+    let partyStarted = false;
+
     function createCandleElement() {
       const c = document.createElement("div");
       c.classList.add("candle");
       return c;
     }
 
-    function placeCandleInCell(cell) {
-      // Kerze bleibt fix – wir überschreiben einfach den Inhalt der Zelle,
-      // wenn dort noch keine Kerze ist.
+    function clearCellInner(cell) {
+      cell.innerHTML = "";
+      const inner = document.createElement("div");
+      inner.classList.add("matrix-cell-inner");
+      cell.appendChild(inner);
+    }
+
+    function placeCandleInCell(cell, skipCheck = false) {
+      // Kerze bleibt fix – wenn noch keine Kerze da ist, setzen
       if (!cell.querySelector(".candle")) {
-        cell.innerHTML = "";
-        const inner = document.createElement("div");
-        inner.classList.add("matrix-cell-inner");
+        clearCellInner(cell);
+        const inner = cell.querySelector(".matrix-cell-inner");
         inner.appendChild(createCandleElement());
-        cell.appendChild(inner);
       }
+      if (!skipCheck) {
+        checkSolution();
+      }
+    }
+
+    function removeCandleFromCell(cell) {
+      if (cell.querySelector(".candle")) {
+        clearCellInner(cell);
+      }
+      checkSolution();
+    }
+
+    function toggleCandleInCell(cell) {
+      if (cell.querySelector(".candle")) {
+        removeCandleFromCell(cell);
+      } else {
+        placeCandleInCell(cell);
+      }
+    }
+
+    function cellsEqual(a, b) {
+      return a.row === b.row && a.col === b.col;
+    }
+
+    function checkSolution() {
+      if (partyStarted) return; // nur einmal feiern
+
+      const placed = [];
+      document.querySelectorAll(".dropzone").forEach(cell => {
+        if (cell.querySelector(".candle")) {
+          placed.push({
+            row: parseInt(cell.dataset.row, 10),
+            col: parseInt(cell.dataset.col, 10)
+          });
+        }
+      });
+
+      // gleiche Anzahl?
+      if (placed.length !== SOLUTION_CELLS.length) return false;
+
+      // jede Lösungszelle muss belegt sein
+      for (const solCell of SOLUTION_CELLS) {
+        if (!placed.some(p => cellsEqual(p, solCell))) {
+          return false;
+        }
+      }
+
+      // hier: Lösung korrekt
+      startParty();
+      return true;
     }
 
     function renderMatrix() {
@@ -292,9 +453,9 @@
               }
             });
 
-            // Tap: einfaches Tippen auf eine freie Zelle setzt direkt eine Kerze
+            // Klick/Tap: toggelt Kerze
             cell.addEventListener("click", () => {
-              placeCandleInCell(cell);
+              toggleCandleInCell(cell);
             });
           }
 
@@ -353,6 +514,7 @@
     }, { passive: false });
 
     function moveDraggingCandle(touch) {
+      if (!touchDraggingEl) return;
       const x = touch.clientX;
       const y = touch.clientY;
       const offsetX = 32;
@@ -363,8 +525,53 @@
 
     // Reset
     document.getElementById("resetButton").addEventListener("click", () => {
+      partyStarted = false;
+      hideParty();
       renderMatrix();
     });
+
+    // ---------- Party-Logik ----------
+
+    const partyOverlay = document.getElementById("partyOverlay");
+    const partyClose = document.getElementById("partyClose");
+
+    function startParty() {
+      partyStarted = true;
+      showPartyOverlay();
+      launchFallingCandles(40, 5000); // 40 Kerzen, ~5 Sekunden
+    }
+
+    function showPartyOverlay() {
+      partyOverlay.classList.add("visible");
+    }
+
+    function hideParty() {
+      partyOverlay.classList.remove("visible");
+    }
+
+    partyClose.addEventListener("click", () => {
+      hideParty();
+    });
+
+    function launchFallingCandles(count, durationMs) {
+      const created = [];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.classList.add("falling-candle");
+        el.style.left = Math.random() * 100 + "vw";
+        const delay = Math.random() * 1.5;         // 0–1.5s
+        const duration = 3 + Math.random() * 3;     // 3–6s
+        el.style.animationDuration = duration + "s";
+        el.style.animationDelay = delay + "s";
+        document.body.appendChild(el);
+        created.push(el);
+      }
+
+      // nach einer Weile alle Kerzen wieder entfernen
+      setTimeout(() => {
+        created.forEach(el => el.remove());
+      }, durationMs + 3000);
+    }
 
     // Initiales Rendern
     renderMatrix();
