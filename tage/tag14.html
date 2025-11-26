@@ -81,17 +81,11 @@
       letter-spacing: 0.15em;
     }
 
-    /* --- Rätsel-Layout: zwei Spalten wie Arbeitsblatt --- */
+    /* Rätsel-Layout: zwei Spalten */
     .puzzle-flex {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
       gap: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .puzzle-flex {
-        grid-template-columns: 1fr;
-      }
     }
 
     .questions-box,
@@ -164,7 +158,6 @@
       opacity: 0.55;
     }
 
-    /* Antworten rechts: jetzt ohne eigene Scrollbox, läuft einfach mit der Seite mit */
     .answers-list {
       display: flex;
       flex-direction: column;
@@ -243,7 +236,7 @@
       text-transform: uppercase;
     }
 
-    /* Party-Overlay & Konfetti (unverändert) */
+    /* Party-Overlay & Konfetti */
     .party-overlay {
       position: fixed;
       inset: 0;
@@ -877,8 +870,6 @@
       const karte = e.target.closest(".answer-card");
       if (!karte) return;
 
-      // nur echtes Ziehen starten, wenn Finger etwas länger drauf bleibt / sich bewegt;
-      // hier simple Variante: sofort starten
       const touch = e.touches[0];
       starteTouchDrag(karte, touch);
       e.preventDefault();
