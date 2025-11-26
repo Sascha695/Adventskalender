@@ -113,7 +113,7 @@
 
     .qa-row {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 1fr auto; /* nur Text + Dropzone */
       gap: 6px;
       align-items: center;
       padding: 6px 0;
@@ -122,11 +122,6 @@
 
     .qa-row:last-child {
       border-bottom: none;
-    }
-
-    .qa-number {
-      font-weight: 700;
-      min-width: 1.6rem;
     }
 
     .qa-text {
@@ -188,16 +183,6 @@
       background: rgba(34, 197, 94, 0.18);
       box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
       transform: translateY(-1px);
-    }
-
-    .answer-label {
-      font-weight: 800;
-      font-size: 0.9rem;
-      width: 1.4rem;
-      text-align: center;
-      border-radius: 999px;
-      border: 1px solid rgba(248, 250, 252, 0.85);
-      padding: 2px 0;
     }
 
     .answer-text {
@@ -352,7 +337,6 @@
 
             <div id="questionsList">
               <div class="qa-row" data-question="1">
-                <div class="qa-number">1.</div>
                 <div class="qa-text">What does Mrs. Claus say when she looks at the sky?</div>
                 <div class="drop-zone" data-question="1">
                   <span class="drop-placeholder">Drop answer</span>
@@ -360,7 +344,6 @@
               </div>
 
               <div class="qa-row" data-question="2">
-                <div class="qa-number">2.</div>
                 <div class="qa-text">What do we call Santa when he stops moving?</div>
                 <div class="drop-zone" data-question="2">
                   <span class="drop-placeholder">Drop answer</span>
@@ -368,7 +351,6 @@
               </div>
 
               <div class="qa-row" data-question="3">
-                <div class="qa-number">3.</div>
                 <div class="qa-text">What does the snowman eat for a snack?</div>
                 <div class="drop-zone" data-question="3">
                   <span class="drop-placeholder">Drop answer</span>
@@ -376,7 +358,6 @@
               </div>
 
               <div class="qa-row" data-question="4">
-                <div class="qa-number">4.</div>
                 <div class="qa-text">What do you get when you cross a bird with a turtle?</div>
                 <div class="drop-zone" data-question="4">
                   <span class="drop-placeholder">Drop answer</span>
@@ -384,7 +365,6 @@
               </div>
 
               <div class="qa-row" data-question="5">
-                <div class="qa-number">5.</div>
                 <div class="qa-text">What kind of laundry detergent does Santa use?</div>
                 <div class="drop-zone" data-question="5">
                   <span class="drop-placeholder">Drop answer</span>
@@ -392,7 +372,6 @@
               </div>
 
               <div class="qa-row" data-question="6">
-                <div class="qa-number">6.</div>
                 <div class="qa-text">Who is the most impolite of all the reindeer?</div>
                 <div class="drop-zone" data-question="6">
                   <span class="drop-placeholder">Drop answer</span>
@@ -400,7 +379,6 @@
               </div>
 
               <div class="qa-row" data-question="7">
-                <div class="qa-number">7.</div>
                 <div class="qa-text">When does Christmas come before Thanksgiving?</div>
                 <div class="drop-zone" data-question="7">
                   <span class="drop-placeholder">Drop answer</span>
@@ -408,7 +386,6 @@
               </div>
 
               <div class="qa-row" data-question="8">
-                <div class="qa-number">8.</div>
                 <div class="qa-text">What does a snowman like to eat for breakfast?</div>
                 <div class="drop-zone" data-question="8">
                   <span class="drop-placeholder">Drop answer</span>
@@ -416,7 +393,6 @@
               </div>
 
               <div class="qa-row" data-question="9">
-                <div class="qa-number">9.</div>
                 <div class="qa-text">Why is Santa good at karate?</div>
                 <div class="drop-zone" data-question="9">
                   <span class="drop-placeholder">Drop answer</span>
@@ -424,7 +400,6 @@
               </div>
 
               <div class="qa-row" data-question="10">
-                <div class="qa-number">10.</div>
                 <div class="qa-text">Which of Santa's reindeer can you see in outer space?</div>
                 <div class="drop-zone" data-question="10">
                   <span class="drop-placeholder">Drop answer</span>
@@ -432,7 +407,6 @@
               </div>
 
               <div class="qa-row" data-question="11">
-                <div class="qa-number">11.</div>
                 <div class="qa-text">Who sings “Blue Christmas” and makes toy guitars?</div>
                 <div class="drop-zone" data-question="11">
                   <span class="drop-placeholder">Drop answer</span>
@@ -440,7 +414,6 @@
               </div>
 
               <div class="qa-row" data-question="12">
-                <div class="qa-number">12.</div>
                 <div class="qa-text">What Christmas carol is the favorite of parents?</div>
                 <div class="drop-zone" data-question="12">
                   <span class="drop-placeholder">Drop answer</span>
@@ -448,7 +421,6 @@
               </div>
 
               <div class="qa-row" data-question="13">
-                <div class="qa-number">13.</div>
                 <div class="qa-text">What did Adam say to his wife?</div>
                 <div class="drop-zone" data-question="13">
                   <span class="drop-placeholder">Drop answer</span>
@@ -456,7 +428,6 @@
               </div>
 
               <div class="qa-row" data-question="14">
-                <div class="qa-number">14.</div>
                 <div class="qa-text">What do lions sing at Christmas?</div>
                 <div class="drop-zone" data-question="14">
                   <span class="drop-placeholder">Drop answer</span>
@@ -464,7 +435,6 @@
               </div>
 
               <div class="qa-row" data-question="15">
-                <div class="qa-number">15.</div>
                 <div class="qa-text">What is the best thing to put into a Christmas cake?</div>
                 <div class="drop-zone" data-question="15">
                   <span class="drop-placeholder">Drop answer</span>
@@ -472,7 +442,6 @@
               </div>
 
               <div class="qa-row" data-question="16">
-                <div class="qa-number">16.</div>
                 <div class="qa-text">What does Frosty the Snowman take when he gets sick?</div>
                 <div class="drop-zone" data-question="16">
                   <span class="drop-placeholder">Drop answer</span>
@@ -480,7 +449,6 @@
               </div>
 
               <div class="qa-row" data-question="17">
-                <div class="qa-number">17.</div>
                 <div class="qa-text">What do elves learn at school?</div>
                 <div class="drop-zone" data-question="17">
                   <span class="drop-placeholder">Drop answer</span>
@@ -488,7 +456,6 @@
               </div>
 
               <div class="qa-row" data-question="18">
-                <div class="qa-number">18.</div>
                 <div class="qa-text">How do sheep say “Merry Christmas” in Mexico?</div>
                 <div class="drop-zone" data-question="18">
                   <span class="drop-placeholder">Drop answer</span>
@@ -496,7 +463,6 @@
               </div>
 
               <div class="qa-row" data-question="19">
-                <div class="qa-number">19.</div>
                 <div class="qa-text">Why was Santa's elf depressed?</div>
                 <div class="drop-zone" data-question="19">
                   <span class="drop-placeholder">Drop answer</span>
@@ -504,7 +470,6 @@
               </div>
 
               <div class="qa-row" data-question="20">
-                <div class="qa-number">20.</div>
                 <div class="qa-text">Why did the Christmas cookie go to the doctor?</div>
                 <div class="drop-zone" data-question="20">
                   <span class="drop-placeholder">Drop answer</span>
@@ -512,7 +477,6 @@
               </div>
 
               <div class="qa-row" data-question="21">
-                <div class="qa-number">21.</div>
                 <div class="qa-text">Who delivers Christmas presents to dogs?</div>
                 <div class="drop-zone" data-question="21">
                   <span class="drop-placeholder">Drop answer</span>
@@ -535,107 +499,86 @@
 
             <div class="answers-list" id="answerPool">
               <div class="answer-card" draggable="true" data-id="U" data-correct-question="1">
-                <div class="answer-label">U</div>
                 <div class="answer-text">Looks like reindeer.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="K" data-correct-question="2">
-                <div class="answer-label">K</div>
                 <div class="answer-text">Santa Pause.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="P" data-correct-question="3">
-                <div class="answer-label">P</div>
                 <div class="answer-text">A snow cone.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="I" data-correct-question="4">
-                <div class="answer-label">I</div>
                 <div class="answer-text">A turtledove.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="N" data-correct-question="5">
-                <div class="answer-label">N</div>
                 <div class="answer-text">Yule Tide.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="Q" data-correct-question="6">
-                <div class="answer-label">Q</div>
                 <div class="answer-text">Rude-dolf.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="D" data-correct-question="7">
-                <div class="answer-label">D</div>
                 <div class="answer-text">In the dictionary.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="L" data-correct-question="8">
-                <div class="answer-label">L</div>
                 <div class="answer-text">Frosted Flakes.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="R" data-correct-question="9">
-                <div class="answer-label">R</div>
                 <div class="answer-text">He has a black belt.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="A" data-correct-question="10">
-                <div class="answer-label">A</div>
                 <div class="answer-text">Comet.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="O" data-correct-question="11">
-                <div class="answer-label">O</div>
                 <div class="answer-text">Elfis.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="T" data-correct-question="12">
-                <div class="answer-label">T</div>
                 <div class="answer-text">Silent Night.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="C" data-correct-question="13">
-                <div class="answer-label">C</div>
                 <div class="answer-text">It’s Christmas Eve.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="B" data-correct-question="14">
-                <div class="answer-label">B</div>
                 <div class="answer-text">Jungle Bells.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="J" data-correct-question="15">
-                <div class="answer-label">J</div>
                 <div class="answer-text">Your teeth.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="M" data-correct-question="16">
-                <div class="answer-label">M</div>
                 <div class="answer-text">A chill pill.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="H" data-correct-question="17">
-                <div class="answer-label">H</div>
                 <div class="answer-text">The elf-abet.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="G" data-correct-question="18">
-                <div class="answer-label">G</div>
                 <div class="answer-text">Fleece Navidad.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="E" data-correct-question="19">
-                <div class="answer-label">E</div>
                 <div class="answer-text">Low elf-esteem.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="S" data-correct-question="20">
-                <div class="answer-label">S</div>
                 <div class="answer-text">It was feeling crummy.</div>
               </div>
 
               <div class="answer-card" draggable="true" data-id="F" data-correct-question="21">
-                <div class="answer-label">F</div>
                 <div class="answer-text">Santa Paws.</div>
               </div>
             </div>
@@ -668,6 +611,14 @@
 
     // aktuell per Klick ausgewählte Antwortkarte (für Handy einfacher)
     let ausgewaehlteKarte = null;
+
+    // Antworten zufällig mischen
+    (function mischeAntworten() {
+      const karten = Array.from(antwortPool.children);
+      karten
+        .sort(() => Math.random() - 0.5)
+        .forEach(karte => antwortPool.appendChild(karte));
+    })();
 
     // Hilfsfunktion: Antwort in Dropzone einsetzen
     function setzeAntwortInDropzone(dropzone, karte) {
