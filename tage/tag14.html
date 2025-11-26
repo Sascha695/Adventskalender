@@ -36,7 +36,7 @@
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/riddle_reindeer.png");
+      background-image: url("assets/santa_lock.png");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -81,7 +81,7 @@
       letter-spacing: 0.15em;
     }
 
-    /* Rätsel-Layout: zwei Spalten */
+    /* Rätsel-Layout: zwei Spalten (auch auf Handy) */
     .puzzle-flex {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
@@ -612,6 +612,19 @@
     // aktuell per Klick ausgewählte Antwortkarte (für Handy einfacher)
     let ausgewaehlteKarte = null;
 
+    // Auto-Scroll-Einstellungen
+    const SCROLL_ZONE_HEIGHT = 80; // px vom oberen/unteren Rand
+    const SCROLL_SPEED = 15;       // px pro Tick
+
+    function handleAutoScroll(pointerY) {
+      const viewportHeight = window.innerHeight;
+      if (pointerY < SCROLL_ZONE_HEIGHT) {
+        window.scrollBy(0, -SCROLL_SPEED);
+      } else if (viewportHeight - pointerY < SCROLL_ZONE_HEIGHT) {
+        window.scrollBy(0, SCROLL_SPEED);
+      }
+    }
+
     // Antworten zufällig mischen
     (function mischeAntworten() {
       const karten = Array.from(antwortPool.children);
@@ -706,6 +719,13 @@
 
     document.addEventListener("dragend", () => {
       aktuellGezogeneKarteId = null;
+    });
+
+    // globales dragover für Auto-Scroll
+    document.addEventListener("dragover", (e) => {
+      if (!aktuellGezogeneKarteId) return;
+      e.preventDefault();
+      handleAutoScroll(e.clientY);
     });
 
     dropZonen.forEach(zone => {
@@ -830,6 +850,7 @@
       if (!touchFloatingEl) return;
       const touch = e.touches[0];
       bewegeTouchDrag(touch);
+      handleAutoScroll(touch.clientY); // Auto-Scroll auch bei Touch
       e.preventDefault();
     }, { passive: false });
 
