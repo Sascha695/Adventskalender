@@ -13,18 +13,18 @@
 
     * { box-sizing: border-box; }
 
+    /* Überschrift */
     .main-title {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 900;
-  color: #fefce8;
-  margin-top: 40px;     /* Abstand zum oberen Rand */
-  margin-bottom: 100px;  /* Abstand zum restlichen Inhalt */
-  text-shadow: 0 0 18px rgba(255, 230, 150, 0.8);
-}
-
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #fefce8;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 18px rgba(255, 230, 150, 0.8);
+    }
 
     body {
       margin: 0;
@@ -50,6 +50,7 @@
       z-index: 1;
       min-height: 300vh;
       padding: 20px 12px 40px;
+      margin-top: 160px;  /* Abstand, damit der Anfang des Rätsels weiter unten startet */
     }
 
     .container {
@@ -113,13 +114,12 @@
     .candle {
       width: 80%;
       height: 80%;
-      background-image: url("assets/candle.png"); /* Kerzenbild */
+      background-image: url("assets/candle.png");
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
     }
 
-    /* das „fliegende“ Kerzenbild beim Touch-Drag */
     .dragging-candle {
       position: fixed;
       width: 64px;
@@ -146,7 +146,7 @@
 
     .matrix-cell {
       position: relative;
-      padding-top: 100%; /* Quadrat */
+      padding-top: 100%;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid rgba(148, 163, 184, 0.7);
@@ -200,7 +200,7 @@
     .party-overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at top, rgba(250, 250, 250, 0.2), rgba(15, 23, 42, 0.95));
+      background: radial-gradient(circle at top, rgba(250,250,250,0.2), rgba(15,23,42,0.95));
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -224,7 +224,7 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: #facc15;
-      text-shadow: 0 0 16px rgba(250, 204, 21, 0.9);
+      text-shadow: 0 0 16px rgba(250,204,21,0.9);
     }
 
     .party-sub {
@@ -239,7 +239,7 @@
       padding: 10px 24px;
       border-radius: 999px;
       border: 2px solid #facc15;
-      background: rgba(22, 163, 74, 0.85);
+      background: rgba(22,163,74,0.85);
       color: #fefce8;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -247,7 +247,6 @@
       cursor: pointer;
     }
 
-    /* Fallende Kerzen */
     .falling-candle {
       position: fixed;
       top: -100px;
@@ -265,23 +264,21 @@
     }
 
     @keyframes candle-fall {
-      0% {
-        transform: translateY(-100px) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(120vh) rotate(20deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(20deg); opacity: 0; }
     }
+
   </style>
 </head>
 <body>
+
   <div class="bg-layer"></div>
 
-  <div class="page-content">
-    <h1 class="main-title">Es werde Licht</h1>
+  <!-- Überschrift gehört nach AUßEN -->
+  <h1 class="main-title">Es werde Licht</h1>
 
+  <!-- Und der Inhalt startet weit unten -->
+  <div class="page-content">
     <div class="container">
 
       <div class="tile">
@@ -289,10 +286,9 @@
         <p>
           Draußen ist es mittlerweile schon so richtig dunkel. Bei diesem Rätsel sollen alle leeren Felder 
           mit der Helligkeit einer Kerze beleuchtet werden. Eine Kerze beleuchtet jedes leere Feld in 
-          der Reihe <strong>und</strong> der Spalte, in der sie sich befindet – außer ein blaues Feld 
-          blockiert das Licht. Die Zahlen in den blauen Feldern geben an, wie viele 
-          Kerzen waagerecht oder senkrecht an das Feld grenzen. <strong>Keine Kerze darf eine 
-          andere beleuchten.</strong> Wo müssen die Kerzen aufgestellt werden?
+          der Reihe <strong>und</strong> der Spalte – außer ein blaues Feld blockiert das Licht.
+          Die Zahlen geben an, wie viele Kerzen angrenzen. 
+          <strong>Keine Kerze darf eine andere beleuchten.</strong>
         </p>
       </div>
 
@@ -304,8 +300,9 @@
             </div>
             <div class="candle-source-label">
               Kerze nehmen und an die richtige Stelle ziehen
+            </div>
           </div>
-        </div>
+        </div> <!-- korrekt geschlossen -->
 
         <div class="matrix-wrapper">
           <div id="matrix" class="matrix-grid"></div>
@@ -319,13 +316,10 @@
     </div>
   </div>
 
-  <!-- Party-Overlay -->
+  <!-- Party -->
   <div id="partyOverlay" class="party-overlay">
     <div class="party-message">Du erhellst die Nacht ❤️ Dein Buchstabe heute ist: c</div>
-    <div class="party-sub">
-      Du hast alle Kerzen richtig platziert und jedes Feld beleuchtet. <br>
-      Genieß die kleine Kerzen-Party! 🕯✨
-    </div>
+    <div class="party-sub">Du hast alle Kerzen richtig platziert – genieße die Kerzen-Party! 🕯✨</div>
     <button id="partyClose" class="party-close-btn">Weiter spielen</button>
   </div>
 
@@ -333,7 +327,6 @@
     const ROWS = 7;
     const COLS = 9;
 
-    // Zahlen wie in deinem PUZZLE_DATA
     const PUZZLE_DATA = [
       ["", "", "", "1", "", "1", "", "", ""],
       ["", "2", "1", "", "", "", "2", "", ""],
@@ -344,8 +337,6 @@
       ["0", "", "", "", "", "", "", "", ""]
     ];
 
-    // Einzig richtige Lösungs-Konfiguration (0-basierte Zeilen/Spalten)
-    // Gefunden unter Berücksichtigung aller Regeln (Zahlen, Beleuchtung, keine Kerze sieht eine andere)
     const SOLUTION_CELLS = [
       { row: 0, col: 2 },
       { row: 0, col: 8 },
@@ -375,30 +366,21 @@
     }
 
     function placeCandleInCell(cell, skipCheck = false) {
-      // Kerze bleibt fix – wenn noch keine Kerze da ist, setzen
       if (!cell.querySelector(".candle")) {
         clearCellInner(cell);
-        const inner = cell.querySelector(".matrix-cell-inner");
-        inner.appendChild(createCandleElement());
+        cell.querySelector(".matrix-cell-inner").appendChild(createCandleElement());
       }
-      if (!skipCheck) {
-        checkSolution();
-      }
+      if (!skipCheck) checkSolution();
     }
 
     function removeCandleFromCell(cell) {
-      if (cell.querySelector(".candle")) {
-        clearCellInner(cell);
-      }
+      if (cell.querySelector(".candle")) clearCellInner(cell);
       checkSolution();
     }
 
     function toggleCandleInCell(cell) {
-      if (cell.querySelector(".candle")) {
-        removeCandleFromCell(cell);
-      } else {
-        placeCandleInCell(cell);
-      }
+      if (cell.querySelector(".candle")) removeCandleFromCell(cell);
+      else placeCandleInCell(cell);
     }
 
     function cellsEqual(a, b) {
@@ -406,29 +388,24 @@
     }
 
     function checkSolution() {
-      if (partyStarted) return; // nur einmal feiern
+      if (partyStarted) return;
 
       const placed = [];
       document.querySelectorAll(".dropzone").forEach(cell => {
         if (cell.querySelector(".candle")) {
           placed.push({
-            row: parseInt(cell.dataset.row, 10),
-            col: parseInt(cell.dataset.col, 10)
+            row: parseInt(cell.dataset.row),
+            col: parseInt(cell.dataset.col)
           });
         }
       });
 
-      // gleiche Anzahl?
       if (placed.length !== SOLUTION_CELLS.length) return false;
 
-      // jede Lösungszelle muss belegt sein
       for (const solCell of SOLUTION_CELLS) {
-        if (!placed.some(p => cellsEqual(p, solCell))) {
-          return false;
-        }
+        if (!placed.some(p => cellsEqual(p, solCell))) return false;
       }
 
-      // hier: Lösung korrekt
       startParty();
       return true;
     }
@@ -454,23 +431,15 @@
             cell.dataset.row = r;
             cell.dataset.col = c;
 
-            // HTML5 Drag & Drop
-            cell.addEventListener("dragover", (e) => {
+            cell.addEventListener("dragover", e => e.preventDefault());
+            cell.addEventListener("drop", e => {
               e.preventDefault();
-            });
-
-            cell.addEventListener("drop", (e) => {
-              e.preventDefault();
-              const type = e.dataTransfer.getData("text/plain");
-              if (type === "candle") {
+              if (e.dataTransfer.getData("text/plain") === "candle") {
                 placeCandleInCell(cell);
               }
             });
 
-            // Klick/Tap: toggelt Kerze
-            cell.addEventListener("click", () => {
-              toggleCandleInCell(cell);
-            });
+            cell.addEventListener("click", () => toggleCandleInCell(cell));
           }
 
           cell.appendChild(inner);
@@ -479,49 +448,37 @@
       }
     }
 
-    // --- Drag-Logik für die Kerzenquelle (Maus + Touch) ---
-
     const candleSource = document.getElementById("candleSource");
 
-    // Desktop-Drag
     candleSource.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", "candle");
     });
 
-    // Touch-Drag (eigene Implementierung)
+    // Touch-Drag
     let touchDraggingEl = null;
 
     candleSource.addEventListener("touchstart", (e) => {
       const touch = e.touches[0];
       touchDraggingEl = document.createElement("div");
       touchDraggingEl.classList.add("dragging-candle");
-      const inner = createCandleElement();
-      touchDraggingEl.appendChild(inner);
+      touchDraggingEl.appendChild(createCandleElement());
       document.body.appendChild(touchDraggingEl);
-
       moveDraggingCandle(touch);
       e.preventDefault();
     }, { passive: false });
 
     candleSource.addEventListener("touchmove", (e) => {
       if (!touchDraggingEl) return;
-      const touch = e.touches[0];
-      moveDraggingCandle(touch);
+      moveDraggingCandle(e.touches[0]);
       e.preventDefault();
     }, { passive: false });
 
     candleSource.addEventListener("touchend", (e) => {
       if (!touchDraggingEl) return;
       const touch = e.changedTouches[0];
-
       const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (dropTarget) {
-        const cell = dropTarget.closest(".dropzone");
-        if (cell) {
-          placeCandleInCell(cell);
-        }
-      }
-
+      const cell = dropTarget?.closest(".dropzone");
+      if (cell) placeCandleInCell(cell);
       touchDraggingEl.remove();
       touchDraggingEl = null;
       e.preventDefault();
@@ -529,43 +486,30 @@
 
     function moveDraggingCandle(touch) {
       if (!touchDraggingEl) return;
-      const x = touch.clientX;
-      const y = touch.clientY;
-      const offsetX = 32;
-      const offsetY = 45;
-      touchDraggingEl.style.left = (x - offsetX) + "px";
-      touchDraggingEl.style.top = (y - offsetY) + "px";
+      touchDraggingEl.style.left = (touch.clientX - 32) + "px";
+      touchDraggingEl.style.top = (touch.clientY - 45) + "px";
     }
 
-    // Reset
     document.getElementById("resetButton").addEventListener("click", () => {
       partyStarted = false;
       hideParty();
       renderMatrix();
     });
 
-    // ---------- Party-Logik ----------
-
     const partyOverlay = document.getElementById("partyOverlay");
     const partyClose = document.getElementById("partyClose");
 
     function startParty() {
       partyStarted = true;
-      showPartyOverlay();
-      launchFallingCandles(40, 5000); // 40 Kerzen, ~5 Sekunden
-    }
-
-    function showPartyOverlay() {
       partyOverlay.classList.add("visible");
+      launchFallingCandles(40, 5000);
     }
 
     function hideParty() {
       partyOverlay.classList.remove("visible");
     }
 
-    partyClose.addEventListener("click", () => {
-      hideParty();
-    });
+    partyClose.addEventListener("click", hideParty);
 
     function launchFallingCandles(count, durationMs) {
       const created = [];
@@ -573,22 +517,18 @@
         const el = document.createElement("div");
         el.classList.add("falling-candle");
         el.style.left = Math.random() * 100 + "vw";
-        const delay = Math.random() * 1.5;         // 0–1.5s
-        const duration = 3 + Math.random() * 3;     // 3–6s
+        const delay = Math.random() * 1.5;
+        const duration = 3 + Math.random() * 3;
         el.style.animationDuration = duration + "s";
         el.style.animationDelay = delay + "s";
         document.body.appendChild(el);
         created.push(el);
       }
-
-      // nach einer Weile alle Kerzen wieder entfernen
-      setTimeout(() => {
-        created.forEach(el => el.remove());
-      }, durationMs + 3000);
+      setTimeout(() => created.forEach(el => el.remove()), durationMs + 3000);
     }
 
-    // Initiales Rendern
     renderMatrix();
   </script>
+
 </body>
 </html>
