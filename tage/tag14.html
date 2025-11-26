@@ -36,7 +36,7 @@
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/santa_lock.png"); /* Hintergrund kannst du bei Bedarf ändern */
+      background-image: url("assets/santa_lock.png");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -73,9 +73,6 @@
       color: #fefce8;
     }
 
-    .muted { opacity: 0.85; font-size: 0.9rem; }
-
-    /* --- Rätsel-Layout: Fragen & Antworten --- */
     .lock-title {
       text-align: center;
       font-weight: 700;
@@ -84,6 +81,7 @@
       letter-spacing: 0.15em;
     }
 
+    /* --- Rätsel-Layout: zwei Spalten wie Arbeitsblatt --- */
     .puzzle-flex {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
@@ -166,12 +164,11 @@
       opacity: 0.55;
     }
 
+    /* Antworten rechts: jetzt ohne eigene Scrollbox, läuft einfach mit der Seite mit */
     .answers-list {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 520px;
-      overflow-y: auto;
       padding-right: 4px;
     }
 
@@ -187,10 +184,17 @@
       cursor: grab;
       touch-action: none;
       user-select: none;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
     }
 
     .answer-card:active {
       cursor: grabbing;
+    }
+
+    .answer-card.selected {
+      background: rgba(34, 197, 94, 0.18);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+      transform: translateY(-1px);
     }
 
     .answer-label {
@@ -217,7 +221,6 @@
       opacity: 0.95;
     }
 
-    /* Info-Bereich unter dem Rätsel */
     .info-bar {
       margin-top: 10px;
       font-size: 0.85rem;
@@ -240,7 +243,7 @@
       text-transform: uppercase;
     }
 
-    /* Party-Overlay */
+    /* Party-Overlay & Konfetti (unverändert) */
     .party-overlay {
       position: fixed;
       inset: 0;
@@ -291,7 +294,6 @@
       cursor: pointer;
     }
 
-    /* Konfetti */
     .falling-confetti {
       position: fixed;
       top: -20px;
@@ -328,7 +330,6 @@
   <div class="page-content">
     <div class="container">
 
-      <!-- Einstimmungsgeschichte, jetzt auf Englisch -->
       <div class="tile">
         <h2>Can you help Santa remember the punchlines?</h2>
         <p>
@@ -345,21 +346,18 @@
         </p>
       </div>
 
-      <!-- Rätsel-Kachel -->
       <div class="tile">
         <div class="lock-title">Questions &amp; Answers</div>
 
         <div class="puzzle-flex">
-          <!-- Fragen-Spalte -->
+          <!-- Fragen links -->
           <div class="questions-box">
             <div class="questions-header">Questions</div>
             <div class="questions-sub">
-              Drag an answer from the right side onto each question. On a phone or tablet, move the answers with your finger.
+              Drag an answer from the right side onto each question – or tap an answer and then tap a question field.
             </div>
 
-            <!-- Jede Frage mit Drop-Zone -->
             <div id="questionsList">
-              <!-- 1 -->
               <div class="qa-row" data-question="1">
                 <div class="qa-number">1.</div>
                 <div class="qa-text">What does Mrs. Claus say when she looks at the sky?</div>
@@ -368,7 +366,6 @@
                 </div>
               </div>
 
-              <!-- 2 -->
               <div class="qa-row" data-question="2">
                 <div class="qa-number">2.</div>
                 <div class="qa-text">What do we call Santa when he stops moving?</div>
@@ -377,7 +374,6 @@
                 </div>
               </div>
 
-              <!-- 3 -->
               <div class="qa-row" data-question="3">
                 <div class="qa-number">3.</div>
                 <div class="qa-text">What does the snowman eat for a snack?</div>
@@ -386,7 +382,6 @@
                 </div>
               </div>
 
-              <!-- 4 -->
               <div class="qa-row" data-question="4">
                 <div class="qa-number">4.</div>
                 <div class="qa-text">What do you get when you cross a bird with a turtle?</div>
@@ -395,7 +390,6 @@
                 </div>
               </div>
 
-              <!-- 5 -->
               <div class="qa-row" data-question="5">
                 <div class="qa-number">5.</div>
                 <div class="qa-text">What kind of laundry detergent does Santa use?</div>
@@ -404,7 +398,6 @@
                 </div>
               </div>
 
-              <!-- 6 -->
               <div class="qa-row" data-question="6">
                 <div class="qa-number">6.</div>
                 <div class="qa-text">Who is the most impolite of all the reindeer?</div>
@@ -413,7 +406,6 @@
                 </div>
               </div>
 
-              <!-- 7 -->
               <div class="qa-row" data-question="7">
                 <div class="qa-number">7.</div>
                 <div class="qa-text">When does Christmas come before Thanksgiving?</div>
@@ -422,7 +414,6 @@
                 </div>
               </div>
 
-              <!-- 8 -->
               <div class="qa-row" data-question="8">
                 <div class="qa-number">8.</div>
                 <div class="qa-text">What does a snowman like to eat for breakfast?</div>
@@ -431,7 +422,6 @@
                 </div>
               </div>
 
-              <!-- 9 -->
               <div class="qa-row" data-question="9">
                 <div class="qa-number">9.</div>
                 <div class="qa-text">Why is Santa good at karate?</div>
@@ -440,7 +430,6 @@
                 </div>
               </div>
 
-              <!-- 10 -->
               <div class="qa-row" data-question="10">
                 <div class="qa-number">10.</div>
                 <div class="qa-text">Which of Santa's reindeer can you see in outer space?</div>
@@ -449,7 +438,6 @@
                 </div>
               </div>
 
-              <!-- 11 -->
               <div class="qa-row" data-question="11">
                 <div class="qa-number">11.</div>
                 <div class="qa-text">Who sings “Blue Christmas” and makes toy guitars?</div>
@@ -458,7 +446,6 @@
                 </div>
               </div>
 
-              <!-- 12 -->
               <div class="qa-row" data-question="12">
                 <div class="qa-number">12.</div>
                 <div class="qa-text">What Christmas carol is the favorite of parents?</div>
@@ -467,7 +454,6 @@
                 </div>
               </div>
 
-              <!-- 13 -->
               <div class="qa-row" data-question="13">
                 <div class="qa-number">13.</div>
                 <div class="qa-text">What did Adam say to his wife?</div>
@@ -476,7 +462,6 @@
                 </div>
               </div>
 
-              <!-- 14 -->
               <div class="qa-row" data-question="14">
                 <div class="qa-number">14.</div>
                 <div class="qa-text">What do lions sing at Christmas?</div>
@@ -485,7 +470,6 @@
                 </div>
               </div>
 
-              <!-- 15 -->
               <div class="qa-row" data-question="15">
                 <div class="qa-number">15.</div>
                 <div class="qa-text">What is the best thing to put into a Christmas cake?</div>
@@ -494,7 +478,6 @@
                 </div>
               </div>
 
-              <!-- 16 -->
               <div class="qa-row" data-question="16">
                 <div class="qa-number">16.</div>
                 <div class="qa-text">What does Frosty the Snowman take when he gets sick?</div>
@@ -503,7 +486,6 @@
                 </div>
               </div>
 
-              <!-- 17 -->
               <div class="qa-row" data-question="17">
                 <div class="qa-number">17.</div>
                 <div class="qa-text">What do elves learn at school?</div>
@@ -512,7 +494,6 @@
                 </div>
               </div>
 
-              <!-- 18 -->
               <div class="qa-row" data-question="18">
                 <div class="qa-number">18.</div>
                 <div class="qa-text">How do sheep say “Merry Christmas” in Mexico?</div>
@@ -521,7 +502,6 @@
                 </div>
               </div>
 
-              <!-- 19 -->
               <div class="qa-row" data-question="19">
                 <div class="qa-number">19.</div>
                 <div class="qa-text">Why was Santa's elf depressed?</div>
@@ -530,7 +510,6 @@
                 </div>
               </div>
 
-              <!-- 20 -->
               <div class="qa-row" data-question="20">
                 <div class="qa-number">20.</div>
                 <div class="qa-text">Why did the Christmas cookie go to the doctor?</div>
@@ -539,7 +518,6 @@
                 </div>
               </div>
 
-              <!-- 21 -->
               <div class="qa-row" data-question="21">
                 <div class="qa-number">21.</div>
                 <div class="qa-text">Who delivers Christmas presents to dogs?</div>
@@ -550,20 +528,19 @@
             </div>
 
             <div class="info-bar">
-              <span>If you want to move an answer, just drag it to a different question or back to the list.</span>
+              <span>Tap a filled box with no answer selected to send the answer back to the list.</span>
               <button class="info-btn" id="checkButton">Check matches</button>
             </div>
           </div>
 
-          <!-- Antworten-Spalte -->
+          <!-- Antworten rechts -->
           <div class="answers-box">
             <div class="answers-header">Answers</div>
             <div class="questions-sub">
-              Each answer has a letter, just like on a worksheet. Match every question with the right Christmas joke.
+              You can drag these answers onto the questions or tap one and then tap a question box.
             </div>
 
             <div class="answers-list" id="answerPool">
-              <!-- Jede Antwortkarte hat ihre richtige Frage in data-correct-question -->
               <div class="answer-card" draggable="true" data-id="U" data-correct-question="1">
                 <div class="answer-label">U</div>
                 <div class="answer-text">Looks like reindeer.</div>
@@ -687,9 +664,7 @@
   </div>
 
   <script>
-    // --- JavaScript: Drag-&-Drop-Logik für Fragen & Antworten (mit Touch-Unterstützung) ---
-
-    // alle Drop-Zonen und Antwortkarten holen
+    // --- Grund-Variablen ---
     const dropZonen = document.querySelectorAll(".drop-zone");
     const antwortPool = document.getElementById("answerPool");
     const checkButton = document.getElementById("checkButton");
@@ -698,29 +673,76 @@
     const partyClose = document.getElementById("partyClose");
     let partyGestartet = false;
 
-    // Hilfsfunktion: Karte in eine Drop-Zone einsetzen
+    // aktuell per Klick ausgewählte Antwortkarte (für Handy einfacher)
+    let ausgewaehlteKarte = null;
+
+    // Hilfsfunktion: Antwort in Dropzone einsetzen
     function setzeAntwortInDropzone(dropzone, karte) {
-      // evtl. vorhandene Karte zurück in den Pool schieben
       const vorhandene = dropzone.querySelector(".answer-card");
       if (vorhandene) {
         antwortPool.appendChild(vorhandene);
       }
 
-      // Platzhalter entfernen
       const platzhalter = dropzone.querySelector(".drop-placeholder");
       if (platzhalter) platzhalter.remove();
 
-      // Karte einsetzen
       dropzone.appendChild(karte);
       dropzone.classList.add("filled");
     }
 
-    // Hilfsfunktion: Karte zurück in den Pool legen
+    // Hilfsfunktion: Karte zurück in den Pool
     function legeKarteInPool(karte) {
       antwortPool.appendChild(karte);
     }
 
-    // --- Drag & Drop mit Maus / Desktop ---
+    // --- Klick-Auswahl von Antworten (für Handy bequem) ---
+
+    function waehleAntwortKarte(karte) {
+      if (ausgewaehlteKarte === karte) {
+        karte.classList.remove("selected");
+        ausgewaehlteKarte = null;
+        return;
+      }
+      if (ausgewaehlteKarte) {
+        ausgewaehlteKarte.classList.remove("selected");
+      }
+      ausgewaehlteKarte = karte;
+      karte.classList.add("selected");
+    }
+
+    // Klicks auf Antwortkarten (egal ob im Pool oder in einer Dropzone)
+    document.addEventListener("click", (e) => {
+      const karte = e.target.closest(".answer-card");
+      if (karte) {
+        waehleAntwortKarte(karte);
+        return;
+      }
+
+      const zone = e.target.closest(".drop-zone");
+      if (zone) {
+        // wenn eine Karte ausgewählt ist -> dort einsetzen
+        if (ausgewaehlteKarte) {
+          setzeAntwortInDropzone(zone, ausgewaehlteKarte);
+          ausgewaehlteKarte.classList.remove("selected");
+          ausgewaehlteKarte = null;
+        } else {
+          // keine Karte ausgewählt: falls Zone eine Karte hat, zurück in den Pool
+          const vorhandene = zone.querySelector(".answer-card");
+          if (vorhandene) {
+            legeKarteInPool(vorhandene);
+            if (!zone.querySelector(".drop-placeholder")) {
+              const span = document.createElement("span");
+              span.classList.add("drop-placeholder");
+              span.textContent = "Drop answer";
+              zone.appendChild(span);
+            }
+            zone.classList.remove("filled");
+          }
+        }
+      }
+    });
+
+    // --- Drag & Drop (Maus) ---
 
     let aktuellGezogeneKarteId = null;
 
@@ -730,6 +752,12 @@
       aktuellGezogeneKarteId = karte.dataset.id;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", karte.dataset.id);
+
+      // Auswahl beim Ziehen entfernen
+      if (ausgewaehlteKarte) {
+        ausgewaehlteKarte.classList.remove("selected");
+        ausgewaehlteKarte = null;
+      }
     });
 
     document.addEventListener("dragend", () => {
@@ -752,7 +780,6 @@
       });
     });
 
-    // erlaubt, Karten durch Ziehen zurück in den Pool zu legen
     antwortPool.addEventListener("dragover", (e) => {
       if (!aktuellGezogeneKarteId) return;
       e.preventDefault();
@@ -766,7 +793,6 @@
       const karte = document.querySelector('.answer-card[data-id="' + CSS.escape(id) + '"]');
       if (!karte) return;
 
-      // Dropzone wieder "leeren", falls nötig
       const parentZone = karte.parentElement.closest(".drop-zone");
       if (parentZone) {
         if (!parentZone.querySelector(".drop-placeholder")) {
@@ -781,7 +807,7 @@
       legeKarteInPool(karte);
     });
 
-    // --- Touch-Unterstützung ---
+    // --- Touch-Drag (optional, zusätzlich zum Tippen) ---
 
     let touchAktiveKarte = null;
     let touchFloatingEl = null;
@@ -795,14 +821,17 @@
       touchOffsetX = touch.clientX - rect.left;
       touchOffsetY = touch.clientY - rect.top;
 
-      // schwebendes Element erstellen (Kopie)
+      if (ausgewaehlteKarte) {
+        ausgewaehlteKarte.classList.remove("selected");
+        ausgewaehlteKarte = null;
+      }
+
       touchFloatingEl = karte.cloneNode(true);
       touchFloatingEl.classList.add("floating-answer");
       touchFloatingEl.style.left = rect.left + "px";
       touchFloatingEl.style.top = rect.top + "px";
       document.body.appendChild(touchFloatingEl);
 
-      // Original etwas "ausblenden", bis drop erfolgt
       karte.style.opacity = "0.2";
     }
 
@@ -822,8 +851,6 @@
       if (zielDropzone) {
         setzeAntwortInDropzone(zielDropzone, touchAktiveKarte);
       } else if (zielPool || !zielElement) {
-        // zurück in den Pool
-        // ggf. Dropzone wieder mit Platzhalter ausstatten
         const parentZone = touchAktiveKarte.parentElement.closest(".drop-zone");
         if (parentZone) {
           if (!parentZone.querySelector(".drop-placeholder")) {
@@ -836,7 +863,6 @@
         }
         legeKarteInPool(touchAktiveKarte);
       } else {
-        // an sonstiger Stelle losgelassen -> Karte bleibt wo sie war
         touchAktiveKarte.style.opacity = "1";
       }
 
@@ -846,10 +872,13 @@
       touchAktiveKarte = null;
     }
 
-    // Touch-Events nur auf den Antwortkarten
-    antwortPool.addEventListener("touchstart", (e) => {
+    // Touchstart nur auf Antwortkarten
+    document.addEventListener("touchstart", (e) => {
       const karte = e.target.closest(".answer-card");
       if (!karte) return;
+
+      // nur echtes Ziehen starten, wenn Finger etwas länger drauf bleibt / sich bewegt;
+      // hier simple Variante: sofort starten
       const touch = e.touches[0];
       starteTouchDrag(karte, touch);
       e.preventDefault();
@@ -928,14 +957,12 @@
         const el = document.createElement("div");
         el.classList.add("falling-confetti");
 
-        // zufällige Farbe, Größe und Position
         el.style.background = farben[Math.floor(Math.random() * farben.length)];
         const groesse = 6 + Math.random() * 10;
         el.style.width = groesse + "px";
         el.style.height = groesse + "px";
         el.style.left = Math.random() * 100 + "vw";
 
-        // zufällige Timing-Variationen
         const delay = Math.random() * 1.5;
         const dauer = 2 + Math.random() * 3;
 
