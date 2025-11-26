@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Kerzen-Matrix-Rätsel</title>
+  <title>Kerzen-Rätsel</title>
 
   <style>
     :root {
@@ -24,7 +24,7 @@
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/tag22_bg.png"); /* optionaler Hintergrund */
+      background-image: url("assets/maze_candle.png"); /* optionaler Hintergrund */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -35,7 +35,7 @@
     .page-content {
       position: relative;
       z-index: 1;
-      min-height: 100vh;
+      min-height: 300vh;
       padding: 20px 12px 40px;
     }
 
@@ -87,7 +87,7 @@
 
     .candle-source {
       width: 64px;
-      height: 90px;
+      height: 64px;
       border-radius: 16px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(248, 250, 252, 0.7);
@@ -272,12 +272,12 @@
       <div class="tile">
         <h2>Kerzen aufstellen</h2>
         <p>
-          Sind die Lichter angezündet? Bei diesem Rätsel sollen alle weißen Felder 
-          mit Kerzen beleuchtet werden. Eine Kerze beleuchtet jedes weiße Feld in 
-          der Reihe und der Spalte, in der sie sich befindet – außer ein blaues Feld 
+          Draußen ist es mittlerweile schon so richtig dunkel. Bei diesem Rätsel sollen alle leeren Felder 
+          mit der Helligkeit einer Kerze beleuchtet werden. Eine Kerze beleuchtet jedes leere Feld in 
+          der Reihe <strong>und</strong> der Spalte, in der sie sich befindet – außer ein blaues Feld 
           blockiert das Licht. Die Zahlen in den blauen Feldern geben an, wie viele 
-          Kerzen waagerecht oder senkrecht an das Feld grenzen. Keine Kerze darf eine 
-          andere beleuchten. Wo müssen die Kerzen aufgestellt werden?
+          Kerzen waagerecht oder senkrecht an das Feld grenzen. <strong>eine Kerze darf eine 
+          andere beleuchten.</strong> Wo müssen die Kerzen aufgestellt werden?
         </p>
       </div>
 
