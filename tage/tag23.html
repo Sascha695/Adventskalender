@@ -285,25 +285,31 @@
       cursor: pointer;
     }
 
-    .falling-candle {
+    /* Konfetti */
+    .falling-confetti {
       position: fixed;
-      top: -100px;
-      width: 40px;
-      height: 60px;
-      background-image: url("assets/candle.png");
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center;
+      top: -20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: red;
+      opacity: 0.9;
       pointer-events: none;
       z-index: 9998;
-      animation-name: candle-fall;
+      animation-name: confetti-fall;
       animation-timing-function: linear;
       animation-fill-mode: forwards;
     }
 
-    @keyframes candle-fall {
-      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(120vh) rotate(20deg); opacity: 0; }
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -404,7 +410,7 @@
     <div class="party-message">Zahlenschloss geknackt!</div>
     <div class="party-sub">
       Super, du hast den richtigen Code gefunden.  
-      <br>Dein Buchstabe heute ist: <strong>?</strong>
+      <br>Dein Buchstabe heute ist: <strong>e</strong>
     </div>
     <button id="partyClose" class="party-close-btn">Weiter spielen</button>
   </div>
@@ -542,7 +548,7 @@
     function startParty() {
       partyStarted = true;
       partyOverlay.classList.add("visible");
-      launchFallingCandles(35, 5000);
+      launchConfetti(80, 5000);
     }
 
     function hideParty() {
@@ -551,19 +557,34 @@
 
     partyClose.addEventListener("click", hideParty);
 
-    function launchFallingCandles(count, durationMs) {
+    function launchConfetti(count, durationMs) {
       const created = [];
+      const colors = ["#facc15", "#ef4444", "#3b82f6", "#22c55e", "#e879f9"];
+
       for (let i = 0; i < count; i++) {
         const el = document.createElement("div");
-        el.classList.add("falling-candle");
+        el.classList.add("falling-confetti");
+
+        // Zufällige Farbe, Größe und Position
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        const size = 6 + Math.random() * 10;
+        el.style.width = size + "px";
+        el.style.height = size + "px";
+
         el.style.left = Math.random() * 100 + "vw";
+
+        // Zufällige Timing-Variationen
         const delay = Math.random() * 1.5;
-        const duration = 3 + Math.random() * 3;
+        const duration = 2 + Math.random() * 3;
+
         el.style.animationDuration = duration + "s";
         el.style.animationDelay = delay + "s";
+
         document.body.appendChild(el);
         created.push(el);
       }
+
+      // Automatisch entfernen
       setTimeout(() => created.forEach(el => el.remove()), durationMs + 3000);
     }
   </script>
