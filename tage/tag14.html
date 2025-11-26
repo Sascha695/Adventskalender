@@ -1,65 +1,952 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 14 – Liedtitel-Ergänzung</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Santa Matching Puzzle – Day 14</title>
+
+  <style>
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+    }
+
+    * { box-sizing: border-box; }
+
+    .main-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #fefce8;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 18px rgba(255, 230, 150, 0.8);
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #e5e7eb;
+      overflow-x: hidden;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-image: url("assets/santa_lock.png"); /* Hintergrund kannst du bei Bedarf ändern */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 300vh;
+      padding: 20px 12px 40px;
+      margin-top: 450px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .muted { opacity: 0.85; font-size: 0.9rem; }
+
+    /* --- Rätsel-Layout: Fragen & Antworten --- */
+    .lock-title {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .puzzle-flex {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .puzzle-flex {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .questions-box,
+    .answers-box {
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .questions-header,
+    .answers-header {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .questions-sub {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .qa-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(55, 65, 81, 0.7);
+    }
+
+    .qa-row:last-child {
+      border-bottom: none;
+    }
+
+    .qa-number {
+      font-weight: 700;
+      min-width: 1.6rem;
+    }
+
+    .qa-text {
+      font-size: 0.88rem;
+      line-height: 1.3;
+    }
+
+    .drop-zone {
+      width: 80px;
+      min-height: 32px;
+      border-radius: 8px;
+      border: 1px dashed rgba(148, 163, 184, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 2px 4px;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .drop-zone.filled {
+      border-style: solid;
+      border-color: rgba(250, 204, 21, 0.9);
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.55);
+    }
+
+    .drop-placeholder {
+      opacity: 0.55;
+    }
+
+    .answers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .answer-card {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      font-size: 0.86rem;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .answer-card:active {
+      cursor: grabbing;
+    }
+
+    .answer-label {
+      font-weight: 800;
+      font-size: 0.9rem;
+      width: 1.4rem;
+      text-align: center;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.85);
+      padding: 2px 0;
+    }
+
+    .answer-text {
+      flex: 1;
+    }
+
+    /* schwebende Karte für Touch-Drag */
+    .floating-answer {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      width: 220px;
+      max-width: 70vw;
+      opacity: 0.95;
+    }
+
+    /* Info-Bereich unter dem Rätsel */
+    .info-bar {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      opacity: 0.9;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .info-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Party-Overlay */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(250,250,250,0.2), rgba(15,23,42,0.95));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9990;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .party-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .party-message {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #facc15;
+      text-shadow: 0 0 16px rgba(250,204,21,0.9);
+    }
+
+    .party-sub {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 460px;
+    }
+
+    .party-close-btn {
+      margin-top: 28px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 2px solid #facc15;
+      background: rgba(22,163,74,0.85);
+      color: #fefce8;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* Konfetti */
+    .falling-confetti {
+      position: fixed;
+      top: -20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: red;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 9998;
+      animation-name: confetti-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">✨</span><h1>Tag 14: Liedtitel-Ergänzung</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+
+<body>
+  <div class="bg-layer"></div>
+
+  <h1 class="main-title">Santa Riddle – Day 14</h1>
+
+  <div class="page-content">
+    <div class="container">
+
+      <!-- Einstimmungsgeschichte, jetzt auf Englisch -->
+      <div class="tile">
+        <h2>Can you help Santa remember the punchlines?</h2>
+        <p>
+          It is the 14th of December and the North Pole is buzzing with excitement.
+          Santa has prepared gifts, packed his sleigh and practised his “Ho Ho Ho!” –
+          but there is one more important job: his famous Christmas joke show for the elves.
+          <br><br>
+          When Santa looks at his list of jokes, he gasps.
+          “Oh dear… I mixed up all the questions and answers!” he sighs.
+          “If I tell the wrong punchline, the reindeer will laugh at me for weeks!”
+          <br><br>
+          Santa needs a clever helper who can match each question with the correct funny answer.
+          Are you ready to connect them again so the Christmas show can go on?
+        </p>
       </div>
-      <p class="muted">Datum: 14.12.</p>
-      <h2>Rätsel</h2>
-      <p>Ergänze den Titel: „O ____baum“.</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <!-- Rätsel-Kachel -->
+      <div class="tile">
+        <div class="lock-title">Questions &amp; Answers</div>
+
+        <div class="puzzle-flex">
+          <!-- Fragen-Spalte -->
+          <div class="questions-box">
+            <div class="questions-header">Questions</div>
+            <div class="questions-sub">
+              Drag an answer from the right side onto each question. On a phone or tablet, move the answers with your finger.
+            </div>
+
+            <!-- Jede Frage mit Drop-Zone -->
+            <div id="questionsList">
+              <!-- 1 -->
+              <div class="qa-row" data-question="1">
+                <div class="qa-number">1.</div>
+                <div class="qa-text">What does Mrs. Claus say when she looks at the sky?</div>
+                <div class="drop-zone" data-question="1">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 2 -->
+              <div class="qa-row" data-question="2">
+                <div class="qa-number">2.</div>
+                <div class="qa-text">What do we call Santa when he stops moving?</div>
+                <div class="drop-zone" data-question="2">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 3 -->
+              <div class="qa-row" data-question="3">
+                <div class="qa-number">3.</div>
+                <div class="qa-text">What does the snowman eat for a snack?</div>
+                <div class="drop-zone" data-question="3">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 4 -->
+              <div class="qa-row" data-question="4">
+                <div class="qa-number">4.</div>
+                <div class="qa-text">What do you get when you cross a bird with a turtle?</div>
+                <div class="drop-zone" data-question="4">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 5 -->
+              <div class="qa-row" data-question="5">
+                <div class="qa-number">5.</div>
+                <div class="qa-text">What kind of laundry detergent does Santa use?</div>
+                <div class="drop-zone" data-question="5">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 6 -->
+              <div class="qa-row" data-question="6">
+                <div class="qa-number">6.</div>
+                <div class="qa-text">Who is the most impolite of all the reindeer?</div>
+                <div class="drop-zone" data-question="6">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 7 -->
+              <div class="qa-row" data-question="7">
+                <div class="qa-number">7.</div>
+                <div class="qa-text">When does Christmas come before Thanksgiving?</div>
+                <div class="drop-zone" data-question="7">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 8 -->
+              <div class="qa-row" data-question="8">
+                <div class="qa-number">8.</div>
+                <div class="qa-text">What does a snowman like to eat for breakfast?</div>
+                <div class="drop-zone" data-question="8">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 9 -->
+              <div class="qa-row" data-question="9">
+                <div class="qa-number">9.</div>
+                <div class="qa-text">Why is Santa good at karate?</div>
+                <div class="drop-zone" data-question="9">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 10 -->
+              <div class="qa-row" data-question="10">
+                <div class="qa-number">10.</div>
+                <div class="qa-text">Which of Santa's reindeer can you see in outer space?</div>
+                <div class="drop-zone" data-question="10">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 11 -->
+              <div class="qa-row" data-question="11">
+                <div class="qa-number">11.</div>
+                <div class="qa-text">Who sings “Blue Christmas” and makes toy guitars?</div>
+                <div class="drop-zone" data-question="11">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 12 -->
+              <div class="qa-row" data-question="12">
+                <div class="qa-number">12.</div>
+                <div class="qa-text">What Christmas carol is the favorite of parents?</div>
+                <div class="drop-zone" data-question="12">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 13 -->
+              <div class="qa-row" data-question="13">
+                <div class="qa-number">13.</div>
+                <div class="qa-text">What did Adam say to his wife?</div>
+                <div class="drop-zone" data-question="13">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 14 -->
+              <div class="qa-row" data-question="14">
+                <div class="qa-number">14.</div>
+                <div class="qa-text">What do lions sing at Christmas?</div>
+                <div class="drop-zone" data-question="14">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 15 -->
+              <div class="qa-row" data-question="15">
+                <div class="qa-number">15.</div>
+                <div class="qa-text">What is the best thing to put into a Christmas cake?</div>
+                <div class="drop-zone" data-question="15">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 16 -->
+              <div class="qa-row" data-question="16">
+                <div class="qa-number">16.</div>
+                <div class="qa-text">What does Frosty the Snowman take when he gets sick?</div>
+                <div class="drop-zone" data-question="16">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 17 -->
+              <div class="qa-row" data-question="17">
+                <div class="qa-number">17.</div>
+                <div class="qa-text">What do elves learn at school?</div>
+                <div class="drop-zone" data-question="17">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 18 -->
+              <div class="qa-row" data-question="18">
+                <div class="qa-number">18.</div>
+                <div class="qa-text">How do sheep say “Merry Christmas” in Mexico?</div>
+                <div class="drop-zone" data-question="18">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 19 -->
+              <div class="qa-row" data-question="19">
+                <div class="qa-number">19.</div>
+                <div class="qa-text">Why was Santa's elf depressed?</div>
+                <div class="drop-zone" data-question="19">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 20 -->
+              <div class="qa-row" data-question="20">
+                <div class="qa-number">20.</div>
+                <div class="qa-text">Why did the Christmas cookie go to the doctor?</div>
+                <div class="drop-zone" data-question="20">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+
+              <!-- 21 -->
+              <div class="qa-row" data-question="21">
+                <div class="qa-number">21.</div>
+                <div class="qa-text">Who delivers Christmas presents to dogs?</div>
+                <div class="drop-zone" data-question="21">
+                  <span class="drop-placeholder">Drop answer</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-bar">
+              <span>If you want to move an answer, just drag it to a different question or back to the list.</span>
+              <button class="info-btn" id="checkButton">Check matches</button>
+            </div>
+          </div>
+
+          <!-- Antworten-Spalte -->
+          <div class="answers-box">
+            <div class="answers-header">Answers</div>
+            <div class="questions-sub">
+              Each answer has a letter, just like on a worksheet. Match every question with the right Christmas joke.
+            </div>
+
+            <div class="answers-list" id="answerPool">
+              <!-- Jede Antwortkarte hat ihre richtige Frage in data-correct-question -->
+              <div class="answer-card" draggable="true" data-id="U" data-correct-question="1">
+                <div class="answer-label">U</div>
+                <div class="answer-text">Looks like reindeer.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="K" data-correct-question="2">
+                <div class="answer-label">K</div>
+                <div class="answer-text">Santa Pause.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="P" data-correct-question="3">
+                <div class="answer-label">P</div>
+                <div class="answer-text">A snow cone.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="I" data-correct-question="4">
+                <div class="answer-label">I</div>
+                <div class="answer-text">A turtledove.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="N" data-correct-question="5">
+                <div class="answer-label">N</div>
+                <div class="answer-text">Yule Tide.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="Q" data-correct-question="6">
+                <div class="answer-label">Q</div>
+                <div class="answer-text">Rude-dolf.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="D" data-correct-question="7">
+                <div class="answer-label">D</div>
+                <div class="answer-text">In the dictionary.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="L" data-correct-question="8">
+                <div class="answer-label">L</div>
+                <div class="answer-text">Frosted Flakes.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="R" data-correct-question="9">
+                <div class="answer-label">R</div>
+                <div class="answer-text">He has a black belt.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="A" data-correct-question="10">
+                <div class="answer-label">A</div>
+                <div class="answer-text">Comet.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="O" data-correct-question="11">
+                <div class="answer-label">O</div>
+                <div class="answer-text">Elfis.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="T" data-correct-question="12">
+                <div class="answer-label">T</div>
+                <div class="answer-text">Silent Night.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="C" data-correct-question="13">
+                <div class="answer-label">C</div>
+                <div class="answer-text">It’s Christmas Eve.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="B" data-correct-question="14">
+                <div class="answer-label">B</div>
+                <div class="answer-text">Jungle Bells.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="J" data-correct-question="15">
+                <div class="answer-label">J</div>
+                <div class="answer-text">Your teeth.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="M" data-correct-question="16">
+                <div class="answer-label">M</div>
+                <div class="answer-text">A chill pill.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="H" data-correct-question="17">
+                <div class="answer-label">H</div>
+                <div class="answer-text">The elf-abet.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="G" data-correct-question="18">
+                <div class="answer-label">G</div>
+                <div class="answer-text">Fleece Navidad.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="E" data-correct-question="19">
+                <div class="answer-label">E</div>
+                <div class="answer-text">Low elf-esteem.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="S" data-correct-question="20">
+                <div class="answer-label">S</div>
+                <div class="answer-text">It was feeling crummy.</div>
+              </div>
+
+              <div class="answer-card" draggable="true" data-id="F" data-correct-question="21">
+                <div class="answer-label">F</div>
+                <div class="answer-text">Santa Paws.</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">T</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
+  <!-- Party-Overlay -->
+  <div id="partyOverlay" class="party-overlay">
+    <div class="party-message">You matched them all!</div>
+    <div class="party-sub">
+      Santa’s joke show is saved – the elves are laughing again!
+      <br>As a little reward for your help today, you receive the letter: <strong>e</strong>
+    </div>
+    <button id="partyClose" class="party-close-btn">Continue</button>
+  </div>
+
   <script>
-    const ANSWERS = "tannenbaum";
-    const TODAY_LETTER = "T";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    // --- JavaScript: Drag-&-Drop-Logik für Fragen & Antworten (mit Touch-Unterstützung) ---
+
+    // alle Drop-Zonen und Antwortkarten holen
+    const dropZonen = document.querySelectorAll(".drop-zone");
+    const antwortPool = document.getElementById("answerPool");
+    const checkButton = document.getElementById("checkButton");
+
+    const partyOverlay = document.getElementById("partyOverlay");
+    const partyClose = document.getElementById("partyClose");
+    let partyGestartet = false;
+
+    // Hilfsfunktion: Karte in eine Drop-Zone einsetzen
+    function setzeAntwortInDropzone(dropzone, karte) {
+      // evtl. vorhandene Karte zurück in den Pool schieben
+      const vorhandene = dropzone.querySelector(".answer-card");
+      if (vorhandene) {
+        antwortPool.appendChild(vorhandene);
+      }
+
+      // Platzhalter entfernen
+      const platzhalter = dropzone.querySelector(".drop-placeholder");
+      if (platzhalter) platzhalter.remove();
+
+      // Karte einsetzen
+      dropzone.appendChild(karte);
+      dropzone.classList.add("filled");
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+
+    // Hilfsfunktion: Karte zurück in den Pool legen
+    function legeKarteInPool(karte) {
+      antwortPool.appendChild(karte);
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+
+    // --- Drag & Drop mit Maus / Desktop ---
+
+    let aktuellGezogeneKarteId = null;
+
+    document.addEventListener("dragstart", (e) => {
+      const karte = e.target.closest(".answer-card");
+      if (!karte) return;
+      aktuellGezogeneKarteId = karte.dataset.id;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", karte.dataset.id);
+    });
+
+    document.addEventListener("dragend", () => {
+      aktuellGezogeneKarteId = null;
+    });
+
+    dropZonen.forEach(zone => {
+      zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
       });
+
+      zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData("text/plain");
+        if (!id) return;
+        const karte = document.querySelector('.answer-card[data-id="' + CSS.escape(id) + '"]');
+        if (!karte) return;
+        setzeAntwortInDropzone(zone, karte);
+      });
+    });
+
+    // erlaubt, Karten durch Ziehen zurück in den Pool zu legen
+    antwortPool.addEventListener("dragover", (e) => {
+      if (!aktuellGezogeneKarteId) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+
+    antwortPool.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text/plain");
+      if (!id) return;
+      const karte = document.querySelector('.answer-card[data-id="' + CSS.escape(id) + '"]');
+      if (!karte) return;
+
+      // Dropzone wieder "leeren", falls nötig
+      const parentZone = karte.parentElement.closest(".drop-zone");
+      if (parentZone) {
+        if (!parentZone.querySelector(".drop-placeholder")) {
+          const span = document.createElement("span");
+          span.classList.add("drop-placeholder");
+          span.textContent = "Drop answer";
+          parentZone.appendChild(span);
+        }
+        parentZone.classList.remove("filled");
+      }
+
+      legeKarteInPool(karte);
+    });
+
+    // --- Touch-Unterstützung ---
+
+    let touchAktiveKarte = null;
+    let touchFloatingEl = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+
+    function starteTouchDrag(karte, touch) {
+      touchAktiveKarte = karte;
+
+      const rect = karte.getBoundingClientRect();
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+
+      // schwebendes Element erstellen (Kopie)
+      touchFloatingEl = karte.cloneNode(true);
+      touchFloatingEl.classList.add("floating-answer");
+      touchFloatingEl.style.left = rect.left + "px";
+      touchFloatingEl.style.top = rect.top + "px";
+      document.body.appendChild(touchFloatingEl);
+
+      // Original etwas "ausblenden", bis drop erfolgt
+      karte.style.opacity = "0.2";
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function bewegeTouchDrag(touch) {
+      if (!touchFloatingEl) return;
+      touchFloatingEl.style.left = (touch.clientX - touchOffsetX) + "px";
+      touchFloatingEl.style.top = (touch.clientY - touchOffsetY) + "px";
+    }
+
+    function beendeTouchDrag(touch) {
+      if (!touchAktiveKarte || !touchFloatingEl) return;
+
+      const zielElement = document.elementFromPoint(touch.clientX, touch.clientY);
+      const zielDropzone = zielElement && zielElement.closest(".drop-zone");
+      const zielPool = zielElement && zielElement.closest("#answerPool");
+
+      if (zielDropzone) {
+        setzeAntwortInDropzone(zielDropzone, touchAktiveKarte);
+      } else if (zielPool || !zielElement) {
+        // zurück in den Pool
+        // ggf. Dropzone wieder mit Platzhalter ausstatten
+        const parentZone = touchAktiveKarte.parentElement.closest(".drop-zone");
+        if (parentZone) {
+          if (!parentZone.querySelector(".drop-placeholder")) {
+            const span = document.createElement("span");
+            span.classList.add("drop-placeholder");
+            span.textContent = "Drop answer";
+            parentZone.appendChild(span);
+          }
+          parentZone.classList.remove("filled");
+        }
+        legeKarteInPool(touchAktiveKarte);
+      } else {
+        // an sonstiger Stelle losgelassen -> Karte bleibt wo sie war
+        touchAktiveKarte.style.opacity = "1";
+      }
+
+      touchFloatingEl.remove();
+      touchFloatingEl = null;
+      touchAktiveKarte.style.opacity = "1";
+      touchAktiveKarte = null;
+    }
+
+    // Touch-Events nur auf den Antwortkarten
+    antwortPool.addEventListener("touchstart", (e) => {
+      const karte = e.target.closest(".answer-card");
+      if (!karte) return;
+      const touch = e.touches[0];
+      starteTouchDrag(karte, touch);
+      e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!touchFloatingEl) return;
+      const touch = e.touches[0];
+      bewegeTouchDrag(touch);
+      e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener("touchend", (e) => {
+      if (!touchFloatingEl) return;
+      const touch = e.changedTouches[0];
+      beendeTouchDrag(touch);
+      e.preventDefault();
+    }, { passive: false });
+
+    // --- Lösungsprüfung ---
+
+    function pruefeAlleZuordnungen() {
+      const alleFragen = document.querySelectorAll(".qa-row");
+      let alleGefuellt = true;
+      let allesRichtig = true;
+
+      alleFragen.forEach(frage => {
+        const frageNr = frage.dataset.question;
+        const zone = frage.querySelector(".drop-zone");
+        const karte = zone.querySelector(".answer-card");
+        if (!karte) {
+          alleGefuellt = false;
+          allesRichtig = false;
+          return;
+        }
+        const richtigeFrage = karte.dataset.correctQuestion;
+        if (richtigeFrage !== frageNr) {
+          allesRichtig = false;
+        }
+      });
+
+      if (!alleGefuellt) {
+        alert("Not all questions have an answer yet. Keep matching!");
+        return;
+      }
+
+      if (allesRichtig) {
+        starteParty();
+      } else {
+        alert("Some matches are not correct yet. Try swapping a few answers!");
+      }
+    }
+
+    checkButton.addEventListener("click", pruefeAlleZuordnungen);
+
+    // --- Party / Erfolg ---
+
+    function starteParty() {
+      if (partyGestartet) return;
+      partyGestartet = true;
+      partyOverlay.classList.add("visible");
+      starteKonfetti(90, 5000);
+    }
+
+    function versteckeParty() {
+      partyOverlay.classList.remove("visible");
+    }
+
+    partyClose.addEventListener("click", versteckeParty);
+
+    function starteKonfetti(count, dauerMs) {
+      const erstellt = [];
+      const farben = ["#facc15", "#ef4444", "#3b82f6", "#22c55e", "#e879f9"];
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.classList.add("falling-confetti");
+
+        // zufällige Farbe, Größe und Position
+        el.style.background = farben[Math.floor(Math.random() * farben.length)];
+        const groesse = 6 + Math.random() * 10;
+        el.style.width = groesse + "px";
+        el.style.height = groesse + "px";
+        el.style.left = Math.random() * 100 + "vw";
+
+        // zufällige Timing-Variationen
+        const delay = Math.random() * 1.5;
+        const dauer = 2 + Math.random() * 3;
+
+        el.style.animationDuration = dauer + "s";
+        el.style.animationDelay = delay + "s";
+
+        document.body.appendChild(el);
+        erstellt.push(el);
+      }
+
+      setTimeout(() => erstellt.forEach(el => el.remove()), dauerMs + 3000);
     }
   </script>
 </body>
