@@ -43,8 +43,11 @@
       font-size: 0.85rem;
     }
 
+    /* Weniger Abstand nach oben, damit auf dem Handy alles zu sehen ist */
     .puzzle-container {
-      padding: 40vh 1rem 4rem 1rem;
+      padding: 5rem 1rem 4rem 1rem;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
 
     @media (min-width: 768px) {
@@ -61,6 +64,12 @@
       border-radius: 16px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
       line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .puzzle-card {
+        padding: 1.4rem 1.2rem;
+      }
     }
 
     .puzzle-title {
@@ -184,19 +193,19 @@
       color: #2f6532;
     }
 
-    /* Schlitten und Slots nun in einer Reihe */
+    /* Standard: Schlitten & Slots in einer Reihe (für größere Bildschirme) */
     .sled-area {
       margin-top: 1.5rem;
       display: flex;
-      align-items: center;       /* gleiche Höhe */
+      align-items: center;
       justify-content: flex-start;
-      gap: 0.8rem;               /* etwas kleinerer Abstand */
-      flex-wrap: nowrap;         /* NICHT umbrechen, alles in einer Zeile */
-      overflow-x: auto;          /* falls Bildschirm sehr schmal ist, horizontal scrollen */
+      gap: 0.8rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
     }
 
     .sled-image {
-      max-width: 180px;          /* etwas kleiner, damit alle Rentiere daneben passen */
+      max-width: 180px;
       height: auto;
       flex-shrink: 0;
     }
@@ -204,14 +213,14 @@
     .slots-row {
       display: flex;
       justify-content: flex-start;
-      gap: 0.35rem;              /* enger zusammenrücken */
+      gap: 0.35rem;
       margin: 0;
       flex-wrap: nowrap;
     }
 
     .slot {
-      width: 45px;               /* kleiner gemacht */
-      height: 65px;              /* kleiner gemacht */
+      width: 45px;
+      height: 65px;
       border: 2px dashed #7ca88a;
       border-radius: 8px;
       display: flex;
@@ -230,7 +239,7 @@
     }
 
     .slot-hint {
-      font-size: 0.7rem;         /* etwas kleiner, damit es in den Slot passt */
+      font-size: 0.7rem;
       color: #7ca88a;
       position: absolute;
       bottom: 2px;
@@ -317,6 +326,51 @@
       text-align: center;
       color: #7ca88a;
       margin-top: 0.4rem;
+    }
+
+    /* MOBILE-ANPASSUNGEN:
+       - Schlitten oben, Slots darunter
+       - kleinere Slots & kleinere Rentiere, damit alles auf den Screen passt
+    */
+    @media (max-width: 600px) {
+      .sled-area {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        overflow-x: visible;
+      }
+
+      .sled-image {
+        max-width: 140px;
+      }
+
+      .slots-row {
+        justify-content: center;
+        gap: 0.3rem;
+      }
+
+      .slot {
+        width: 38px;
+        height: 55px;
+      }
+
+      .slot-hint {
+        font-size: 0.6rem;
+      }
+
+      .reindeer-option img {
+        max-width: 40px;
+        max-height: 48px;
+      }
+
+      .dragging-reindeer {
+        width: 50px;
+      }
+
+      .letter-container {
+        padding: 1.2rem 1.4rem;
+      }
     }
   </style>
 </head>
