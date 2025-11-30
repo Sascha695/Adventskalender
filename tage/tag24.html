@@ -184,18 +184,19 @@
       color: #2f6532;
     }
 
-    /* NEU: Schlitten links, Slots rechts */
+    /* Schlitten und Slots nun in einer Reihe */
     .sled-area {
       margin-top: 1.5rem;
       display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;        /* auf kleinen Screens dürfen sie umbrechen */
+      align-items: center;       /* gleiche Höhe */
+      justify-content: flex-start;
+      gap: 0.8rem;               /* etwas kleinerer Abstand */
+      flex-wrap: nowrap;         /* NICHT umbrechen, alles in einer Zeile */
+      overflow-x: auto;          /* falls Bildschirm sehr schmal ist, horizontal scrollen */
     }
 
     .sled-image {
-      max-width: 220px;
+      max-width: 180px;          /* etwas kleiner, damit alle Rentiere daneben passen */
       height: auto;
       flex-shrink: 0;
     }
@@ -203,20 +204,14 @@
     .slots-row {
       display: flex;
       justify-content: flex-start;
-      gap: 0.5rem;
+      gap: 0.35rem;              /* enger zusammenrücken */
       margin: 0;
       flex-wrap: nowrap;
     }
 
-    @media (min-width: 900px) {
-      .sled-area {
-        justify-content: flex-start;  /* auf größeren Bildschirmen eher linksbündig */
-      }
-    }
-
     .slot {
-      width: 55px;
-      height: 80px;
+      width: 45px;               /* kleiner gemacht */
+      height: 65px;              /* kleiner gemacht */
       border: 2px dashed #7ca88a;
       border-radius: 8px;
       display: flex;
@@ -235,10 +230,10 @@
     }
 
     .slot-hint {
-      font-size: 0.8rem;
+      font-size: 0.7rem;         /* etwas kleiner, damit es in den Slot passt */
       color: #7ca88a;
       position: absolute;
-      bottom: 4px;
+      bottom: 2px;
       left: 50%;
       transform: translateX(-50%);
     }
@@ -663,4 +658,5 @@
   </script>
 </body>
 </html>
+
 
