@@ -171,6 +171,143 @@
       color: #234130;
       margin-top: 0.4rem;
     }
+
+    /* --- Schritt 2: Schlitten & Drag-and-Drop --- */
+
+    .step-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #2f6532;
+    }
+
+    .sled-area {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .sled-image {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
+    }
+
+    .slots-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: nowrap;
+    }
+
+    .slot {
+      width: 60px;
+      height: 90px;
+      border: 2px dashed #7ca88a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.8);
+      position: relative;
+      touch-action: none;
+    }
+
+    .slot img.slot-reindeer {
+      max-width: 100%;
+      max-height: 100%;
+      pointer-events: none;
+    }
+
+    .slot-hint {
+      font-size: 0.8rem;
+      color: #7ca88a;
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .reindeer-palette {
+      margin-top: 1.5rem;
+      border-top: 1px dashed #7ca88a;
+      padding-top: 1rem;
+    }
+
+    .palette-title {
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      color: #28563a;
+    }
+
+    .palette-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.7rem;
+    }
+
+    .reindeer-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      touch-action: none;
+    }
+
+    .reindeer-option img {
+      max-width: 50px;
+      max-height: 60px;
+      pointer-events: none;
+    }
+
+    .reindeer-option span {
+      font-size: 0.85rem;
+    }
+
+    .dragging-reindeer {
+      position: fixed;
+      width: 60px;
+      height: auto;
+      pointer-events: none;
+      z-index: 2000;
+      transform: translate(-50%, -50%);
+    }
+
+    .step2-buttons {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .step2-buttons button {
+      padding: 0.4rem 0.8rem;
+      margin: 0 0.25rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    #arrangementFeedback {
+      margin-top: 0.8rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #c0392b;
+    }
+
+    #arrangementFeedback.success {
+      color: #1f6b3a;
+    }
+
+    .slot-clear-hint {
+      font-size: 0.8rem;
+      text-align: center;
+      color: #7ca88a;
+      margin-top: 0.4rem;
+    }
   </style>
 </head>
 <body>
@@ -182,52 +319,137 @@
     <div class="puzzle-card">
       <h2 class="puzzle-title">Chaos im Rentier-Stall</h2>
 
-      <p class="puzzle-text">
-        Die Rentiere des Weihnachtsmanns streiten darüber, wer an welcher Position
-        den großen Geschenkschlitten ziehen darf.
-      </p>
-      <p class="puzzle-text">
-        Zwei Rentiere tragen einen grünen Schal. Zwischen den beiden grünen Schals
-        stehen links ein gelber und rechts zwei rote. Das eine Rentier mit dem
-        grünen Schal ist das fünfte von rechts, das andere das siebte von links.
-        Alle weiteren Rentiere tragen blaue Schals.
-      </p>
-      <p class="puzzle-text puzzle-question">
-        In welcher Reihenfolge müssen sich die Rentiere aufstellen
-        und wie viele Rentiere ziehen den Schlitten mindestens?
-        (Gesucht ist nur die Anzahl.)
-      </p>
+      <!-- SCHRITT 1: Anzahl Rentiere -->
+      <div id="step1">
+        <p class="puzzle-text">
+          Die Rentiere des Weihnachtsmanns streiten darüber, wer an welcher Position
+          den großen Geschenkschlitten ziehen darf.
+        </p>
+        <p class="puzzle-text">
+          Zwei Rentiere tragen einen grünen Schal. Zwischen den beiden grünen Schals
+          stehen links ein gelber und rechts zwei rote. Das eine Rentier mit dem
+          grünen Schal ist das fünfte von rechts, das andere das siebte von links.
+          Alle weiteren Rentiere tragen blaue Schals.
+        </p>
+        <p class="puzzle-text puzzle-question">
+          In welcher Reihenfolge müssen sich die Rentiere aufstellen
+          und wie viele Rentiere ziehen den Schlitten mindestens?
+          (Gesucht ist nur die Anzahl.)
+        </p>
 
-      <div class="answer-area">
-        <label for="answerInput">Deine Antwort (Zahl): </label>
-        <input type="number" id="answerInput" min="0">
-        <button type="button" onclick="checkRiddle()">Überprüfen</button>
+        <div class="answer-area">
+          <label for="answerInput">Deine Antwort (Zahl): </label>
+          <input type="number" id="answerInput" min="0">
+          <button type="button" onclick="checkRiddle()">Überprüfen</button>
+        </div>
+
+        <div id="quizFeedback2"
+             style="color:red; margin-top:10px; text-align:center;"></div>
+
+        <!-- Hinweise -->
+        <div class="hint-section">
+          <h3>Brauchst du einen Hinweis?</h3>
+          <div class="hint-buttons">
+            <button type="button" onclick="toggleHint(1)">Hinweis&nbsp;1</button>
+            <button type="button" onclick="toggleHint(2)">Hinweis&nbsp;2</button>
+            <button type="button" onclick="toggleHint(3)">Hinweis&nbsp;3</button>
+          </div>
+
+          <div id="hint1" class="hint-text">
+            Male dir eine Reihe von Plätzen auf und markiere die beiden Rentiere
+            mit grünem Schal an den beschriebenen Positionen.
+          </div>
+          <div id="hint2" class="hint-text">
+            Zwischen den beiden grünen Schals steht links ein gelber und rechts
+            zwei rote Rentiere. Trage diese zuerst ein.
+          </div>
+          <div id="hint3" class="hint-text">
+            Die übrigen Plätze links und rechts werden von Rentieren mit blauem
+            Schal aufgefüllt. Zähle am Ende alle Rentiere.
+          </div>
+        </div>
       </div>
 
-      <div id="quizFeedback2"
-           style="color:red; margin-top:10px; text-align:center;"></div>
+      <!-- SCHRITT 2: Schlitten + Rentiere platzieren -->
+      <div id="step2" style="display:none;">
+        <p class="step-title">
+          Super! Jetzt stelle die Rentiere in der richtigen Reihenfolge vor den Schlitten.
+        </p>
+        <p class="puzzle-text">
+          Ziehe die Rentiere aus der Auswahl unten in die sieben freien Felder vor dem Schlitten.
+          Du kannst ein Feld durch Antippen wieder leeren.
+        </p>
 
-      <!-- Hinweise -->
-      <div class="hint-section">
-        <h3>Brauchst du einen Hinweis?</h3>
-        <div class="hint-buttons">
-          <button type="button" onclick="toggleHint(1)">Hinweis&nbsp;1</button>
-          <button type="button" onclick="toggleHint(2)">Hinweis&nbsp;2</button>
-          <button type="button" onclick="toggleHint(3)">Hinweis&nbsp;3</button>
+        <div class="sled-area">
+          <!-- Deinen Schlitten hier einfügen -->
+          <img src="assets/schlitten.png" alt="Schlitten" class="sled-image">
+
+          <div class="slots-row">
+            <!-- 7 Slots von links nach rechts -->
+            <div class="slot" data-index="0">
+              <span class="slot-hint">1</span>
+            </div>
+            <div class="slot" data-index="1">
+              <span class="slot-hint">2</span>
+            </div>
+            <div class="slot" data-index="2">
+              <span class="slot-hint">3</span>
+            </div>
+            <div class="slot" data-index="3">
+              <span class="slot-hint">4</span>
+            </div>
+            <div class="slot" data-index="4">
+              <span class="slot-hint">5</span>
+            </div>
+            <div class="slot" data-index="5">
+              <span class="slot-hint">6</span>
+            </div>
+            <div class="slot" data-index="6">
+              <span class="slot-hint">7</span>
+            </div>
+          </div>
+          <div class="slot-clear-hint">
+            Tipp: Tippe auf ein Feld, um das Rentier daraus zu entfernen.
+          </div>
         </div>
 
-        <div id="hint1" class="hint-text">
-          Male dir eine Reihe von Plätzen auf und markiere die beiden Rentiere
-          mit grünem Schal an den beschriebenen Positionen.
+        <div class="reindeer-palette">
+          <p class="palette-title">Ziehe Rentiere aus der Auswahl in die Felder:</p>
+          <div class="palette-options">
+            <!-- Bildpfade bitte an deine Dateien anpassen -->
+            <div class="reindeer-option"
+                 data-color="blue"
+                 data-img="assets/rentier_blau.png">
+              <img src="assets/rentier_blau.png" alt="Blaues Rentier">
+              <span>Blau</span>
+            </div>
+            <div class="reindeer-option"
+                 data-color="green"
+                 data-img="assets/rentier_gruen.png">
+              <img src="assets/rentier_gruen.png" alt="Grünes Rentier">
+              <span>Grün</span>
+            </div>
+            <div class="reindeer-option"
+                 data-color="yellow"
+                 data-img="assets/rentier_gelb.png">
+              <img src="assets/rentier_gelb.png" alt="Gelbes Rentier">
+              <span>Gelb</span>
+            </div>
+            <div class="reindeer-option"
+                 data-color="red"
+                 data-img="assets/rentier_rot.png">
+              <img src="assets/rentier_rot.png" alt="Rotes Rentier">
+              <span>Rot</span>
+            </div>
+          </div>
         </div>
-        <div id="hint2" class="hint-text">
-          Zwischen den beiden grünen Schals steht links ein gelber und rechts
-          zwei rote Rentiere. Trage diese zuerst ein.
+
+        <div class="step2-buttons">
+          <button type="button" onclick="checkArrangement()">Anordnung prüfen</button>
+          <button type="button" onclick="resetSlots()">Felder leeren</button>
         </div>
-        <div id="hint3" class="hint-text">
-          Die übrigen Plätze links und rechts werden von Rentieren mit blauem
-          Schal aufgefüllt. Zähle am Ende alle Rentiere.
-        </div>
+
+        <div id="arrangementFeedback"></div>
       </div>
 
       <!-- Buchstaben-Overlay -->
@@ -250,18 +472,28 @@
   </footer>
 
   <script>
+    const correctNumberAnswer = '7'; // Mindestanzahl der Rentiere
+    const correctSequence = ['blue', 'blue', 'green', 'yellow', 'red', 'red', 'green'];
+
+    let dragElement = null;
+    let dragColor = null;
+    let dragImgSrc = null;
+
     function checkRiddle() {
       const input = document.getElementById('answerInput').value.trim();
       const feedback = document.getElementById('quizFeedback2');
-      const correctAnswer = '7'; // Mindestanzahl der Rentiere
 
-      if (input === correctAnswer) {
+      if (input === correctNumberAnswer) {
         feedback.textContent = '';
-        showLetter('X'); // gewünschten Buchstaben hier übergeben
+        goToStep2();
       } else {
         feedback.textContent = 'Leider falsch, versuche es erneut!';
-        document.getElementById('letter-container').style.display = 'none';
       }
+    }
+
+    function goToStep2() {
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
     }
 
     function showLetter(letter) {
@@ -276,6 +508,138 @@
       const isVisible = el.style.display === 'block';
       el.style.display = isVisible ? 'none' : 'block';
     }
+
+    // --- Drag & Drop mit Pointer Events (für Maus & Touch) ---
+
+    function initDragAndDrop() {
+      const paletteOptions = document.querySelectorAll('.reindeer-option');
+      paletteOptions.forEach(option => {
+        option.addEventListener('pointerdown', onPalettePointerDown);
+      });
+
+      const slots = document.querySelectorAll('.slot');
+      slots.forEach(slot => {
+        slot.addEventListener('click', () => {
+          // Slot leeren durch Antippen
+          slot.innerHTML = '<span class="slot-hint">' + (Number(slot.dataset.index) + 1) + '</span>';
+        });
+      });
+    }
+
+    function onPalettePointerDown(e) {
+      e.preventDefault();
+
+      const option = e.currentTarget;
+      dragColor = option.dataset.color;
+      dragImgSrc = option.dataset.img;
+
+      dragElement = document.createElement('img');
+      dragElement.src = dragImgSrc;
+      dragElement.alt = option.querySelector('img').alt;
+      dragElement.className = 'dragging-reindeer';
+      document.body.appendChild(dragElement);
+
+      moveDragElement(e);
+
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+    }
+
+    function onPointerMove(e) {
+      moveDragElement(e);
+    }
+
+    function moveDragElement(e) {
+      if (!dragElement) return;
+      dragElement.style.left = e.clientX + 'px';
+      dragElement.style.top = e.clientY + 'px';
+    }
+
+    function onPointerUp(e) {
+      if (dragElement) {
+        dragElement.remove();
+      }
+
+      const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+      if (dropTarget) {
+        const slot = dropTarget.classList.contains('slot')
+          ? dropTarget
+          : dropTarget.closest('.slot');
+
+        if (slot) {
+          placeReindeerInSlot(slot, dragColor, dragImgSrc);
+        }
+      }
+
+      dragElement = null;
+      dragColor = null;
+      dragImgSrc = null;
+
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+    }
+
+    function placeReindeerInSlot(slot, color, imgSrc) {
+      if (!color || !imgSrc) return;
+
+      slot.innerHTML = ''; // Feld leeren
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.alt = color + 'es Rentier';
+      img.className = 'slot-reindeer';
+      img.dataset.color = color;
+      slot.appendChild(img);
+    }
+
+    function resetSlots() {
+      const slots = document.querySelectorAll('.slot');
+      slots.forEach(slot => {
+        slot.innerHTML = '<span class="slot-hint">' + (Number(slot.dataset.index) + 1) + '</span>';
+      });
+      const feedback = document.getElementById('arrangementFeedback');
+      feedback.textContent = '';
+      feedback.classList.remove('success');
+    }
+
+    function checkArrangement() {
+      const slots = document.querySelectorAll('.slot');
+      const feedback = document.getElementById('arrangementFeedback');
+      feedback.classList.remove('success');
+
+      if (slots.length !== correctSequence.length) {
+        feedback.textContent = 'Es scheint ein Problem mit den Feldern zu geben.';
+        return;
+      }
+
+      const chosenColors = [];
+
+      for (let i = 0; i < slots.length; i++) {
+        const img = slots[i].querySelector('img.slot-reindeer');
+        if (!img) {
+          feedback.textContent = 'Bitte belege alle Felder mit Rentieren.';
+          return;
+        }
+        chosenColors.push(img.dataset.color);
+      }
+
+      for (let i = 0; i < correctSequence.length; i++) {
+        if (chosenColors[i] !== correctSequence[i]) {
+          feedback.textContent = 'Die Reihenfolge stimmt noch nicht ganz. Versuche es noch einmal!';
+          return;
+        }
+      }
+
+      feedback.textContent = 'Perfekt! Die Rentiere stehen richtig vor dem Schlitten.';
+      feedback.classList.add('success');
+
+      // Hier den Buchstaben anzeigen
+      showLetter('i'); // gewünschten Buchstaben hier anpassen
+    }
+
+    // Initialisierung nach Laden der Seite
+    window.addEventListener('DOMContentLoaded', () => {
+      initDragAndDrop();
+    });
   </script>
 </body>
 </html>
