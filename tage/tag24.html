@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
-     --rentier-bg: #ecd39e; /* Beige wie in den Rentierbildern */
-     }
+      --rentier-bg: #ecd39e; /* Beige wie in den Rentierbildern */
+    }
     body {
       margin: 0;
       padding: 0;
@@ -54,12 +54,12 @@
     }
 
     .puzzle-card {
-      max-width: 700px;
+      max-width: 780px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 2.2rem 2.4rem;
       background: var(--rentier-bg);
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
       line-height: 1.5;
     }
 
@@ -184,28 +184,39 @@
       color: #2f6532;
     }
 
+    /* NEU: Schlitten links, Slots rechts */
     .sled-area {
       margin-top: 1.5rem;
-      text-align: center;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;        /* auf kleinen Screens dürfen sie umbrechen */
     }
 
     .sled-image {
-      max-width: 100%;
+      max-width: 220px;
       height: auto;
-      margin-bottom: 1rem;
+      flex-shrink: 0;
     }
 
     .slots-row {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin: 0;
       flex-wrap: nowrap;
     }
 
+    @media (min-width: 900px) {
+      .sled-area {
+        justify-content: flex-start;  /* auf größeren Bildschirmen eher linksbündig */
+      }
+    }
+
     .slot {
-      width: 60px;
-      height: 90px;
+      width: 55px;
+      height: 80px;
       border: 2px dashed #7ca88a;
       border-radius: 8px;
       display: flex;
@@ -214,6 +225,7 @@
       background: var(--rentier-bg);
       position: relative;
       touch-action: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     }
 
     .slot img.slot-reindeer {
@@ -232,9 +244,9 @@
     }
 
     .reindeer-palette {
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       border-top: 1px dashed #7ca88a;
-      padding-top: 1rem;
+      padding-top: 0.8rem;
     }
 
     .palette-title {
@@ -411,9 +423,10 @@
               <span class="slot-hint">7</span>
             </div>
           </div>
-          <div class="slot-clear-hint">
-            Tipp: Tippe auf ein Feld, um das Rentier daraus zu entfernen.
-          </div>
+        </div>
+
+        <div class="slot-clear-hint">
+          Tipp: Tippe auf ein Feld, um das Rentier daraus zu entfernen.
         </div>
 
         <div class="reindeer-palette">
