@@ -3,313 +3,483 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 13 – Wichtel-Logikrätsel</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Adventsrätsel – Tag 13</title>
+
+  <style>
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+    }
+
+    * { box-sizing: border-box; }
+
+    .main-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      font-family: "Comic Sans MS", "Comic Sans", system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fee2e2;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      text-shadow:
+        0 0 10px rgba(248, 113, 113, 0.9),
+        0 0 20px rgba(248, 113, 113, 0.8),
+        0 0 35px rgba(248, 113, 113, 0.75);
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: #000;
+      color: #e5e7eb;
+      overflow-x: hidden;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      /* hier ggf. dein eigenes Hintergrundbild eintragen */
+      background-image: url("assets/riddle_gifts.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 150vh;
+      padding: 20px 12px 40px;
+      margin-top: 450px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .lock-title {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .puzzle-flex {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .questions-box,
+    .answers-box {
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .questions-header,
+    .answers-header {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .questions-sub {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .riddle-text {
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .riddle-text ul {
+      margin-top: 4px;
+      padding-left: 1.2rem;
+    }
+
+    .answer-input-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .answer-input-row input {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.8);
+      background: rgba(15, 23, 42, 0.95);
+      color: #f9fafb;
+      width: 120px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .info-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f9fafb;
+    }
+
+    .info-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      min-height: 1.2em;
+    }
+
+    .feedback.ok {
+      color: #bbf7d0;
+    }
+
+    .feedback.bad {
+      color: #fecaca;
+    }
+
+    .hint-block {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .hint-text {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.95);
+      display: none;
+    }
+
+    /* Party-Overlay & Konfetti */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top,
+        rgba(250,250,250,0.2),
+        rgba(15,23,42,0.95));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9990;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .party-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .party-message {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #facc15;
+      text-shadow: 0 0 16px rgba(250,204,21,0.9);
+    }
+
+    .party-sub {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 460px;
+    }
+
+    .party-close-btn {
+      margin-top: 28px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 2px solid #facc15;
+      background: rgba(22,163,74,0.85);
+      color: #fefce8;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .falling-confetti {
+      position: fixed;
+      top: -20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: red;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 9998;
+      animation-name: confetti-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .puzzle-flex {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
 </head>
-<!--
-  HINTERGRUNDBILD:
-  Um ein Hintergrundbild zu setzen, kannst du in deiner CSS-Datei (style.css) z.B. ergänzen:
 
-  body.bg-image {
-    background-image: url("../assets/dein-weihnachtsbild.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+<body>
+  <div class="bg-layer"></div>
 
-  Und dafür hat das <body>-Element unten die Klasse "bg-image".
--->
-<body class="bg-image" onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo">
-          <span class="emoji">🎄</span>
-          <h1>Tag 13: Das Wichtel-Wirrwar</h1>
-        </div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
-      </div>
-      <p class="muted">Datum: 13.12.</p>
+  <h1 class="main-title">Santa Riddle – Tag 13</h1>
 
-      <h2>Rätsel</h2>
-      <p>
-        Drei Freundinnen treffen sich zum weihnachtlichen Wichteln im „Weihnachtszauberwald“:
-        <strong>Anna</strong>, <strong>Mara</strong> und <strong>Lina</strong>.
-      </p>
-      <p>Sie haben drei Geschenke dabei:</p>
-      <ul>
-        <li>🎁 <strong>Rentier-Tassen-Set</strong></li>
-        <li>🎁 <strong>Lebkuchen-Badebomben</strong></li>
-        <li>🎁 <strong>Schneeflocken-Lichterkette</strong></li>
-      </ul>
-      <p>
-        Jede Freundin hat genau <strong>ein Geschenk gekauft</strong> und jedes Geschenk war für genau
-        <strong>eine Freundin bestimmt</strong>. Durch das Chaos eines überdrehten Weihnachtswichtels
-        sind die Pakete jedoch durcheinandergeraten – am Ende hat aber trotzdem wieder jede
-        ein Geschenk in der Hand.
-      </p>
-      <p><strong>Was du herausfinden sollst:</strong></p>
-      <ol>
-        <li>Wer hat welches Geschenk gekauft?</li>
-        <li>Für wen war welches Geschenk ursprünglich gedacht?</li>
-        <li>Wer hat am Ende welches Geschenk bekommen?</li>
-      </ol>
+  <div class="page-content">
+    <div class="container">
 
-      <h3>Hinweise aus dem Wichtel-Protokoll</h3>
-      <ul>
-        <li>Anna hat <strong>kein Bade-Produkt</strong> gekauft – die Lebkuchen-Badebomben stammen also nicht von ihr.</li>
-        <li>Die <strong>Lebkuchen-Badebomben</strong> waren eigentlich für die größte Frostbeule der Runde gedacht:
-            für <strong>Anna</strong>.</li>
-        <li>Die <strong>Schneeflocken-Lichterkette</strong> war als Überraschung für <strong>Mara</strong> geplant.</li>
-        <li>Lina liebt Kaffee und Tee, fand es aber „zu offensichtlich“, ihr ein Tassen-Set zu schenken –
-            sie hat das <strong>Rentier-Tassen-Set nicht gekauft</strong>.</li>
-        <li>Am Ende bekam <strong>keine</strong> der drei Freundinnen das Geschenk, das ursprünglich für sie bestimmt war.</li>
-      </ul>
-
-      <div style="height:8px"></div>
-
-      <h3>Zuordnungen</h3>
-      <p><strong>Wähle für jede Freundin und jede Frage das passende Geschenk aus.</strong></p>
-
-      <h4>1) Wer hat welches Geschenk gekauft?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna</div>
-          <div class="cell">
-            <select id="buyer-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Mara</div>
-          <div class="cell">
-            <select id="buyer-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Lina</div>
-          <div class="cell">
-            <select id="buyer-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
+      <!-- Einleitungs-Kachel (kannst du auch komplett ändern oder weglassen) -->
+      <div class="tile">
+        <h2>Geschenke-Zauber</h2>
+        <p>
+          Am 13. Dezember herrscht im Weihnachtsdorf Hochbetrieb.
+          Die Fee Iris hat eine besondere Aufgabe: Sie soll dem Weihnachtsmann helfen,
+          sein Geschenkezimmer möglichst schnell zu füllen – mit ein wenig Magie.
+        </p>
       </div>
 
-      <h4>2) Für wen war welches Geschenk ursprünglich gedacht?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Mara sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Lina sollte bekommen …</div>
-          <div class="cell">
-            <select id="intended-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <!-- Rätsel-Kachel -->
+      <div class="tile">
+        <div class="lock-title">Rätsel</div>
 
-      <h4>3) Wer hat am Ende welches Geschenk bekommen?</h4>
-      <div class="table">
-        <div class="row">
-          <div class="cell label">Anna bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-anna" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
+        <div class="puzzle-flex">
+          <!-- linke Seite: Rätseltext -->
+          <div class="questions-box">
+            <div class="questions-header">Geschichte</div>
+            <div class="questions-sub">
+              Lies die Aufgabe und trage ein, nach wie vielen Tagen das Geschenkezimmer voll ist.
+            </div>
+
+            <div class="riddle-text">
+              <ul>
+                <li>Die Fee Iris hilft dem Weihnachtsmann, der mit seinen
+                    Vorbereitungen mal wieder spät dran ist.</li>
+                <li>Sie verzaubert drei Geschenke, sodass sie sich mit jedem
+                    weiteren Tag verdoppeln.</li>
+                <li>Nach einer Woche (7 Tage) ist das Geschenkezimmer bis zur
+                    Decke gefüllt.</li>
+              </ul>
+
+              <p>
+                Nun stellt sich die Frage:
+              </p>
+              <p>
+                <strong>Wie lange würde es dauern, wenn sie zu Beginn
+                <u>sechs</u> Geschenke verzaubern würde?</strong>
+              </p>
+
+              <div class="answer-input-row">
+                <label for="answerInput">Antwort (Tage):</label>
+                <input id="answerInput" type="number" min="1" step="1" />
+                <button class="info-btn" id="checkButton">Antwort prüfen</button>
+              </div>
+
+              <div id="feedback" class="feedback"></div>
+            </div>
+          </div>
+
+          <!-- rechte Seite: Hinweise / Lösungshilfe -->
+          <div class="answers-box">
+            <div class="answers-header">Hinweise</div>
+            <div class="questions-sub">
+              Wenn du nicht weiterkommst, kannst du dir nach und nach
+              Teile der Lösungstabelle einblenden.
+            </div>
+
+            <div class="hint-block">
+              <button class="info-btn" id="hint1Btn">Hinweis 1 anzeigen</button>
+              <div id="hint1Text" class="hint-text">
+                <strong>Tag&nbsp;1:</strong> 3 Geschenke → 6 Geschenke
+              </div>
+            </div>
+
+            <div class="hint-block">
+              <button class="info-btn" id="hint2Btn" disabled>Hinweis 2 anzeigen</button>
+              <div id="hint2Text" class="hint-text">
+                <strong>Tag&nbsp;2:</strong> 6 Geschenke → 12 Geschenke
+              </div>
+            </div>
+
+            <div class="questions-sub" style="margin-top: 12px;">
+              Mehr Hinweise gibt es nicht – den Rest der Verdopplung
+              musst du selbst weiterdenken.
+            </div>
           </div>
         </div>
-        <div class="row">
-          <div class="cell label">Mara bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-mara" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell label">Lina bekam am Ende …</div>
-          <div class="cell">
-            <select id="final-lina" class="input">
-              <option value="">– auswählen –</option>
-              <option value="tassen">Rentier-Tassen-Set</option>
-              <option value="badebomben">Lebkuchen-Badebomben</option>
-              <option value="lichterkette">Schneeflocken-Lichterkette</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div style="height:12px"></div>
-      <div class="row wrap">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="showHint()">Hinweis anzeigen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
-      </div>
-
-      <div id="feedback" class="note hidden"></div>
-      <div id="hintBox" class="note hidden" style="margin-top:8px;"></div>
-
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">H</div>
-      </div>
-      <div class="footer">
-        <small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small>
       </div>
     </div>
   </div>
 
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  <!-- Party-Overlay -->
+  <div id="partyOverlay" class="party-overlay">
+    <div class="party-message">Du hast es gelöst!</div>
+    <div class="party-sub">
+      Das Geschenkezimmer ist rechtzeitig gefüllt –
+      die Fee Iris und der Weihnachtsmann danken dir!
+      <!-- Falls du wie bei Tag 14 einen Buchstaben vergeben willst,
+           kannst du ihn hier ergänzen. -->
+    </div>
+    <button id="partyClose" class="party-close-btn">Weiter</button>
+  </div>
+
   <script>
-    // Korrekte Zuordnungen
-    // Werte: "tassen" | "badebomben" | "lichterkette"
-    const TODAY_LETTER = "H";
+    const correctAnswer = 6;
 
-    const CORRECT = {
-      buyer: {
-        anna: "tassen",        // Anna hat das Rentier-Tassen-Set gekauft
-        mara: "badebomben",    // Mara hat die Lebkuchen-Badebomben gekauft
-        lina: "lichterkette"   // Lina hat die Schneeflocken-Lichterkette gekauft
-      },
-      intended: {
-        anna: "badebomben",    // Für Anna waren die Badebomben gedacht
-        mara: "lichterkette",  // Für Mara war die Lichterkette gedacht
-        lina: "tassen"         // Für Lina waren die Tassen gedacht
-      },
-      final: {
-        anna: "tassen",        // Am Ende hat Anna das Tassen-Set
-        mara: "badebomben",    // Mara hat die Badebomben
-        lina: "lichterkette"   // Lina hat die Lichterkette
+    const answerInput = document.getElementById("answerInput");
+    const checkButton = document.getElementById("checkButton");
+    const feedback = document.getElementById("feedback");
+
+    const hint1Btn = document.getElementById("hint1Btn");
+    const hint2Btn = document.getElementById("hint2Btn");
+    const hint1Text = document.getElementById("hint1Text");
+    const hint2Text = document.getElementById("hint2Text");
+
+    const partyOverlay = document.getElementById("partyOverlay");
+    const partyClose = document.getElementById("partyClose");
+    let partyGestartet = false;
+
+    // Hinweise
+    hint1Btn.addEventListener("click", () => {
+      hint1Text.style.display = "block";
+      hint1Btn.disabled = true;
+      hint2Btn.disabled = false; // jetzt darf Hinweis 2 benutzt werden
+    });
+
+    hint2Btn.addEventListener("click", () => {
+      hint2Text.style.display = "block";
+      hint2Btn.disabled = true;
+    });
+
+    // Antwort prüfen
+    function checkAnswer() {
+      const value = parseInt(answerInput.value, 10);
+
+      feedback.classList.remove("ok", "bad");
+
+      if (Number.isNaN(value)) {
+        feedback.textContent = "Bitte gib eine ganze Zahl ein.";
+        feedback.classList.add("bad");
+        return;
       }
-    };
 
-    // Hinweise (werden nacheinander angezeigt)
-    const HINTS = [
-      "Hinweis 1: Schau dir zuerst genau an, welche Geschenke jede Freundin auf keinen Fall gekauft hat.",
-      "Hinweis 2: Die Person, die das Rentier-Tassen-Set gekauft hat, hatte es am Ende auch vor sich stehen.",
-      "Hinweis 3: Mara saß am Ende mit den Lebkuchen-Badebomben da – und jede packt letztlich das Geschenk aus, das sie selbst gekauft hat."
-    ];
-    let hintIndex = 0;
-
-    function showLetter() {
-      document.getElementById('letterBox').classList.remove('hidden');
-      if (typeof fireConfetti === "function") {
-        fireConfetti();
-      }
-    }
-
-    function setFeedback(msg, ok) {
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if (ok) {
-        box.classList.add('success');
+      if (value === correctAnswer) {
+        feedback.textContent = "Richtig! Mit sechs Startgeschenken dauert es nur sechs Tage.";
+        feedback.classList.add("ok");
+        starteParty();
       } else {
-        box.classList.remove('success');
+        feedback.textContent = "Noch nicht ganz. Überleg noch einmal, wie sich die Geschenke verdoppeln.";
+        feedback.classList.add("bad");
       }
     }
 
-    function showHint() {
-      const box = document.getElementById('hintBox');
-      if (hintIndex < HINTS.length) {
-        box.textContent = HINTS[hintIndex];
-        box.classList.remove('hidden');
-        hintIndex++;
-      } else {
-        box.textContent = "Es gibt keine weiteren Hinweise mehr. 🎄";
-        box.classList.remove('hidden');
+    checkButton.addEventListener("click", checkAnswer);
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        checkAnswer();
       }
+    });
+
+    // Party / Erfolg
+    function starteParty() {
+      if (partyGestartet) return;
+      partyGestartet = true;
+      partyOverlay.classList.add("visible");
+      starteKonfetti(90, 5000);
     }
 
-    function getSelectValue(id) {
-      const el = document.getElementById(id);
-      return el ? el.value : "";
+    function versteckeParty() {
+      partyOverlay.classList.remove("visible");
     }
 
-    function allCorrect() {
-      return (
-        getSelectValue("buyer-anna")  === CORRECT.buyer.anna  &&
-        getSelectValue("buyer-mara")  === CORRECT.buyer.mara  &&
-        getSelectValue("buyer-lina")  === CORRECT.buyer.lina  &&
-        getSelectValue("intended-anna") === CORRECT.intended.anna &&
-        getSelectValue("intended-mara") === CORRECT.intended.mara &&
-        getSelectValue("intended-lina") === CORRECT.intended.lina &&
-        getSelectValue("final-anna") === CORRECT.final.anna &&
-        getSelectValue("final-mara") === CORRECT.final.mara &&
-        getSelectValue("final-lina") === CORRECT.final.lina
-      );
-    }
+    partyClose.addEventListener("click", versteckeParty);
 
-    function solve() {
-      if (allCorrect()) {
-        setFeedback("Richtig! Alle Zuordnungen stimmen. 💫", true);
-        showLetter();
-      } else {
-        setFeedback("Noch nicht ganz richtig. Überprüfe deine Zuordnungen. ❄️", false);
+    function starteKonfetti(count, dauerMs) {
+      const erstellt = [];
+      const farben = ["#facc15", "#ef4444", "#3b82f6", "#22c55e", "#e879f9"];
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.classList.add("falling-confetti");
+
+        el.style.background = farben[Math.floor(Math.random() * farben.length)];
+        const groesse = 6 + Math.random() * 10;
+        el.style.width = groesse + "px";
+        el.style.height = groesse + "px";
+        el.style.left = Math.random() * 100 + "vw";
+
+        const delay = Math.random() * 1.5;
+        const dauer = 2 + Math.random() * 3;
+
+        el.style.animationDuration = dauer + "s";
+        el.style.animationDelay = delay + "s";
+
+        document.body.appendChild(el);
+        erstellt.push(el);
       }
-    }
 
-    function reveal() {
-      // Setze alle Selects auf die korrekten Werte
-      document.getElementById("buyer-anna").value     = CORRECT.buyer.anna;
-      document.getElementById("buyer-mara").value     = CORRECT.buyer.mara;
-      document.getElementById("buyer-lina").value     = CORRECT.buyer.lina;
-      document.getElementById("intended-anna").value  = CORRECT.intended.anna;
-      document.getElementById("intended-mara").value  = CORRECT.intended.mara;
-      document.getElementById("intended-lina").value  = CORRECT.intended.lina;
-      document.getElementById("final-anna").value     = CORRECT.final.anna;
-      document.getElementById("final-mara").value     = CORRECT.final.mara;
-      document.getElementById("final-lina").value     = CORRECT.final.lina;
-
-      setFeedback("Die richtige Lösung wurde eingetragen. ✅", true);
-      showLetter();
+      setTimeout(() => erstellt.forEach(el => el.remove()), dauerMs + 3000);
     }
   </script>
 </body>
 </html>
+
