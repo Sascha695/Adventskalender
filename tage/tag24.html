@@ -1,66 +1,282 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 24 – Finale Frage</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adventskalender Tag 24</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background-color: #e2f4f9;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Wenn du ein Rentier-Bild hast, hier austauschen */
+      background-image: url("assets/rentiere.png");
+      background-size: contain;
+      background-position: center top;
+      background-repeat: no-repeat;
+      background-color: #e2f4f9;
+      opacity: 0.45;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    footer {
+      font-size: 0.85rem;
+    }
+
+    .puzzle-container {
+      padding: 24vh 1rem 4rem 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .puzzle-container {
+        padding-top: 60vh;
+      }
+    }
+
+    .puzzle-card {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: rgba(255, 253, 247, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      line-height: 1.5;
+    }
+
+    .puzzle-title {
+      font-family: "Brush Script MT", "Pacifico", cursive;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #2f6532;
+    }
+
+    .puzzle-text {
+      font-size: 1rem;
+      color: #2b2b2b;
+      margin-bottom: 0.6rem;
+    }
+
+    .puzzle-question {
+      font-weight: bold;
+      color: #1f6b3a;
+      margin-top: 1rem;
+    }
+
+    .answer-area {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    .answer-area input {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+      width: 80px;
+      text-align: center;
+    }
+
+    .answer-area button {
+      padding: 0.4rem 0.8rem;
+      margin-left: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* BUCHSTABEN-OVERLAY */
+    .letter-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      text-align: center;
+      background: rgba(255, 253, 247, 0.97);
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      border: 2px solid #1f6b3a;
+      max-width: 90vw;
+    }
+
+    .letter-container p {
+      margin: 0.3rem 0;
+    }
+
+    .letter {
+      display: inline-block;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 2px solid #1f6b3a;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #1f6b3a;
+      background: #f5fff7;
+    }
+
+    .solution-link-btn {
+      margin-top: 0.8rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* Hinweise */
+    .hint-section {
+      margin-top: 1.5rem;
+      border-top: 1px dashed #7ca88a;
+      padding-top: 1rem;
+    }
+
+    .hint-section h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #28563a;
+      text-align: center;
+    }
+
+    .hint-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hint-buttons button {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .hint-text {
+      display: none;
+      font-size: 0.95rem;
+      color: #234130;
+      margin-top: 0.4rem;
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🔔</span><h1>Tag 24: Finale Frage</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+<body>
+  <header>
+    <h1>Tag&nbsp;24 – Weihnachtsrätsel</h1>
+  </header>
+
+  <main class="puzzle-container">
+    <div class="puzzle-card">
+      <h2 class="puzzle-title">Chaos im Rentier-Stall</h2>
+
+      <p class="puzzle-text">
+        Die Rentiere des Weihnachtsmanns streiten darüber, wer an welcher Position
+        den großen Geschenkschlitten ziehen darf.
+      </p>
+      <p class="puzzle-text">
+        Zwei Rentiere tragen einen grünen Schal. Zwischen den beiden grünen Schals
+        stehen links ein gelber und rechts zwei rote. Das eine Rentier mit dem
+        grünen Schal ist das fünfte von rechts, das andere das siebte von links.
+        Alle weiteren Rentiere tragen blaue Schals.
+      </p>
+      <p class="puzzle-text puzzle-question">
+        In welcher Reihenfolge müssen sich die Rentiere aufstellen
+        und wie viele Rentiere ziehen den Schlitten mindestens?
+        (Gesucht ist nur die Anzahl.)
+      </p>
+
+      <div class="answer-area">
+        <label for="answerInput">Deine Antwort (Zahl): </label>
+        <input type="number" id="answerInput" min="0">
+        <button type="button" onclick="checkRiddle()">Überprüfen</button>
       </div>
-      <p class="muted">Datum: 24.12.</p>
-      <h2>Rätsel</h2>
-      <p>Was ist das Einzige, das größer wird, je mehr man es mit anderen teilt?</p>
-      <div class="note">Hinweis: Umlaute sind erlaubt: GLÜCK.</div>
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <div id="quizFeedback2"
+           style="color:red; margin-top:10px; text-align:center;"></div>
+
+      <!-- Hinweise -->
+      <div class="hint-section">
+        <h3>Brauchst du einen Hinweis?</h3>
+        <div class="hint-buttons">
+          <button type="button" onclick="toggleHint(1)">Hinweis&nbsp;1</button>
+          <button type="button" onclick="toggleHint(2)">Hinweis&nbsp;2</button>
+          <button type="button" onclick="toggleHint(3)">Hinweis&nbsp;3</button>
+        </div>
+
+        <div id="hint1" class="hint-text">
+          Male dir eine Reihe von Plätzen auf und markiere die beiden Rentiere
+          mit grünem Schal an den beschriebenen Positionen.
+        </div>
+        <div id="hint2" class="hint-text">
+          Zwischen den beiden grünen Schals steht links ein gelber und rechts
+          zwei rote Rentiere. Trage diese zuerst ein.
+        </div>
+        <div id="hint3" class="hint-text">
+          Die übrigen Plätze links und rechts werden von Rentieren mit blauem
+          Schal aufgefüllt. Zähle am Ende alle Rentiere.
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">G</div>
+
+      <!-- Buchstaben-Overlay -->
+      <div id="letter-container" class="letter-container" style="display:none;">
+        <p>Richtig! Dein Buchstabe für das Lösungswort ist:</p>
+        <!-- HIER kannst du deinen Buchstaben für Tag 24 eintragen -->
+        <div class="letter" id="letter">X</div>
+        <p>Merke dir diesen Buchstaben!</p>
+        <button class="solution-link-btn"
+                type="button"
+                onclick="window.location.href='loesungswort.html'">
+          Zum Lösungswort
+        </button>
       </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
-  </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+  </main>
+
+  <footer>
+    <!-- Optional: Footer-Text -->
+  </footer>
+
   <script>
-    const ANSWERS = "glueck|glück";
-    const TODAY_LETTER = "G";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
+    function checkRiddle() {
+      const input = document.getElementById('answerInput').value.trim();
+      const feedback = document.getElementById('quizFeedback2');
+      const correctAnswer = '7'; // Mindestanzahl der Rentiere
+
+      if (input === correctAnswer) {
+        feedback.textContent = '';
+        showLetter('X'); // gewünschten Buchstaben hier übergeben
+      } else {
+        feedback.textContent = 'Leider falsch, versuche es erneut!';
+        document.getElementById('letter-container').style.display = 'none';
+      }
     }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
+
+    function showLetter(letter) {
+      const container = document.getElementById('letter-container');
+      document.getElementById('letter').textContent = letter;
+      container.style.display = 'block';
     }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function toggleHint(nr) {
+      const el = document.getElementById('hint' + nr);
+      if (!el) return;
+      const isVisible = el.style.display === 'block';
+      el.style.display = isVisible ? 'none' : 'block';
     }
   </script>
 </body>
 </html>
+
