@@ -19,7 +19,7 @@
       text-align: center;
       font-size: clamp(2.5rem, 5vw, 4rem);
       font-weight: 900;
-      font-family: "Comic Sans MS", "Comic Sans", system-ui, -apple-system,
+      font-family: "Brush Script MT", "Comic Sans MS", "Comic Sans", system-ui, -apple-system,
         BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: #fee2e2;
       margin-top: 40px;
@@ -193,6 +193,22 @@
       display: none;
     }
 
+    /* Erfolgs-Kachel */
+    .success-title {
+      text-align: center;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #bbf7d0;
+    }
+
+    .success-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
     /* Party-Overlay & Konfetti */
     .party-overlay {
       position: fixed;
@@ -288,9 +304,8 @@
   <div class="page-content">
     <div class="container">
 
-      <!-- Einleitungs-Kachel (kannst du auch komplett ändern oder weglassen) -->
+      <!-- Einleitungs-Kachel -->
       <div class="tile">
-        
         <p>
           Am 13. Dezember herrscht im Weihnachtsdorf Hochbetrieb.
           Die letzten Geschenke sind leider noch nicht fertiggestellt und so langsam wird es knapp.
@@ -369,6 +384,28 @@
           </div>
         </div>
       </div>
+
+      <!-- Neue Erfolgs-Kachel (wird erst bei richtiger Lösung angezeigt) -->
+      <div class="tile" id="successTile" style="display: none;">
+        <div class="success-title">Geschafft!</div>
+        <div class="success-text">
+          <p>
+            Du hast die richtige Lösung gefunden:
+            Wenn Knobel-Kobold Karl statt drei gleich <strong>sechs</strong> Geschenke verzaubert,
+            ist das Geschenkezimmer bereits nach <strong>sechs Tagen</strong> randvoll.
+          </p>
+          <p>
+            Die Menge der Geschenke verdoppelt sich ja jeden Tag. Verdoppelt man die
+            Startanzahl, erreicht man die volle Menge genau einen Tag früher –
+            also an Tag&nbsp;6 statt an Tag&nbsp;7.
+          </p>
+          <p>
+            Die Fee Iris und der Weihnachtsmann danken dir für deinen
+            mathemagischen Einsatz!
+          </p>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -376,10 +413,9 @@
   <div id="partyOverlay" class="party-overlay">
     <div class="party-message">Du hast es gelöst!</div>
     <div class="party-sub">
-      Das Geschenkezimmer ist rechtzeitig gefüllt –
-      die Fee Iris und der Weihnachtsmann danken dir!
-      <!-- Falls du wie bei Tag 14 einen Buchstaben vergeben willst,
-           kannst du ihn hier ergänzen. -->
+      Das Geschenkzimmer ist rechtzeitig gefüllt. <br>
+      Knobel-Kobold Karl ist dir zu Dank verplichtet und gibt dir für deine Mühe den Buchstaben: <br>
+      <strong>g</strong>
     </div>
     <button id="partyClose" class="party-close-btn">Weiter</button>
   </div>
@@ -398,6 +434,7 @@
 
     const partyOverlay = document.getElementById("partyOverlay");
     const partyClose = document.getElementById("partyClose");
+    const successTile = document.getElementById("successTile");
     let partyGestartet = false;
 
     // Hinweise
@@ -425,10 +462,20 @@
       }
 
       if (value === correctAnswer) {
-        feedback.textContent = "Richtig! Mit sechs Startgeschenken dauert es nur sechs Tage.";
-        feedback.classList.add("ok");
+        // Feedback-Text im Rätselbereich leeren,
+        // damit der Erfolg hauptsächlich in der neuen Kachel erscheint
+        feedback.textContent = "";
+        feedback.classList.remove("bad", "ok");
+
+        // Erfolgs-Kachel anzeigen
+        if (successTile) {
+          successTile.style.display = "block";
+        }
+
+        // Party starten
         starteParty();
       } else {
+        successTile.style.display = "none"; // Falls vorher schon richtig war und dann falsche Zahl eingetragen wird
         feedback.textContent = "Noch nicht ganz. Überleg noch einmal, wie sich die Geschenke verdoppeln.";
         feedback.classList.add("bad");
       }
@@ -484,5 +531,6 @@
   </script>
 </body>
 </html>
+
 
 
