@@ -46,7 +46,7 @@
       justify-content: center;
       align-items: center;
       padding: 2rem 1rem;
-      margin-top: 60vh;
+      margin-top: 60vh; /* damit man erst scrollen muss */
     }
 
     .solution-card {
@@ -156,6 +156,90 @@
       color: var(--accent);
       font-weight: bold;
     }
+
+    /* ========= ERFOLGS-OVERLAY VOR ALLEM ANDEREN ========= */
+
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;             /* standardmäßig aus */
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;            /* über Karte & restlichem Inhalt */
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      overflow: hidden;
+    }
+
+    .success-overlay.visible {
+      display: flex;
+    }
+
+    .success-content {
+      position: relative;
+      max-width: 700px;
+      margin: 1rem;
+      padding: 2rem 2.5rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .success-content h2 {
+      margin-top: 0;
+      color: var(--accent);
+      font-size: 2rem;
+    }
+
+    .success-content p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .success-content button {
+      padding: 0.6rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    /* ========= Party-Overlay mit fallenden Icons ========= */
+
+    .party-icons {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1; /* hinter dem Text im Overlay, aber noch im Overlay */
+    }
+
+    .party-icon {
+      position: absolute;
+      top: -10vh;
+      font-size: 2rem;
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) translateX(var(--drift, 0px)) rotate(360deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -176,6 +260,21 @@
       </div>
 
       <div id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- ERFOLGS-OVERLAY -->
+  <div id="successOverlay" class="success-overlay">
+    <div class="success-content">
+      <div id="partyIcons" class="party-icons"></div>
+
+      <h2>Juuuuhhhuuuuu, das Lösungswort stimmt! 🎉</h2>
+      <p>
+        Du bist ja richtig gut im Rätsel lösen!<br>
+        Ich wünsche dir einen wunderschönen Tag. Feier noch schön mit deiner Familie
+        und ich freue mich darauf, wenn wir uns wieder sehen.
+      </p>
+      <button type="button" onclick="closeOverlay()">Weiter</button>
     </div>
   </div>
 
@@ -253,8 +352,12 @@
       const cleanEnteredNoSpaces = cleanEntered.replace(/\s+/g, '');
 
       if (cleanEnteredNoSpaces === cleanSolution) {
+        // Feedback im Textfeld (kannst du auch kürzer machen, wenn du willst)
         feedback.textContent = "Juuuuhhhuuuuu das Lösungswort stimmt. Du bist ja richtig gut im Rätsel Lösen! Ich wünsche dir einen wunderschönen Tag. Feier noch schön mit deiner Familie und ich freue mich darauf, wenn wir uns wieder sehen";
         feedback.classList.add('success');
+
+        // Overlay anzeigen und Party starten
+        showSuccessOverlay();
       } else {
         feedback.textContent = "Das Lösungswort stimmt noch nicht ganz. Versuche es noch einmal!";
       }
@@ -268,6 +371,57 @@
       const feedback = document.getElementById('feedback');
       feedback.textContent = '';
       feedback.classList.remove('success');
+    }
+
+    // Overlay anzeigen
+    function showSuccessOverlay() {
+      const overlay = document.getElementById('successOverlay');
+      overlay.classList.add('visible');
+      startPartyIcons();
+    }
+
+    // Overlay schließen
+    function closeOverlay() {
+      const overlay = document.getElementById('successOverlay');
+      overlay.classList.remove('visible');
+
+      // Icons wieder entfernen, damit es beim nächsten Mal neu startet
+      const partyContainer = document.getElementById('partyIcons');
+      partyContainer.innerHTML = "";
+    }
+
+    // Herzen, Tannenbäume, Geschenke regnen lassen
+    function startPartyIcons() {
+      const container = document.getElementById('partyIcons');
+      container.innerHTML = ""; // sicherheitshalber leeren
+
+      const symbols = ['🎁', '🎄', '❤️'];
+      const iconCount = 40; // Anzahl der „Konfetti“-Elemente
+
+      for (let i = 0; i < iconCount; i++) {
+        const span = document.createElement('span');
+        span.className = 'party-icon';
+
+        // Zufällig eines der Symbole auswählen
+        span.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+
+        // Zufällige horizontale Position (0–100vw)
+        const left = Math.random() * 100;
+        span.style.left = left + 'vw';
+
+        // Zufällige Dauer und Verzögerung
+        const duration = 4 + Math.random() * 4; // 4–8 Sekunden
+        const delay = Math.random() * 4;        // 0–4 Sekunden
+
+        span.style.animationDuration = duration + 's';
+        span.style.animationDelay = delay + 's';
+
+        // Leichter zufälliger Drift zur Seite
+        const drift = (Math.random() * 100 - 50); // -50px bis +50px
+        span.style.setProperty('--drift', drift + 'px');
+
+        container.appendChild(span);
+      }
     }
 
     // Initial beim Laden
