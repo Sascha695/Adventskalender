@@ -1,1 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lösungswort</title>
+  <style>
+    :root {
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --accent: #2f6532;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: #222;
+      min-height: 100vh;
+      background-color: #e2f4f9;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Fixiertes Hintergrundbild hinter allem Inhalt */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("assets/loesungswortBG.png"); 
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .solution-card {
+      max-width: 900px;
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      padding: 2rem 2.4rem;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .solution-card {
+        padding: 1.4rem 1.2rem;
+      }
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    p {
+      margin-top: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .solution-instruction {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 1.5rem;
+    }
+
+    .solution-inputs {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .word-group {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      flex-wrap: nowrap;
+    }
+
+    .letter-input {
+      width: 1.5rem;
+      padding: 0.1rem 0.1rem 0.2rem;
+      border: none;
+      border-bottom: 2px solid #333;
+      background: transparent;
+      text-align: center;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      outline: none;
+    }
+
+    .letter-input:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    /* Auf sehr kleinen Bildschirmen Eingabefelder etwas verkleinern */
+    @media (max-width: 600px) {
+      .letter-input {
+        width: 1.1rem;
+        font-size: 1rem;
+      }
+
+      .word-group {
+        gap: 0.25rem;
+      }
+    }
+
+    .buttons {
+      margin-top: 0.5rem;
+    }
+
+    .buttons button {
+      padding: 0.5rem 1rem;
+      margin: 0 0.25rem;
+      font-size: 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .buttons button.secondary {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    #feedback {
+      margin-top: 0.8rem;
+      font-size: 0.95rem;
+      color: #c0392b;
+    }
+
+    #feedback.success {
+      color: var(--accent);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="solution-card">
+      <h1>Das Lösungswort</h1>
+      <p class="solution-instruction">
+        Trage hier das Lösungswort ein. Jede Linie steht für einen Buchstaben.
+      </p>
+
+      <div id="solutionInputs" class="solution-inputs">
+        <!-- Eingabefelder werden per JavaScript erzeugt -->
+      </div>
+
+      <div class="buttons">
+        <button type="button" onclick="checkSolution()">Antwort prüfen</button>
+        <button type="button" class="secondary" onclick="clearInputs()">Alles löschen</button>
+      </div>
+
+      <div id="feedback"></div>
+    </div>
+  </div>
+
+  <script>
+    // Das korrekte Lösungswort
+    const solution = "Frohe Weihnachten Liebling";
+
+    // Eingabefelder anhand des Lösungswortes erzeugen
+    function createInputs() {
+      const container = document.getElementById('solutionInputs');
+      container.innerHTML = '';
+
+      let globalIndex = 0;
+
+      const words = solution.split(' ');
+      words.forEach((word) => {
+        const wordDiv = document.createElement('div');
+        wordDiv.className = 'word-group';
+
+        for (let i = 0; i < word.length; i++) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 1;
+          input.className = 'letter-input';
+          input.dataset.index = globalIndex;
+
+          input.addEventListener('input', onLetterInput);
+          input.addEventListener('keydown', onLetterKeyDown);
+
+          wordDiv.appendChild(input);
+          globalIndex++;
+        }
+
+        container.appendChild(wordDiv);
+      });
+    }
+
+    // Beim Tippen automatisch zum nächsten Feld springen
+    function onLetterInput(e) {
+      const input = e.target;
+      input.value = input.value.toUpperCase();
+
+      if (input.value.length === input.maxLength) {
+        const currentIndex = parseInt(input.dataset.index, 10);
+        const next = document.querySelector('.letter-input[data-index="' + (currentIndex + 1) + '"]');
+        if (next) {
+          next.focus();
+        }
+      }
+    }
+
+    // Mit Backspace zum vorherigen Feld springen
+    function onLetterKeyDown(e) {
+      const input = e.target;
+      const currentIndex = parseInt(input.dataset.index, 10);
+
+      if (e.key === 'Backspace' && input.value === '') {
+        const prev = document.querySelector('.letter-input[data-index="' + (currentIndex - 1) + '"]');
+        if (prev) {
+          prev.focus();
+        }
+      }
+    }
+
+    function checkSolution() {
+      const inputs = Array.from(document.querySelectorAll('.letter-input'));
+      const feedback = document.getElementById('feedback');
+      feedback.classList.remove('success');
+
+      const entered = inputs.map(inp => (inp.value || '')).join('');
+      const cleanEntered = entered.toLowerCase();
+      const cleanSolution = solution.replace(/\s+/g, '').toLowerCase();
+
+      // Leerzeichen im Vergleich ignorieren
+      const cleanEnteredNoSpaces = cleanEntered.replace(/\s+/g, '');
+
+      if (cleanEnteredNoSpaces === cleanSolution) {
+        feedback.textContent = "Super, das Lösungswort stimmt!";
+        feedback.classList.add('success');
+      } else {
+        feedback.textContent = "Das Lösungswort stimmt noch nicht ganz. Versuche es noch einmal!";
+      }
+    }
+
+    function clearInputs() {
+      const inputs = document.querySelectorAll('.letter-input');
+      inputs.forEach(input => input.value = '');
+      if (inputs[0]) inputs[0].focus();
+
+      const feedback = document.getElementById('feedback');
+      feedback.textContent = '';
+      feedback.classList.remove('success');
+    }
+
+    // Initial beim Laden
+    window.addEventListener('DOMContentLoaded', () => {
+      createInputs();
+      const first = document.querySelector('.letter-input');
+      if (first) first.focus();
+    });
+  </script>
+</body>
+</html>
