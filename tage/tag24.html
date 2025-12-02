@@ -751,7 +751,7 @@
 
     function createConfetti(overlay) {
       const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#ffffff'];
-      const numPieces = 120;
+      const numPieces = 1200;
       const screenWidth = window.innerWidth;
 
       for (let i = 0; i < numPieces; i++) {
@@ -760,8 +760,8 @@
         conf.style.left = Math.random() * screenWidth + 'px';
         conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
 
-        const duration = 2.5 + Math.random() * 2; // 2.5–4.5 Sekunden
-        const delay = Math.random() * 1.5;        // 0–1.5 Sekunden
+        const duration = 5.5 + Math.random() * 2; // 2.5–4.5 Sekunden
+        const delay = Math.random() * 0.5;        // 0–0.5 Sekunden
 
         conf.style.animationDuration = duration + 's';
         conf.style.animationDelay = delay + 's';
