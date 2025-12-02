@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
-      --rentier-bg: #ffe3af; /* Beige wie in den Rentierbildern */
+      --rentier-bg: #ffe3af;
     }
     body {
       margin: 0;
@@ -109,7 +109,8 @@
       cursor: pointer;
     }
 
-    /* BUCHSTABEN-OVERLAY */
+    /* ====== Buchstaben-Overlay ====== */
+
     .letter-container {
       position: fixed;
       top: 50%;
@@ -182,7 +183,7 @@
       margin-top: 0.4rem;
     }
 
-    /* --- Schritt 2: Schlitten & Drag-and-Drop --- */
+    /* ===== Schritt 2 ===== */
 
     .step-title {
       font-weight: bold;
@@ -366,39 +367,54 @@
       }
     }
 
-    /* ==== NEU: Party-Overlay & Konfetti ==== */
+    /* ====== Party Overlay ====== */
 
     .party-overlay {
       position: fixed;
       inset: 0;
       background: radial-gradient(circle at top, rgba(255,255,255,0.4), rgba(0,0,0,0.35));
       z-index: 900;
-      pointer-events: none; /* Buttons im Letter-Overlay bleiben klickbar */
+      pointer-events: none;
       overflow: hidden;
     }
+
+    /* --- Natürlichere Konfetti-Animation --- */
 
     .confetti-piece {
       position: fixed;
       top: -10px;
-      width: 8px;
-      height: 14px;
       border-radius: 2px;
       opacity: 0.9;
-      animation-name: confetti-fall;
-      animation-timing-function: linear;
       animation-fill-mode: forwards;
+      will-change: transform;
     }
 
-    @keyframes confetti-fall {
+    @keyframes confetti-fall-left {
       0% {
-        transform: translateY(-100vh) rotateZ(0deg);
+        transform: translate3d(0, -100vh, 0) rotateZ(0deg);
+      }
+      50% {
+        transform: translate3d(-20px, 50vh, 0) rotateZ(180deg);
       }
       100% {
-        transform: translateY(110vh) rotateZ(360deg);
+        transform: translate3d(10px, 110vh, 0) rotateZ(360deg);
+      }
+    }
+
+    @keyframes confetti-fall-right {
+      0% {
+        transform: translate3d(0, -100vh, 0) rotateZ(0deg);
+      }
+      50% {
+        transform: translate3d(20px, 50vh, 0) rotateZ(180deg);
+      }
+      100% {
+        transform: translate3d(-10px, 110vh, 0) rotateZ(360deg);
       }
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Tag&nbsp;24 – Der große Tag</h1>
@@ -406,29 +422,22 @@
 
   <main class="puzzle-container">
     <div class="puzzle-card">
+
       <h2 class="puzzle-title">Chaos im Rentier-Stall</h2>
 
-      <!-- SCHRITT 1: Anzahl Rentiere -->
+      <!-- Schritt 1 -->
       <div id="step1">
+
         <p class="puzzle-text">
-          Heute ist es endlich so weit: Alle Geschenke sind auf dem Schlitten verstaut, 
-          und dank deiner Hilfe hat der Weihnachtsmann alles rechtzeitig geschafft. 
-          Nun kann die große Reise beginnen. <br>
-          Doch als der Weihnachtsmann in den Stall tritt, um den Schlitten startklar zu machen, 
-          bemerkt er sofort, dass etwas nicht stimmt. Die Rentiere sind in heller Aufregung – 
-          sie streiten sich lautstark darüber, wer an welcher Position den schweren Geschenkschlitten ziehen darf. <br>
-          Zum Glück hat der Weihnachtsmann bereits einen Plan geschmiedet. 
-          Um wieder Ruhe in den Stall zu bringen, möchte er die Rentiere nach den Farben ihrer Schals sortieren. 
-          So soll jeder seinen Platz finden – ganz ohne Streit.
+          Heute ist es endlich so weit: Alle Geschenke sind auf dem Schlitten verstaut...
         </p>
+
         <p class="puzzle-text">
-          Zwei Rentiere tragen einen grünen Schal. Zwischen den beiden grünen Schals soll
-          hinten ein gelber und davor zwei rote stehen. Das eine Rentier mit dem
-          grünen Schal soll das fünfte von vorne sein, das andere das siebte von hinten.
-          Alle weiteren Rentiere sollen blaue Schals tragen.
+          Zwei Rentiere tragen einen grünen Schal...
         </p>
-        <p class="puzzle-text puzzle-question">
-          Die erste Frage lautet nun, wie viele Rentiere der Weihnachtsmann heute mindestens an der Start gehen.
+
+        <p class="puzzle-question">
+          Die erste Frage lautet nun, wie viele Rentiere...
         </p>
 
         <div class="answer-area">
@@ -443,102 +452,68 @@
         <!-- Hinweise -->
         <div class="hint-section">
           <h3>Brauchst du einen Hinweis?</h3>
+
           <div class="hint-buttons">
-            <button type="button" onclick="toggleHint(1)">Hinweis&nbsp;1</button>
-            <button type="button" onclick="toggleHint(2)">Hinweis&nbsp;2</button>
-            <button type="button" onclick="toggleHint(3)">Hinweis&nbsp;3</button>
+            <button onclick="toggleHint(1)">Hinweis 1</button>
+            <button onclick="toggleHint(2)">Hinweis 2</button>
+            <button onclick="toggleHint(3)">Hinweis 3</button>
           </div>
 
-          <div id="hint1" class="hint-text">
-            Male dir eine Reihe auf und achte auf die Positionen der grünen Rentiere. 
-            Eins davon kannst du direkt plazieren
-          </div>
-          <div id="hint2" class="hint-text">
-            Zwischen den beiden grünen Schals steht links ein gelber und rechts
-            zwei rote Rentiere. Trage diese zuerst ein.
-          </div>
-          <div id="hint3" class="hint-text">
-            Die übrigen Plätze links und rechts werden von Rentieren mit blauem
-            Schal aufgefüllt. Zähle am Ende alle Rentiere.
-          </div>
+          <div id="hint1" class="hint-text">Male dir eine Reihe...</div>
+          <div id="hint2" class="hint-text">Zwischen den beiden grünen...</div>
+          <div id="hint3" class="hint-text">Die übrigen Plätze...</div>
         </div>
       </div>
 
-      <!-- SCHRITT 2: Schlitten + Rentiere platzieren -->
+      <!-- Schritt 2 -->
       <div id="step2" style="display:none;">
-        <p class="step-title">
-          Super! Jetzt stelle die Rentiere in der richtigen Reihenfolge vor den Schlitten.
-        </p>
+        <p class="step-title">Super! Jetzt stelle die Rentiere ...</p>
+
         <p class="puzzle-text">
-          Ziehe die Rentiere aus der Auswahl unten in die sieben freien Felder vor dem Schlitten.
-          Du kannst ein Feld durch Antippen wieder leeren.
+          Ziehe die Rentiere aus der Auswahl unten...
         </p>
 
         <div class="sled-area">
-          <img src="assets/sledge24.png" alt="Schlitten" class="sled-image">
+          <img src="assets/sledge24.png" class="sled-image" alt="Schlitten">
 
           <div class="slots-row">
-            <div class="slot" data-index="0">
-              <span class="slot-hint">1</span>
-            </div>
-            <div class="slot" data-index="1">
-              <span class="slot-hint">2</span>
-            </div>
-            <div class="slot" data-index="2">
-              <span class="slot-hint">3</span>
-            </div>
-            <div class="slot" data-index="3">
-              <span class="slot-hint">4</span>
-            </div>
-            <div class="slot" data-index="4">
-              <span class="slot-hint">5</span>
-            </div>
-            <div class="slot" data-index="5">
-              <span class="slot-hint">6</span>
-            </div>
-            <div class="slot" data-index="6">
-              <span class="slot-hint">7</span>
-            </div>
+            <div class="slot" data-index="0"><span class="slot-hint">1</span></div>
+            <div class="slot" data-index="1"><span class="slot-hint">2</span></div>
+            <div class="slot" data-index="2"><span class="slot-hint">3</span></div>
+            <div class="slot" data-index="3"><span class="slot-hint">4</span></div>
+            <div class="slot" data-index="4"><span class="slot-hint">5</span></div>
+            <div class="slot" data-index="5"><span class="slot-hint">6</span></div>
+            <div class="slot" data-index="6"><span class="slot-hint">7</span></div>
           </div>
         </div>
 
-        <div class="slot-clear-hint">
-          Tipp: Tippe auf ein Feld, um das Rentier daraus zu entfernen.
-        </div>
+        <div class="slot-clear-hint">Tipp: Tippe auf ein Feld...</div>
 
         <div class="reindeer-palette">
-          <p class="palette-title">Ziehe Rentiere aus der Auswahl in die Felder:</p>
+          <p class="palette-title">Ziehe Rentiere...</p>
+
           <div class="palette-options">
-            <div class="reindeer-option"
-                 data-color="blue"
-                 data-img="assets/reindeer_blue.png">
-              <img src="assets/reindeer_blue.png" alt="Blaues Rentier">
-              <span>Blau</span>
+            <div class="reindeer-option" data-color="blue" data-img="assets/reindeer_blue.png">
+              <img src="assets/reindeer_blue.png"><span>Blau</span>
             </div>
-            <div class="reindeer-option"
-                 data-color="green"
-                 data-img="assets/reindeer_green.png">
-              <img src="assets/reindeer_green.png" alt="Grünes Rentier">
-              <span>Grün</span>
+
+            <div class="reindeer-option" data-color="green" data-img="assets/reindeer_green.png">
+              <img src="assets/reindeer_green.png"><span>Grün</span>
             </div>
-            <div class="reindeer-option"
-                 data-color="yellow"
-                 data-img="assets/reindeer_yellow.png">
-              <img src="assets/reindeer_yellow.png" alt="Gelbes Rentier">
-              <span>Gelb</span>
+
+            <div class="reindeer-option" data-color="yellow" data-img="assets/reindeer_yellow.png">
+              <img src="assets/reindeer_yellow.png"><span>Gelb</span>
             </div>
-            <div class="reindeer-option"
-                 data-color="red"
-                 data-img="assets/reindeer_red.png">
-              <img src="assets/reindeer_red.png" alt="Rotes Rentier">
-              <span>Rot</span>
+
+            <div class="reindeer-option" data-color="red" data-img="assets/reindeer_red.png">
+              <img src="assets/reindeer_red.png"><span>Rot</span>
             </div>
           </div>
         </div>
 
         <div class="step2-buttons">
-          <button type="button" onclick="checkArrangement()">Anordnung prüfen</button>
-          <button type="button" onclick="resetSlots()">Felder leeren</button>
+          <button onclick="checkArrangement()">Anordnung prüfen</button>
+          <button onclick="resetSlots()">Felder leeren</button>
         </div>
 
         <div id="arrangementFeedback"></div>
@@ -546,13 +521,11 @@
 
       <!-- Buchstaben-Overlay -->
       <div id="letter-container" class="letter-container" style="display:none;">
-        <p>Richtig! Dein Buchstabe für das Lösungswort ist:</p>
+        <p>Richtig! Dein Buchstabe:</p>
         <div class="letter" id="letter">X</div>
         <br><br>
-        <p>Hoffentlich hast du dir alle Buchstaben gemerkt.<br>
-        Dann kannst du jetzt zum Lösungswort:</p>
+        <p>Hoffentlich hast du alle Buchstaben ...</p>
         <button class="solution-link-btn"
-                type="button"
                 onclick="window.location.href='assets/loesungswort.html'">
           Zum Lösungswort
         </button>
@@ -560,14 +533,11 @@
     </div>
   </main>
 
-  <!-- NEU: Party-Overlay für Konfetti -->
+  <!-- Party Overlay -->
   <div id="party-overlay" class="party-overlay" style="display:none;"></div>
 
-  <footer>
-  </footer>
-
   <script>
-    const correctNumberAnswer = '7'; // Mindestanzahl der Rentiere
+    const correctNumberAnswer = '7';
     const correctSequence = ['blue', 'blue', 'green', 'yellow', 'red', 'red', 'green'];
 
     let dragElement = null;
@@ -596,18 +566,13 @@
       document.getElementById('letter').textContent = letter;
       container.style.display = 'block';
 
-      // NEU: Party starten, sobald der Buchstabe erscheint
       startPartyEffect();
     }
 
     function toggleHint(nr) {
       const el = document.getElementById('hint' + nr);
-      if (!el) return;
-      const isVisible = el.style.display === 'block';
-      el.style.display = isVisible ? 'none' : 'block';
+      el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
-
-    // --- Drag & Drop mit Pointer Events (für Maus & Touch) ---
 
     function initDragAndDrop() {
       const paletteOptions = document.querySelectorAll('.reindeer-option');
@@ -626,13 +591,11 @@
     function onPalettePointerDown(e) {
       e.preventDefault();
 
-      const option = e.currentTarget;
-      dragColor = option.dataset.color;
-      dragImgSrc = option.dataset.img;
+      dragColor = e.currentTarget.dataset.color;
+      dragImgSrc = e.currentTarget.dataset.img;
 
       dragElement = document.createElement('img');
       dragElement.src = dragImgSrc;
-      dragElement.alt = option.querySelector('img').alt;
       dragElement.className = 'dragging-reindeer';
       document.body.appendChild(dragElement);
 
@@ -653,19 +616,15 @@
     }
 
     function onPointerUp(e) {
-      if (dragElement) {
-        dragElement.remove();
-      }
+      if (dragElement) dragElement.remove();
 
       const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-      if (dropTarget) {
-        const slot = dropTarget.classList.contains('slot')
-          ? dropTarget
-          : dropTarget.closest('.slot');
+      const slot = dropTarget?.classList.contains('slot')
+        ? dropTarget
+        : dropTarget?.closest('.slot');
 
-        if (slot) {
-          placeReindeerInSlot(slot, dragColor, dragImgSrc);
-        }
+      if (slot) {
+        placeReindeerInSlot(slot, dragColor, dragImgSrc);
       }
 
       dragElement = null;
@@ -677,12 +636,11 @@
     }
 
     function placeReindeerInSlot(slot, color, imgSrc) {
-      if (!color || !imgSrc) return;
+      if (!color) return;
 
       slot.innerHTML = '';
       const img = document.createElement('img');
       img.src = imgSrc;
-      img.alt = color + 'es Rentier';
       img.className = 'slot-reindeer';
       img.dataset.color = color;
       slot.appendChild(img);
@@ -693,6 +651,7 @@
       slots.forEach(slot => {
         slot.innerHTML = '<span class="slot-hint">' + (Number(slot.dataset.index) + 1) + '</span>';
       });
+
       const feedback = document.getElementById('arrangementFeedback');
       feedback.textContent = '';
       feedback.classList.remove('success');
@@ -703,17 +662,12 @@
       const feedback = document.getElementById('arrangementFeedback');
       feedback.classList.remove('success');
 
-      if (slots.length !== correctSequence.length) {
-        feedback.textContent = 'Es scheint ein Problem mit den Feldern zu geben.';
-        return;
-      }
-
       const chosenColors = [];
 
       for (let i = 0; i < slots.length; i++) {
         const img = slots[i].querySelector('img.slot-reindeer');
         if (!img) {
-          feedback.textContent = 'Bitte belege alle Felder mit Rentieren.';
+          feedback.textContent = 'Bitte belege alle Felder.';
           return;
         }
         chosenColors.push(img.dataset.color);
@@ -721,28 +675,26 @@
 
       for (let i = 0; i < correctSequence.length; i++) {
         if (chosenColors[i] !== correctSequence[i]) {
-          feedback.textContent = 'Die Reihenfolge stimmt noch nicht ganz. Versuche es noch einmal!';
+          feedback.textContent = 'Die Reihenfolge stimmt noch nicht.';
           return;
         }
       }
 
-      feedback.textContent = 'Perfekt! Die Rentiere stehen richtig vor dem Schlitten.';
+      feedback.textContent = 'Perfekt!';
       feedback.classList.add('success');
 
-      // Hier den Buchstaben anzeigen
-      showLetter('i'); // gewünschten Buchstaben hier anpassen
+      showLetter('i');
     }
 
-    // ==== NEU: Konfetti-Party ====
+    /* ====== Konfetti ====== */
 
     function startPartyEffect() {
       const overlay = document.getElementById('party-overlay');
       overlay.style.display = 'block';
-      overlay.innerHTML = ''; // sicherheitshalber leeren
+      overlay.innerHTML = '';
 
       createConfetti(overlay);
 
-      // Konfetti nach ein paar Sekunden wieder entfernen
       setTimeout(() => {
         overlay.style.display = 'none';
         overlay.innerHTML = '';
@@ -751,31 +703,45 @@
 
     function createConfetti(overlay) {
       const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#ffffff'];
+      const animations = ['confetti-fall-left', 'confetti-fall-right'];
       const numPieces = 160;
       const screenWidth = window.innerWidth;
 
       for (let i = 0; i < numPieces; i++) {
         const conf = document.createElement('div');
         conf.className = 'confetti-piece';
+
+        // Position
         conf.style.left = Math.random() * screenWidth + 'px';
+
+        // Farbe
         conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
 
-        const duration = 5.5 + Math.random() * 2; // 2.5–4.5 Sekunden
-        const delay = Math.random() * 0.5;        // 0–0.5 Sekunden
+        // Zufällige Größe
+        const w = 6 + Math.random() * 6;
+        const h = 10 + Math.random() * 10;
+        conf.style.width = w + 'px';
+        conf.style.height = h + 'px';
 
+        // Zufällige Dauer
+        const duration = 3 + Math.random() * 2;
         conf.style.animationDuration = duration + 's';
-        conf.style.animationDelay = delay + 's';
+
+        // Keine Verzögerung → sofortiger Start
+        conf.style.animationDelay = '0s';
+
+        // Zufällige Richtung
+        conf.style.animationName = animations[Math.floor(Math.random() * animations.length)];
 
         overlay.appendChild(conf);
       }
     }
 
-    // Initialisierung nach Laden der Seite
-    window.addEventListener('DOMContentLoaded', () => {
-      initDragAndDrop();
-    });
+    window.addEventListener('DOMContentLoaded', initDragAndDrop);
   </script>
+
 </body>
 </html>
+
 
 
