@@ -23,7 +23,6 @@
       left: 0;
       width: 100%;
       height: 100%;
-      /* Wenn du ein Rentier-Bild hast, hier austauschen */
       background-image: url("assets/lastBG.png");
       background-size: contain;
       background-position: center top;
@@ -43,7 +42,6 @@
       font-size: 0.85rem;
     }
 
-    /* Weniger Abstand nach oben, damit auf dem Handy alles zu sehen ist */
     .puzzle-container {
       padding: 5rem 1rem 4rem 1rem;
       min-height: 100vh;
@@ -193,7 +191,6 @@
       color: #2f6532;
     }
 
-    /* Standard: Schlitten & Slots in einer Reihe (für größere Bildschirme) */
     .sled-area {
       margin-top: 1.5rem;
       display: flex;
@@ -328,10 +325,6 @@
       margin-top: 0.4rem;
     }
 
-    /* MOBILE-ANPASSUNGEN:
-       - Schlitten oben, Slots darunter
-       - kleinere Slots & kleinere Rentiere, damit alles auf den Screen passt
-    */
     @media (max-width: 600px) {
       .sled-area {
         flex-direction: column;
@@ -372,6 +365,38 @@
         padding: 1.2rem 1.4rem;
       }
     }
+
+    /* ==== NEU: Party-Overlay & Konfetti ==== */
+
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.4), rgba(0,0,0,0.35));
+      z-index: 900;
+      pointer-events: none; /* Buttons im Letter-Overlay bleiben klickbar */
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      top: -10px;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      opacity: 0.9;
+      animation-name: confetti-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotateZ(0deg);
+      }
+      100% {
+        transform: translateY(110vh) rotateZ(360deg);
+      }
+    }
   </style>
 </head>
 <body>
@@ -395,7 +420,6 @@
           Zum Glück hat der Weihnachtsmann bereits einen Plan geschmiedet. 
           Um wieder Ruhe in den Stall zu bringen, möchte er die Rentiere nach den Farben ihrer Schals sortieren. 
           So soll jeder seinen Platz finden – ganz ohne Streit.
-          
         </p>
         <p class="puzzle-text">
           Zwei Rentiere tragen einen grünen Schal. Zwischen den beiden grünen Schals soll
@@ -451,11 +475,9 @@
         </p>
 
         <div class="sled-area">
-          <!-- Deinen Schlitten hier einfügen -->
           <img src="assets/sledge24.png" alt="Schlitten" class="sled-image">
 
           <div class="slots-row">
-            <!-- 7 Slots von links nach rechts -->
             <div class="slot" data-index="0">
               <span class="slot-hint">1</span>
             </div>
@@ -487,7 +509,6 @@
         <div class="reindeer-palette">
           <p class="palette-title">Ziehe Rentiere aus der Auswahl in die Felder:</p>
           <div class="palette-options">
-            <!-- Bildpfade bitte an deine Dateien anpassen -->
             <div class="reindeer-option"
                  data-color="blue"
                  data-img="assets/reindeer_blue.png">
@@ -526,10 +547,8 @@
       <!-- Buchstaben-Overlay -->
       <div id="letter-container" class="letter-container" style="display:none;">
         <p>Richtig! Dein Buchstabe für das Lösungswort ist:</p>
-        <!-- HIER kannst du deinen Buchstaben für Tag 24 eintragen -->
         <div class="letter" id="letter">X</div>
-        <br>
-        <br>
+        <br><br>
         <p>Hoffentlich hast du dir alle Buchstaben gemerkt.<br>
         Dann kannst du jetzt zum Lösungswort:</p>
         <button class="solution-link-btn"
@@ -541,8 +560,10 @@
     </div>
   </main>
 
+  <!-- NEU: Party-Overlay für Konfetti -->
+  <div id="party-overlay" class="party-overlay" style="display:none;"></div>
+
   <footer>
-    <!-- Optional: Footer-Text -->
   </footer>
 
   <script>
@@ -574,6 +595,9 @@
       const container = document.getElementById('letter-container');
       document.getElementById('letter').textContent = letter;
       container.style.display = 'block';
+
+      // NEU: Party starten, sobald der Buchstabe erscheint
+      startPartyEffect();
     }
 
     function toggleHint(nr) {
@@ -594,7 +618,6 @@
       const slots = document.querySelectorAll('.slot');
       slots.forEach(slot => {
         slot.addEventListener('click', () => {
-          // Slot leeren durch Antippen
           slot.innerHTML = '<span class="slot-hint">' + (Number(slot.dataset.index) + 1) + '</span>';
         });
       });
@@ -656,7 +679,7 @@
     function placeReindeerInSlot(slot, color, imgSrc) {
       if (!color || !imgSrc) return;
 
-      slot.innerHTML = ''; // Feld leeren
+      slot.innerHTML = '';
       const img = document.createElement('img');
       img.src = imgSrc;
       img.alt = color + 'es Rentier';
@@ -708,6 +731,43 @@
 
       // Hier den Buchstaben anzeigen
       showLetter('i'); // gewünschten Buchstaben hier anpassen
+    }
+
+    // ==== NEU: Konfetti-Party ====
+
+    function startPartyEffect() {
+      const overlay = document.getElementById('party-overlay');
+      overlay.style.display = 'block';
+      overlay.innerHTML = ''; // sicherheitshalber leeren
+
+      createConfetti(overlay);
+
+      // Konfetti nach ein paar Sekunden wieder entfernen
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        overlay.innerHTML = '';
+      }, 5000);
+    }
+
+    function createConfetti(overlay) {
+      const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#ffffff'];
+      const numPieces = 120;
+      const screenWidth = window.innerWidth;
+
+      for (let i = 0; i < numPieces; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti-piece';
+        conf.style.left = Math.random() * screenWidth + 'px';
+        conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        const duration = 2.5 + Math.random() * 2; // 2.5–4.5 Sekunden
+        const delay = Math.random() * 1.5;        // 0–1.5 Sekunden
+
+        conf.style.animationDuration = duration + 's';
+        conf.style.animationDelay = delay + 's';
+
+        overlay.appendChild(conf);
+      }
     }
 
     // Initialisierung nach Laden der Seite
