@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lösungswort</title>
+
   <style>
     :root {
       --card-bg: rgba(255, 255, 255, 0.9);
@@ -24,7 +25,7 @@
       overflow-x: hidden;
     }
 
-    /* Fixiertes Hintergrundbild hinter allem Inhalt */
+    /* Fixiertes Hintergrundbild */
     body::before {
       content: "";
       position: fixed;
@@ -32,7 +33,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url("assets/loesungswortBG.png"); 
+      background-image: url("assets/loesungswortBG.png");
       background-size: cover;
       background-position: center top;
       background-repeat: no-repeat;
@@ -40,13 +41,14 @@
       pointer-events: none;
     }
 
+    /* Damit man scrollen muss, bevor die Karte sichtbar ist */
     .page-wrapper {
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 2rem 1rem;
-      margin-top: 60vh; /* damit man erst scrollen muss */
+      margin-top: 60vh;
     }
 
     .solution-card {
@@ -70,11 +72,6 @@
       margin-bottom: 0.5rem;
       font-size: 2rem;
       color: var(--accent);
-    }
-
-    p {
-      margin-top: 0.4rem;
-      margin-bottom: 1.2rem;
     }
 
     .solution-instruction {
@@ -114,20 +111,11 @@
       border-bottom-color: var(--accent);
     }
 
-    /* Auf sehr kleinen Bildschirmen Eingabefelder etwas verkleinern */
     @media (max-width: 600px) {
       .letter-input {
         width: 1.1rem;
         font-size: 1rem;
       }
-
-      .word-group {
-        gap: 0.25rem;
-      }
-    }
-
-    .buttons {
-      margin-top: 0.5rem;
     }
 
     .buttons button {
@@ -157,15 +145,16 @@
       font-weight: bold;
     }
 
-    /* ========= ERFOLGS-OVERLAY VOR ALLEM ANDEREN ========= */
-
+    /* ==============================
+       🎉 ERFOLGS-OVERLAY
+       ============================== */
     .success-overlay {
       position: fixed;
       inset: 0;
-      display: none;             /* standardmäßig aus */
+      display: none;
       align-items: center;
       justify-content: center;
-      z-index: 1000;            /* über Karte & restlichem Inhalt */
+      z-index: 1000;
       background: rgba(0, 0, 0, 0.55);
       backdrop-filter: blur(4px);
       overflow: hidden;
@@ -184,18 +173,13 @@
       background: rgba(255, 255, 255, 0.95);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       text-align: center;
+      z-index: 10;
     }
 
     .success-content h2 {
       margin-top: 0;
       color: var(--accent);
       font-size: 2rem;
-    }
-
-    .success-content p {
-      font-size: 1rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
     }
 
     .success-content button {
@@ -208,14 +192,15 @@
       cursor: pointer;
     }
 
-    /* ========= Party-Overlay mit fallenden Icons ========= */
-
+    /* ==============================
+       🎁🎄❤️ Party-Konfetti
+       ============================== */
     .party-icons {
       position: absolute;
       inset: 0;
       pointer-events: none;
       overflow: hidden;
-      z-index: -1; /* hinter dem Text im Overlay, aber noch im Overlay */
+      z-index: 0;
     }
 
     .party-icon {
@@ -229,68 +214,72 @@
 
     @keyframes fall {
       0% {
-        transform: translateY(-100vh) translateX(0) rotate(0deg);
+        transform: translateY(0) rotate(0deg);
         opacity: 0;
       }
       10% {
         opacity: 1;
       }
       100% {
-        transform: translateY(110vh) translateX(var(--drift, 0px)) rotate(360deg);
+        transform: translateY(120vh) translateX(var(--drift, 0px)) rotate(360deg);
         opacity: 0;
       }
     }
   </style>
 </head>
+
 <body>
+
   <div class="page-wrapper">
     <div class="solution-card">
       <h1>Das Lösungswort</h1>
       <p class="solution-instruction">
-        Trage hier das Lösungswort ein. 
+        Trage hier das Lösungswort ein.
       </p>
 
-      <div id="solutionInputs" class="solution-inputs">
-        <!-- Eingabefelder werden per JavaScript erzeugt -->
-      </div>
+      <div id="solutionInputs" class="solution-inputs"></div>
 
       <div class="buttons">
-        <button type="button" onclick="checkSolution()">Antwort prüfen</button>
-        <button type="button" class="secondary" onclick="clearInputs()">Alles löschen</button>
+        <button onclick="checkSolution()">Antwort prüfen</button>
+        <button class="secondary" onclick="clearInputs()">Alles löschen</button>
       </div>
 
       <div id="feedback"></div>
     </div>
   </div>
 
-  <!-- ERFOLGS-OVERLAY -->
+  <!-- ⭐ Erfolgs-Overlay -->
   <div id="successOverlay" class="success-overlay">
     <div class="success-content">
       <div id="partyIcons" class="party-icons"></div>
 
       <h2>Juuuuhhhuuuuu, das Lösungswort stimmt! 🎉</h2>
       <p>
-        Du bist ja richtig gut im Rätsel lösen!<br>
-        Ich wünsche dir einen wunderschönen Tag. Feier noch schön mit deiner Familie
-        und ich freue mich darauf, wenn wir uns wieder sehen.
+        Du bist ja richtig gut im Rätsel lösen!  
+        Ich wünsche dir einen wunderschönen Tag.  
+        Feier noch schön mit deiner Familie –  
+        und ich freue mich schon darauf, wenn wir uns wieder sehen! ❤️
       </p>
-      <button type="button" onclick="closeOverlay()">Weiter</button>
+
+      <button onclick="closeOverlay()">Weiter</button>
     </div>
   </div>
 
   <script>
-    // Das korrekte Lösungswort
+    /* ====================================
+       Eingabefelder generieren
+       ==================================== */
+
     const solution = "Frohe Weihnachten Liebling";
 
-    // Eingabefelder anhand des Lösungswortes erzeugen
     function createInputs() {
       const container = document.getElementById('solutionInputs');
       container.innerHTML = '';
 
       let globalIndex = 0;
-
       const words = solution.split(' ');
-      words.forEach((word) => {
+
+      words.forEach(word => {
         const wordDiv = document.createElement('div');
         wordDiv.className = 'word-group';
 
@@ -312,124 +301,108 @@
       });
     }
 
-    // Beim Tippen automatisch zum nächsten Feld springen
     function onLetterInput(e) {
       const input = e.target;
       input.value = input.value.toUpperCase();
 
-      if (input.value.length === input.maxLength) {
-        const currentIndex = parseInt(input.dataset.index, 10);
-        const next = document.querySelector('.letter-input[data-index="' + (currentIndex + 1) + '"]');
-        if (next) {
-          next.focus();
-        }
+      if (input.value.length === 1) {
+        const next = document.querySelector(
+          `.letter-input[data-index="${parseInt(input.dataset.index) + 1}"]`
+        );
+        if (next) next.focus();
       }
     }
 
-    // Mit Backspace zum vorherigen Feld springen
     function onLetterKeyDown(e) {
       const input = e.target;
-      const currentIndex = parseInt(input.dataset.index, 10);
 
       if (e.key === 'Backspace' && input.value === '') {
-        const prev = document.querySelector('.letter-input[data-index="' + (currentIndex - 1) + '"]');
-        if (prev) {
-          prev.focus();
-        }
+        const prev = document.querySelector(
+          `.letter-input[data-index="${parseInt(input.dataset.index) - 1}"]`
+        );
+        if (prev) prev.focus();
       }
     }
 
-    function checkSolution() {
-      const inputs = Array.from(document.querySelectorAll('.letter-input'));
-      const feedback = document.getElementById('feedback');
-      feedback.classList.remove('success');
+    /* ====================================
+       Lösungswort prüfen
+       ==================================== */
 
-      const entered = inputs.map(inp => (inp.value || '')).join('');
-      const cleanEntered = entered.toLowerCase();
+    function checkSolution() {
+      const inputs = [...document.querySelectorAll('.letter-input')];
+      const feedback = document.getElementById('feedback');
+
+      const entered = inputs.map(i => i.value).join('').toLowerCase();
       const cleanSolution = solution.replace(/\s+/g, '').toLowerCase();
 
-      // Leerzeichen im Vergleich ignorieren
-      const cleanEnteredNoSpaces = cleanEntered.replace(/\s+/g, '');
-
-      if (cleanEnteredNoSpaces === cleanSolution) {
-        // Feedback im Textfeld (kannst du auch kürzer machen, wenn du willst)
-        feedback.textContent = "Juuuuhhhuuuuu das Lösungswort stimmt. Du bist ja richtig gut im Rätsel Lösen! Ich wünsche dir einen wunderschönen Tag. Feier noch schön mit deiner Familie und ich freue mich darauf, wenn wir uns wieder sehen";
+      if (entered === cleanSolution) {
+        feedback.textContent = "Richtig! 🎉";
         feedback.classList.add('success');
-
-        // Overlay anzeigen und Party starten
         showSuccessOverlay();
       } else {
-        feedback.textContent = "Das Lösungswort stimmt noch nicht ganz. Versuche es noch einmal!";
+        feedback.textContent = "Das Lösungswort stimmt noch nicht ganz.";
+        feedback.classList.remove('success');
       }
     }
 
     function clearInputs() {
-      const inputs = document.querySelectorAll('.letter-input');
-      inputs.forEach(input => input.value = '');
-      if (inputs[0]) inputs[0].focus();
+      [...document.querySelectorAll('.letter-input')].forEach(i => (i.value = ''));
+      document.querySelector('.letter-input').focus();
 
       const feedback = document.getElementById('feedback');
       feedback.textContent = '';
       feedback.classList.remove('success');
     }
 
-    // Overlay anzeigen
+    /* ====================================
+       Erfolgsoverlay + Party Icons
+       ==================================== */
+
     function showSuccessOverlay() {
-      const overlay = document.getElementById('successOverlay');
-      overlay.classList.add('visible');
+      document.getElementById('successOverlay').classList.add('visible');
       startPartyIcons();
     }
 
-    // Overlay schließen
     function closeOverlay() {
       const overlay = document.getElementById('successOverlay');
       overlay.classList.remove('visible');
-
-      // Icons wieder entfernen, damit es beim nächsten Mal neu startet
-      const partyContainer = document.getElementById('partyIcons');
-      partyContainer.innerHTML = "";
+      document.getElementById('partyIcons').innerHTML = "";
     }
 
-    // Herzen, Tannenbäume, Geschenke regnen lassen
     function startPartyIcons() {
       const container = document.getElementById('partyIcons');
-      container.innerHTML = ""; // sicherheitshalber leeren
+      container.innerHTML = "";
 
       const symbols = ['🎁', '🎄', '❤️'];
-      const iconCount = 40; // Anzahl der „Konfetti“-Elemente
+      const iconCount = 40;
 
       for (let i = 0; i < iconCount; i++) {
         const span = document.createElement('span');
         span.className = 'party-icon';
 
-        // Zufällig eines der Symbole auswählen
         span.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        span.style.left = Math.random() * 100 + 'vw';
 
-        // Zufällige horizontale Position (0–100vw)
-        const left = Math.random() * 100;
-        span.style.left = left + 'vw';
-
-        // Zufällige Dauer und Verzögerung
-        const duration = 4 + Math.random() * 4; // 4–8 Sekunden
-        const delay = Math.random() * 4;        // 0–4 Sekunden
+        const duration = 4 + Math.random() * 4;
+        const delay = Math.random() * 3;
 
         span.style.animationDuration = duration + 's';
         span.style.animationDelay = delay + 's';
 
-        // Leichter zufälliger Drift zur Seite
-        const drift = (Math.random() * 100 - 50); // -50px bis +50px
+        const drift = (Math.random() * 100 - 50);
         span.style.setProperty('--drift', drift + 'px');
 
         container.appendChild(span);
       }
     }
 
-    // Initial beim Laden
+    /* Start */
     window.addEventListener('DOMContentLoaded', () => {
       createInputs();
-      const first = document.querySelector('.letter-input');
-      if (first) first.focus();
+      document.querySelector('.letter-input').focus();
     });
   </script>
+
 </body>
 </html>
+
