@@ -3,64 +3,471 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 15 – Winter-Frage</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <title>Adventskalender – Tag 15</title>
+
+  <style>
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #e5e7eb;
+      overflow-x: hidden;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-image: url("assets/drudel_BG.png"); /* optionaler Hintergrund */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .main-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #fefce8;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      text-shadow: 0 0 18px rgba(255, 230, 150, 0.8);
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 160vh;
+      padding: 20px 12px 40px;
+      margin-top: 290px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #fefce8;
+    }
+
+    .muted { opacity: 0.85; font-size: 0.9rem; }
+
+    .riddle-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    /* Grid */
+    .logic-grid-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .logic-grid {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 580px;
+      table-layout: fixed;
+      font-size: 0.9rem;
+    }
+
+    .logic-grid th,
+    .logic-grid td {
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 6px 4px;
+      text-align: center;
+    }
+
+    .logic-grid th {
+      background: rgba(15, 23, 42, 0.8);
+      font-weight: 600;
+    }
+
+    .row-header {
+      text-align: left;
+      font-weight: 600;
+      padding-left: 8px;
+      white-space: nowrap;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .grid-cell {
+      cursor: pointer;
+      user-select: none;
+      height: 32px;
+      vertical-align: middle;
+      font-size: 1.1rem;
+      font-weight: 700;
+      transition: background 0.15s ease, transform 0.05s ease;
+    }
+
+    .grid-cell:active {
+      transform: scale(0.96);
+    }
+
+    .grid-cell.plus {
+      background: rgba(22, 163, 74, 0.8);
+    }
+
+    .grid-legend {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border-radius: 18px;
+      padding: 8px 16px;
+      border: 2px solid #facc15;
+      background-image: linear-gradient(135deg, #15803d, #22c55e);
+      color: #fefce8;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .feedback {
+      margin-top: 8px;
+      min-height: 1.2em;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .feedback.error {
+      color: #fecaca;
+    }
+
+    .feedback.success {
+      color: #bbf7d0;
+    }
+
+    /* Party-Overlay */
+    .party-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(250,250,250,0.2), rgba(15,23,42,0.95));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9990;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .party-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .party-message {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #facc15;
+      text-shadow: 0 0 16px rgba(250,204,21,0.9);
+    }
+
+    .party-sub {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 420px;
+    }
+
+    .party-close-btn {
+      margin-top: 28px;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 2px solid #facc15;
+      background: rgba(22,163,74,0.85);
+      color: #fefce8;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* fallende Sterne */
+    .falling-star {
+      position: fixed;
+      top: -60px;
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle, #fde68a 0%, #facc15 40%, rgba(250,204,21,0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      animation-name: star-fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes star-fall {
+      0% { transform: translateY(-60px) translateX(0) scale(1); opacity: 1; }
+      100% { transform: translateY(120vh) translateX(40px) scale(0.6); opacity: 0; }
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">❄️</span><h1>Tag 15: Winter-Frage</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+<body>
+
+  <div class="bg-layer"></div>
+
+  <h1 class="main-title">Tag 15 – Weihnachts-Logikrätsel</h1>
+
+  <div class="page-content">
+    <div class="container">
+
+      <!-- Kachel mit Geschichte & Hinweisen -->
+      <div class="tile">
+        <h2>Wer bekommt welches Geschenk?</h2>
+        <p>
+          Hendrik, Oliver und Sandra sind schon gespannt, was sie unter dem
+          Weihnachtsbaum finden werden. Jedes Kind bekommt genau ein Geschenk,
+          jedes Geschenk hat eine andere Papierfarbe und alle drei sind
+          unterschiedlich alt.
+        </p>
+        <p>
+          Finde heraus: Welches Geschenk gehört zu welchem Kind, welche Farbe
+          hat das Geschenkpapier und wie alt sind die Kinder?
+        </p>
+
+        <p class="muted">
+          Tippe in der Matrix auf ein Feld, um ein <strong>„+“</strong> (passt) zu setzen
+          oder wieder zu entfernen. Versuche, alle Informationen logisch zu verknüpfen.
+        </p>
+
+        <h3>Hinweise</h3>
+        <ul>
+          <li>Das jüngste Kind bekommt einen Teddy. Es ist kein Mädchen.</li>
+          <li>Das Videospiel ist in gelbes Geschenkpapier eingepackt.</li>
+          <li>Hendrik ist älter als Sandra, deren Geschenk mit rotem Papier umwickelt ist.</li>
+        </ul>
       </div>
-      <p class="muted">Datum: 15.12.</p>
-      <h2>Rätsel</h2>
-      <p>Was bedeckt im Winter Seen und Pfützen mit einer glatten, rutschigen Schicht?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <!-- Kachel mit Matrix -->
+      <div class="tile">
+        <div class="riddle-wrapper">
+          <div class="logic-grid-container">
+            <table class="logic-grid">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th colspan="3">Geschenk</th>
+                  <th colspan="3">Farbe</th>
+                  <th colspan="3">Alter</th>
+                </tr>
+                <tr>
+                  <th></th>
+                  <th>Videospiel</th>
+                  <th>Buch</th>
+                  <th>Teddy</th>
+                  <th>rot</th>
+                  <th>gelb</th>
+                  <th>türkis</th>
+                  <th>4 Jahre</th>
+                  <th>7 Jahre</th>
+                  <th>12 Jahre</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="row-header">Hendrik</td>
+                  <td class="grid-cell" data-key="hendrik-videospiel"></td>
+                  <td class="grid-cell" data-key="hendrik-buch"></td>
+                  <td class="grid-cell" data-key="hendrik-teddy"></td>
+                  <td class="grid-cell" data-key="hendrik-rot"></td>
+                  <td class="grid-cell" data-key="hendrik-gelb"></td>
+                  <td class="grid-cell" data-key="hendrik-tuerkis"></td>
+                  <td class="grid-cell" data-key="hendrik-4"></td>
+                  <td class="grid-cell" data-key="hendrik-7"></td>
+                  <td class="grid-cell" data-key="hendrik-12"></td>
+                </tr>
+                <tr>
+                  <td class="row-header">Oliver</td>
+                  <td class="grid-cell" data-key="oliver-videospiel"></td>
+                  <td class="grid-cell" data-key="oliver-buch"></td>
+                  <td class="grid-cell" data-key="oliver-teddy"></td>
+                  <td class="grid-cell" data-key="oliver-rot"></td>
+                  <td class="grid-cell" data-key="oliver-gelb"></td>
+                  <td class="grid-cell" data-key="oliver-tuerkis"></td>
+                  <td class="grid-cell" data-key="oliver-4"></td>
+                  <td class="grid-cell" data-key="oliver-7"></td>
+                  <td class="grid-cell" data-key="oliver-12"></td>
+                </tr>
+                <tr>
+                  <td class="row-header">Sandra</td>
+                  <td class="grid-cell" data-key="sandra-videospiel"></td>
+                  <td class="grid-cell" data-key="sandra-buch"></td>
+                  <td class="grid-cell" data-key="sandra-teddy"></td>
+                  <td class="grid-cell" data-key="sandra-rot"></td>
+                  <td class="grid-cell" data-key="sandra-gelb"></td>
+                  <td class="grid-cell" data-key="sandra-tuerkis"></td>
+                  <td class="grid-cell" data-key="sandra-4"></td>
+                  <td class="grid-cell" data-key="sandra-7"></td>
+                  <td class="grid-cell" data-key="sandra-12"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="grid-legend">
+            Tippe auf ein Feld: leer → „+“ → leer
+          </div>
+
+          <div class="input-row">
+            <button id="checkButton" class="btn">Lösung prüfen</button>
+          </div>
+
+          <div id="feedback" class="feedback"></div>
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">E</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
+
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
+  <!-- Party-Overlay -->
+  <div id="partyOverlay" class="party-overlay">
+    <div class="party-message">Richtig! 🎄</div>
+    <div class="party-sub">
+      Du hast das Logikrätsel gelöst – alle Kombinationen stimmen.
+      <br>Dein Buchstabe heute lautet <strong>X</strong>.
+    </div>
+    <button id="partyClose" class="party-close-btn">Weiter rätseln</button>
+  </div>
+
   <script>
-    const ANSWERS = "eis";
-    const TODAY_LETTER = "E";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
-    }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
+    // Zellen-Zustände: nur "" oder "plus"
+    const cells = document.querySelectorAll(".grid-cell");
+    cells.forEach(cell => {
+      cell.dataset.state = ""; // "", "plus"
+      cell.addEventListener("click", () => {
+        const state = cell.dataset.state;
+        const next = state === "plus" ? "" : "plus";
+
+        cell.dataset.state = next;
+        cell.textContent = next === "plus" ? "+" : "";
+        cell.classList.toggle("plus", next === "plus");
       });
+    });
+
+    const feedback = document.getElementById("feedback");
+    const checkButton = document.getElementById("checkButton");
+    const overlay = document.getElementById("partyOverlay");
+    const closeBtn = document.getElementById("partyClose");
+    let partyStarted = false;
+
+    // Richtige Lösung: Felder, die ein Plus haben müssen
+    const solutionPlus = new Set([
+      "hendrik-videospiel",
+      "hendrik-gelb",
+      "hendrik-12",
+      "oliver-teddy",
+      "oliver-tuerkis",
+      "oliver-4",
+      "sandra-buch",
+      "sandra-rot",
+      "sandra-7"
+    ]);
+
+    function checkSolution() {
+      for (const cell of cells) {
+        const key = cell.dataset.key;
+        const hasPlus = cell.dataset.state === "plus";
+        const shouldHavePlus = solutionPlus.has(key);
+
+        // Muss Plus haben, hat aber keins
+        if (shouldHavePlus && !hasPlus) {
+          feedback.textContent = "Es fehlt noch das ein oder andere Plus an den richtigen Stellen.";
+          feedback.className = "feedback error";
+          return;
+        }
+
+        // Darf kein Plus haben, hat aber eins
+        if (!shouldHavePlus && hasPlus) {
+          feedback.textContent = "Hier und da ist ein Plus zu viel – kontrolliere deine Markierungen.";
+          feedback.className = "feedback error";
+          return;
+        }
+      }
+
+      feedback.textContent = "Perfekt – alles stimmt!";
+      feedback.className = "feedback success";
+      startParty();
     }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
+
+    function startParty() {
+      if (partyStarted) return;
+      partyStarted = true;
+      overlay.classList.add("visible");
+      launchFallingStars(40, 5000);
     }
+
+    function hideParty() {
+      overlay.classList.remove("visible");
+    }
+
+    function launchFallingStars(count, durationMs) {
+      const created = [];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.classList.add("falling-star");
+        el.style.left = Math.random() * 100 + "vw";
+        const delay = Math.random() * 1.5;
+        const duration = 3 + Math.random() * 3;
+        el.style.animationDuration = duration + "s";
+        el.style.animationDelay = delay + "s";
+        document.body.appendChild(el);
+        created.push(el);
+      }
+      setTimeout(() => created.forEach(el => el.remove()), durationMs + 3000);
+    }
+
+    checkButton.addEventListener("click", checkSolution);
+    closeBtn.addEventListener("click", hideParty);
   </script>
+
 </body>
 </html>
+
