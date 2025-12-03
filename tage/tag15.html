@@ -24,7 +24,7 @@
     .bg-layer {
       position: fixed;
       inset: 0;
-      background-image: url("assets/15_BG.png"); /* optionaler Hintergrund */
+      background-image: url("assets/15_BG.png");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -49,7 +49,7 @@
       z-index: 1;
       min-height: 160vh;
       padding: 12px 12px 32px;
-      margin-top: 370px;
+      margin-top: 370px; /* weiter nach unten */
     }
 
     .container {
@@ -82,24 +82,18 @@
       gap: 18px;
     }
 
-    /* Grid */
-    .logic-grid-container {
-      width: 100%;
-      /* kein horizontales Scrollen mehr nötig, Tabelle passt sich an */
-      overflow-x: visible;
-    }
+    .logic-grid-container { width: 100%; overflow-x: visible; }
 
     .logic-grid {
       border-collapse: collapse;
       width: 100%;
-      /* min-width entfernt, damit die Tabelle auf Handy-Breite schrumpfen kann */
       table-layout: fixed;
       font-size: 0.8rem;
     }
 
     .logic-grid th,
     .logic-grid td {
-      font-size: 0.65rem;   /* kleiner als vorher */
+      font-size: 0.65rem;
       border: 1px solid rgba(148, 163, 184, 0.6);
       padding: 2px 1px;
       text-align: center;
@@ -129,13 +123,8 @@
       transition: background 0.15s ease, transform 0.05s ease;
     }
 
-    .grid-cell:active {
-      transform: scale(0.96);
-    }
-
-    .grid-cell.plus {
-      background: rgba(22, 163, 74, 0.8);
-    }
+    .grid-cell:active { transform: scale(0.96); }
+    .grid-cell.plus { background: rgba(22, 163, 74, 0.8); }
 
     .grid-legend {
       font-size: 0.85rem;
@@ -173,15 +162,9 @@
       font-size: 0.95rem;
     }
 
-    .feedback.error {
-      color: #fecaca;
-    }
+    .feedback.error { color: #fecaca; }
+    .feedback.success { color: #bbf7d0; }
 
-    .feedback.success {
-      color: #bbf7d0;
-    }
-
-    /* Party-Overlay */
     .party-overlay {
       position: fixed;
       inset: 0;
@@ -232,7 +215,6 @@
       cursor: pointer;
     }
 
-    /* fallende Sterne */
     .falling-star {
       position: fixed;
       top: -60px;
@@ -252,7 +234,7 @@
       100% { transform: translateY(120vh) translateX(40px) scale(0.6); opacity: 0; }
     }
 
-    /* Extra-Mobiloptimierung für sehr kleine Bildschirme */
+    /* MOBILE: hier war das Problem! */
     @media (max-width: 480px) {
       .main-title {
         font-size: clamp(2rem, 7vw, 3rem);
@@ -261,30 +243,22 @@
       }
 
       .page-content {
-        margin-top: 180px;
+        margin-top: 370px;  /* vorher 180px → überschreibt Desktop */
         padding: 10px 8px 28px;
       }
 
-      .tile {
-        padding: 12px 12px;
-      }
+      .tile { padding: 12px 12px; }
 
-      .logic-grid {
-        font-size: 0.7rem;
-      }
+      .logic-grid { font-size: 0.7rem; }
 
       .logic-grid th,
-      .logic-grid td {
-        padding: 3px 1px;
-      }
+      .logic-grid td { padding: 3px 1px; }
 
-      .grid-cell {
-        height: 24px;
-        font-size: 0.9rem;
-      }
+      .grid-cell { height: 24px; font-size: 0.9rem; }
     }
   </style>
 </head>
+
 <body>
 
   <div class="bg-layer"></div>
@@ -294,7 +268,7 @@
   <div class="page-content">
     <div class="container">
 
-      <!-- Kachel mit Geschichte & Hinweisen -->
+      <!-- Kachel 1 -->
       <div class="tile">
         <h2>Wer bekommt welches Geschenk?</h2>
         <p>
@@ -310,7 +284,7 @@
 
         <p class="muted">
           Tippe in der Matrix auf ein Feld, um ein <strong>„+“</strong> (passt) zu setzen
-          oder wieder zu entfernen. Versuche, alle Informationen logisch zu verknüpfen.
+          oder wieder zu entfernen.
         </p>
 
         <h3>Hinweise</h3>
@@ -321,7 +295,7 @@
         </ul>
       </div>
 
-      <!-- Kachel mit Matrix -->
+      <!-- Kachel 2 -->
       <div class="tile">
         <div class="riddle-wrapper">
           <div class="logic-grid-container">
@@ -402,7 +376,7 @@
     </div>
   </div>
 
-  <!-- Party-Overlay -->
+  <!-- Party Overlay -->
   <div id="partyOverlay" class="party-overlay">
     <div class="party-message">Richtig! 🎄</div>
     <div class="party-sub">
@@ -413,14 +387,12 @@
   </div>
 
   <script>
-    // Zellen-Zustände: nur "" oder "plus"
     const cells = document.querySelectorAll(".grid-cell");
     cells.forEach(cell => {
-      cell.dataset.state = ""; // "", "plus"
+      cell.dataset.state = "";
       cell.addEventListener("click", () => {
         const state = cell.dataset.state;
         const next = state === "plus" ? "" : "plus";
-
         cell.dataset.state = next;
         cell.textContent = next === "plus" ? "+" : "";
         cell.classList.toggle("plus", next === "plus");
@@ -433,7 +405,6 @@
     const closeBtn = document.getElementById("partyClose");
     let partyStarted = false;
 
-    // Richtige Lösung: Felder, die ein Plus haben müssen
     const solutionPlus = new Set([
       "hendrik-videospiel",
       "hendrik-gelb",
@@ -452,14 +423,12 @@
         const hasPlus = cell.dataset.state === "plus";
         const shouldHavePlus = solutionPlus.has(key);
 
-        // Muss Plus haben, hat aber keins
         if (shouldHavePlus && !hasPlus) {
           feedback.textContent = "Es fehlt noch das ein oder andere Plus an den richtigen Stellen.";
           feedback.className = "feedback error";
           return;
         }
 
-        // Darf kein Plus haben, hat aber eins
         if (!shouldHavePlus && hasPlus) {
           feedback.textContent = "Hier und da ist ein Plus zu viel – kontrolliere deine Markierungen.";
           feedback.className = "feedback error";
