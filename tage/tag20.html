@@ -416,6 +416,57 @@
       lastOverZone: null,
     };
 
+    // -------- Auto-Scroll während Pointer-Drag --------
+    const autoScroll = {
+      raf: null,
+      active: false,
+      lastClientY: 0,
+      edge: 90,      // Abstand zum Viewport-Rand (px), ab dem gescrollt wird
+      maxSpeed: 18,  // max. Scrollgeschwindigkeit (px pro Frame)
+    };
+
+    function startAutoScroll() {
+      if (autoScroll.raf) return;
+      autoScroll.active = true;
+
+      const tick = () => {
+        if (!autoScroll.active) {
+          autoScroll.raf = null;
+          return;
+        }
+
+        const y = autoScroll.lastClientY;
+        const vh = window.innerHeight;
+
+        let delta = 0;
+
+        // unten
+        if (y > vh - autoScroll.edge) {
+          const t = (y - (vh - autoScroll.edge)) / autoScroll.edge; // 0..1
+          delta = Math.ceil(t * autoScroll.maxSpeed);
+        }
+        // oben
+        else if (y < autoScroll.edge) {
+          const t = (autoScroll.edge - y) / autoScroll.edge; // 0..1
+          delta = -Math.ceil(t * autoScroll.maxSpeed);
+        }
+
+        if (delta !== 0) {
+          window.scrollBy(0, delta);
+        }
+
+        autoScroll.raf = requestAnimationFrame(tick);
+      };
+
+      autoScroll.raf = requestAnimationFrame(tick);
+    }
+
+    function stopAutoScroll() {
+      autoScroll.active = false;
+      if (autoScroll.raf) cancelAnimationFrame(autoScroll.raf);
+      autoScroll.raf = null;
+    }
+
     // --- Helpers ---
     function clearFeedback() {
       feedbackEl.textContent = "";
@@ -514,12 +565,7 @@
         const strong = document.createElement("strong");
         strong.textContent = `Feld ${i}`;
 
-        const small = document.createElement("span");
-        small.className = "slot-hint";
-        small.textContent = "beliebige Silbenanzahl";
-
-        title.appendChild(strong);
-        title.appendChild(small);
+        title.appendChild(strong); // <-- "beliebige Silbenanzahl" entfernt
 
         const slots = document.createElement("div");
         slots.className = "slots";
@@ -689,6 +735,10 @@
         pointerDrag.startParent.insertBefore(ph, chip);
       }
 
+      // Auto-Scroll starten
+      autoScroll.lastClientY = e.clientY;
+      startAutoScroll();
+
       document.addEventListener("pointermove", onPointerMoveDoc, { passive: false });
       document.addEventListener("pointerup", onPointerUpDoc, { passive: false });
       document.addEventListener("pointercancel", onPointerUpDoc, { passive: false });
@@ -712,6 +762,9 @@
       if (!pointerDrag.active) return;
       e.preventDefault();
 
+      // Auto-Scroll: Position merken
+      autoScroll.lastClientY = e.clientY;
+
       const chip = pointerDrag.chip;
       chip.style.left = (e.clientX - pointerDrag.offsetX) + "px";
       chip.style.top = (e.clientY - pointerDrag.offsetY) + "px";
@@ -721,6 +774,9 @@
     }
 
     function cleanupPointerDrag() {
+      // Auto-Scroll stoppen
+      stopAutoScroll();
+
       const chip = pointerDrag.chip;
 
       if (pointerDrag.lastOverZone) {
@@ -816,4 +872,5 @@
   </script>
 </body>
 </html>
+
 
