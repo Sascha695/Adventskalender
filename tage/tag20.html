@@ -292,20 +292,18 @@
       <!-- Intro -->
       <div class="tile">
         <p>
-          Um bestens auf den großen Abend vorbereitet zu sein und sicherzugehen, 
-          dass auch wirklich alles reibungslos funktioniert, macht der Weihnachtsmann jedes Jahr eine kleine Testfahrt. 
+          Um bestens auf den großen Abend vorbereitet zu sein und sicherzugehen,
+          dass auch wirklich alles reibungslos funktioniert, macht der Weihnachtsmann jedes Jahr eine kleine Testfahrt.
           Damit seine Rentiere dabei geschont werden, belädt er den Schlitten nur mit ein paar leichten Wortfetzen aus bekannten Weihnachtswörtern.<br>
-          Normalerweise ist seine treue Helferin Sarah immer an seiner Seite. 
+          Normalerweise ist seine treue Helferin Sarah immer an seiner Seite.
           Doch in diesem Jahr hatte sie sich entschieden, lieber einen Tag auf den Skipisten zu verbringen.
           Der Weihnachtsmann lächelt und denkt sich:<br>
           <strong>„Hohoho, das schaffe ich doch auch ganz allein!“</strong>
-          Leider hat er dabei nicht an die vereiste Fahrbahn gedacht. Denn Sarah, die wahre Expertin für glatte Straßen, erinnerte ihn 
+          Leider hat er dabei nicht an die vereiste Fahrbahn gedacht. Denn Sarah, die wahre Expertin für glatte Straßen, erinnerte ihn
           sonst immer an die Schneeketten außerdem wusste sie genau, wie man sie richtig anlegt.
           Als der Schlitten plötzlich ins Rutschen gerät, denkt er sich: „Hätte ich doch nur auf Sarah gehört und die Schneeketten aufgezogen“. <br>
           Jetzt bleibt es halt doch wieder an dir hängen: Kannst du die Wortfetzen wieder logisch zusammenfügen?
-          
         </p>
-        
       </div>
 
       <!-- Rätsel -->
@@ -320,9 +318,7 @@
             <div class="sub">Nutze das Bild als Hinweis – die Wortfetzen daraus musst du zusammensetzen.</div>
 
             <div class="img-wrap">
-              <!-- HIER dein Bild eintragen -->
               <img class="puzzle-img" src="assets/wortfetzen.png" alt="Wortfetzen-Rätsel" />
-              <!-- Tipp: Wenn du exakt dein eingebundenes Bild nutzen willst, speichere es z.B. als assets/tag20_wortfetzen.jpg -->
             </div>
 
             <div class="panel-head">Wortfetzen</div>
@@ -356,15 +352,9 @@
     <div class="tile" id="successTile">
       <div class="success-title">Geschafft!</div>
       <div class="success-text">
-        <p>
-          Du hast alle 6 Wörter korrekt zusammengesetzt. 🎄✨
-        </p>
-        <p>
-          Dein Lösungsbuchstabe für Tag 20 ist: <strong>i</strong>
-        </p>
-        <p class="small">
-          (Buchstaben kannst du natürlich frei anpassen.)
-        </p>
+        <p>Du hast alle 6 Wörter korrekt zusammengesetzt. 🎄✨</p>
+        <p>Dein Lösungsbuchstabe für Tag 20 ist: <strong>i</strong></p>
+        <p class="small">(Buchstaben kannst du natürlich frei anpassen.)</p>
         <div class="controls" style="justify-content:center; margin-top: 12px;">
           <button class="btn" id="closeSuccessBtn" type="button">Weiter</button>
         </div>
@@ -391,5 +381,268 @@
 
     // --- DOM ---
     const pool = document.getElementById("pool");
-    const wor
+    const wordsWrap = document.getElementById("words");
+    const checkBtn = document.getElementById("checkBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const feedbackEl = document.getElementById("feedback");
 
+    const successWrapper = document.getElementById("successTileWrapper");
+    const closeSuccessBtn = document.getElementById("closeSuccessBtn");
+
+    // --- State ---
+    let selectedChip = null; // für Klick-zu-verschieben
+    const state = {
+      placements: Object.fromEntries(targets.map(t => [t.id, []])),
+    };
+
+    // --- Helpers ---
+    function clearFeedback() {
+      feedbackEl.textContent = "";
+      feedbackEl.classList.remove("ok", "bad");
+    }
+
+    function setFeedbackOk(msg) {
+      feedbackEl.textContent = msg;
+      feedbackEl.classList.remove("bad");
+      feedbackEl.classList.add("ok");
+    }
+
+    function setFeedbackBad(msg) {
+      feedbackEl.textContent = msg;
+      feedbackEl.classList.remove("ok");
+      feedbackEl.classList.add("bad");
+    }
+
+    function makeChip(text) {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = text;
+      chip.setAttribute("draggable", "true");
+      chip.dataset.syllable = text;
+
+      // Klick-Selection
+      chip.addEventListener("click", () => {
+        if (selectedChip === chip) {
+          chip.classList.remove("selected");
+          selectedChip = null;
+          return;
+        }
+        if (selectedChip) selectedChip.classList.remove("selected");
+        selectedChip = chip;
+        chip.classList.add("selected");
+      });
+
+      // Drag Start
+      chip.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", chip.dataset.syllable);
+        e.dataTransfer.setData("from", chip.parentElement?.id || "");
+
+        if (selectedChip && selectedChip !== chip) selectedChip.classList.remove("selected");
+        selectedChip = chip;
+        chip.classList.add("selected");
+      });
+
+      return chip;
+    }
+
+    function renderWords() {
+      wordsWrap.innerHTML = "";
+
+      targets.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "word-card";
+
+        const title = document.createElement("div");
+        title.className = "word-title";
+
+        const strong = document.createElement("strong");
+        strong.textContent = t.label;
+
+        const small = document.createElement("span");
+        small.className = "slot-hint";
+        small.textContent = `(${t.parts.length} Silben)`;
+
+        title.appendChild(strong);
+        title.appendChild(small);
+
+        const slots = document.createElement("div");
+        slots.className = "slots";
+        slots.id = t.id;
+
+        // Drop + Click target
+        wireDropZone(slots);
+
+        // Initial hint
+        updateSlotHint(slots);
+
+        card.appendChild(title);
+        card.appendChild(slots);
+        wordsWrap.appendChild(card);
+      });
+
+      // Pool ist ebenfalls Drop-Zone (zurücklegen)
+      wireDropZone(pool);
+      updateSlotHint(pool);
+    }
+
+    function updateSlotHint(zoneEl) {
+      const hasChips = zoneEl.querySelector(".chip") != null;
+      const existingHint = zoneEl.querySelector(":scope > .slot-hint");
+
+      if (!hasChips) {
+        if (!existingHint) {
+          const hint = document.createElement("div");
+          hint.className = "slot-hint";
+          hint.textContent = zoneEl.id === "pool"
+            ? "Silben hier ablegen"
+            : "Silben hier hineinziehen oder mit Klick platzieren";
+          zoneEl.appendChild(hint);
+        }
+      } else {
+        if (existingHint) existingHint.remove();
+      }
+    }
+
+    function wireDropZone(zoneEl) {
+      zoneEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+
+      zoneEl.addEventListener("drop", (e) => {
+        e.preventDefault();
+        clearFeedback();
+
+        const syll = e.dataTransfer.getData("text/plain");
+        if (!syll) return;
+
+        let chip = selectedChip;
+        if (!chip || chip.dataset.syllable !== syll) {
+          chip = document.querySelector(`.chip[data-syllable="${CSS.escape(syll)}"]`);
+        }
+        if (!chip) return;
+
+        moveChipToZone(chip, zoneEl);
+      });
+
+      // Klick: wenn ein Chip selektiert ist, in diese Zone verschieben
+      zoneEl.addEventListener("click", () => {
+        if (!selectedChip) return;
+        clearFeedback();
+        moveChipToZone(selectedChip, zoneEl);
+      });
+    }
+
+    function removeFromPlacements(syll) {
+      for (const key of Object.keys(state.placements)) {
+        const idx = state.placements[key].indexOf(syll);
+        if (idx !== -1) state.placements[key].splice(idx, 1);
+      }
+    }
+
+    function addToPlacements(wordId, syll) {
+      state.placements[wordId].push(syll);
+    }
+
+    function moveChipToZone(chipEl, zoneEl) {
+      const syll = chipEl.dataset.syllable;
+      const fromZone = chipEl.parentElement;
+
+      // State aktualisieren
+      removeFromPlacements(syll);
+
+      // DOM verschieben
+      zoneEl.appendChild(chipEl);
+
+      if (zoneEl.id !== "pool") {
+        addToPlacements(zoneEl.id, syll);
+      }
+
+      // Selection zurücksetzen
+      chipEl.classList.remove("selected");
+      selectedChip = null;
+
+      // Hints aktualisieren
+      if (fromZone) updateSlotHint(fromZone);
+      updateSlotHint(zoneEl);
+    }
+
+    function resetAll() {
+      clearFeedback();
+      state.placements = Object.fromEntries(targets.map(t => [t.id, []]));
+
+      const chips = Array.from(document.querySelectorAll(".chip"));
+      chips.forEach(ch => {
+        ch.classList.remove("selected");
+        pool.appendChild(ch);
+      });
+      selectedChip = null;
+
+      // Hints überall neu setzen
+      updateSlotHint(pool);
+      targets.forEach(t => {
+        const z = document.getElementById(t.id);
+        if (z) updateSlotHint(z);
+      });
+
+      successWrapper.classList.remove("visible");
+    }
+
+    function checkSolution() {
+      clearFeedback();
+
+      let allCorrect = true;
+
+      for (const t of targets) {
+        const userParts = state.placements[t.id];
+        if (userParts.length !== t.parts.length) {
+          allCorrect = false;
+          continue;
+        }
+        for (let i = 0; i < t.parts.length; i++) {
+          if (userParts[i] !== t.parts[i]) {
+            allCorrect = false;
+            break;
+          }
+        }
+      }
+
+      // Optional: Pool muss leer sein
+      const poolHasChip = pool.querySelector(".chip") != null;
+      if (poolHasChip) allCorrect = false;
+
+      if (allCorrect) {
+        setFeedbackOk("✅ Perfekt! Alle Wörter stimmen.");
+        successWrapper.classList.add("visible");
+      } else {
+        setFeedbackBad("❌ Noch nicht ganz. Prüfe Silben & Reihenfolge (und ob alle Silben verteilt sind).");
+      }
+    }
+
+    // --- Init ---
+    function init() {
+      renderWords();
+
+      // Chips in Pool rendern
+      pool.innerHTML = "";
+      syllables.forEach(s => pool.appendChild(makeChip(s)));
+      updateSlotHint(pool);
+
+      // Buttons
+      checkBtn.addEventListener("click", checkSolution);
+      resetBtn.addEventListener("click", resetAll);
+
+      // Erfolg schließen
+      closeSuccessBtn.addEventListener("click", () => {
+        successWrapper.classList.remove("visible");
+      });
+
+      // ESC schließt Erfolgsoverlay
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") successWrapper.classList.remove("visible");
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
