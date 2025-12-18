@@ -24,12 +24,12 @@
       background: #000;
       color: #e5e7eb;
       overflow-x: hidden;
+      touch-action: manipulation;
     }
 
     .bg-layer {
       position: fixed;
       inset: 0;
-      /* Optional: eigenes Hintergrundbild */
       background-image: url("assets/schneekettenpflicht.png");
       background-size: cover;
       background-position: center;
@@ -146,6 +146,7 @@
 
     .chip {
       user-select: none;
+      -webkit-user-select: none;
       padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid rgba(248, 250, 252, 0.75);
@@ -158,12 +159,19 @@
       align-items: center;
       gap: 8px;
       font-size: 0.9rem;
+      touch-action: none; /* wichtig für Pointer Events Drag auf Mobile */
     }
 
     .chip:active { cursor: grabbing; }
     .chip.selected {
       outline: 2px solid var(--warn);
       box-shadow: 0 0 0 4px rgba(253,230,138,0.15);
+    }
+
+    .chip.dragging {
+      opacity: 0.9;
+      transform: scale(1.03);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
     }
 
     /* Lösungsfelder */
@@ -203,6 +211,11 @@
       border-radius: 14px;
       border: 1px dashed rgba(148, 163, 184, 0.55);
       background: rgba(15, 23, 42, 0.65);
+    }
+
+    .slots.drag-over {
+      outline: 2px solid rgba(253,230,138,0.75);
+      box-shadow: 0 0 0 4px rgba(253,230,138,0.12);
     }
 
     .slot-hint {
@@ -322,22 +335,22 @@
             </div>
 
             <div class="panel-head">Wortfetzen</div>
-            <div class="sub">Ziehe die Silben in die richtigen Lösungswörter (insgesamt 6 Wörter).</div>
+            <div class="sub">Ziehe die Silben in die Lösungsfelder (die 6 richtigen Wörter zählen – egal in welchem Feld sie stehen).</div>
 
             <div id="pool" class="chip-pool" aria-label="Silben Pool"></div>
 
             <div class="controls">
               <button class="btn" id="checkBtn">Lösung prüfen</button>
               <button class="btn" id="resetBtn" type="button">Zurücksetzen</button>
-              <span class="small">Tipp: Reihenfolge im Wort zählt.</span>
+              <span class="small">Tipp: Reihenfolge im jeweiligen Feld zählt.</span>
             </div>
             <div id="feedback" class="feedback"></div>
           </div>
 
           <!-- Rechts: Lösungswörter (Drop-Zonen) -->
           <div class="panel">
-            <div class="panel-head">Lösungswörter</div>
-            <div class="sub">Fülle alle 6 Felder. Jedes Feld kann mehrere Silben enthalten.</div>
+            <div class="panel-head">Lösungsfelder</div>
+            <div class="sub">Fülle alle 6 Felder. Die Wörter dürfen in beliebigen Feldern stehen.</div>
 
             <div id="words" class="words"></div>
           </div>
@@ -364,19 +377,19 @@
 
   <script>
     // --- Konfiguration --
-    // Silben aus dem Bild (genau die "Wortfetzen")
     const syllables = [
       "BAUM","DER","FER","GLÜH","KER","LA","MET","NEN","NUSS","PFEF","REN","TA","TAN","TIER","WEIN","WUN","ZE"
     ];
 
-    // 6 Zielwörter (jeweils als Silbenfolge)
+    // Die 6 korrekten Wörter (als Silbenfolge) – Reihenfolge IM Wort zählt,
+    // aber: welches Feld welches Wort enthält ist egal.
     const targets = [
-      { id: "w1", label: "Wort 1", parts: ["TAN","NEN","BAUM"] },
-      { id: "w2", label: "Wort 2", parts: ["REN","TIER"] },
-      { id: "w3", label: "Wort 3", parts: ["PFEF","FER","NUSS"] },
-      { id: "w4", label: "Wort 4", parts: ["GLÜH","WEIN"] },
-      { id: "w5", label: "Wort 5", parts: ["LA","MET","TA"] },
-      { id: "w6", label: "Wort 6", parts: ["WUN","DER","KER","ZE"] },
+      ["TAN","NEN","BAUM"],
+      ["REN","TIER"],
+      ["PFEF","FER","NUSS"],
+      ["GLÜH","WEIN"],
+      ["LA","MET","TA"],
+      ["WUN","DER","KER","ZE"],
     ];
 
     // --- DOM ---
@@ -390,9 +403,17 @@
     const closeSuccessBtn = document.getElementById("closeSuccessBtn");
 
     // --- State ---
-    let selectedChip = null; // für Klick-zu-verschieben
-    const state = {
-      placements: Object.fromEntries(targets.map(t => [t.id, []])),
+    let selectedChip = null;
+
+    // Pointer-Drag State (Mobile + Desktop)
+    const pointerDrag = {
+      active: false,
+      chip: null,
+      startParent: null,
+      offsetX: 0,
+      offsetY: 0,
+      placeholder: null,
+      lastOverZone: null,
     };
 
     // --- Helpers ---
@@ -400,89 +421,29 @@
       feedbackEl.textContent = "";
       feedbackEl.classList.remove("ok", "bad");
     }
-
     function setFeedbackOk(msg) {
       feedbackEl.textContent = msg;
       feedbackEl.classList.remove("bad");
       feedbackEl.classList.add("ok");
     }
-
     function setFeedbackBad(msg) {
       feedbackEl.textContent = msg;
       feedbackEl.classList.remove("ok");
       feedbackEl.classList.add("bad");
     }
 
-    function makeChip(text) {
-      const chip = document.createElement("div");
-      chip.className = "chip";
-      chip.textContent = text;
-      chip.setAttribute("draggable", "true");
-      chip.dataset.syllable = text;
-
-      // Klick-Selection
-      chip.addEventListener("click", () => {
-        if (selectedChip === chip) {
-          chip.classList.remove("selected");
-          selectedChip = null;
-          return;
-        }
-        if (selectedChip) selectedChip.classList.remove("selected");
-        selectedChip = chip;
-        chip.classList.add("selected");
-      });
-
-      // Drag Start
-      chip.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/plain", chip.dataset.syllable);
-        e.dataTransfer.setData("from", chip.parentElement?.id || "");
-
-        if (selectedChip && selectedChip !== chip) selectedChip.classList.remove("selected");
-        selectedChip = chip;
-        chip.classList.add("selected");
-      });
-
-      return chip;
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+      return true;
     }
 
-    function renderWords() {
-      wordsWrap.innerHTML = "";
+    function serializeParts(parts) {
+      return parts.join("|");
+    }
 
-      targets.forEach(t => {
-        const card = document.createElement("div");
-        card.className = "word-card";
-
-        const title = document.createElement("div");
-        title.className = "word-title";
-
-        const strong = document.createElement("strong");
-        strong.textContent = t.label;
-
-        const small = document.createElement("span");
-        small.className = "slot-hint";
-        small.textContent = `(${t.parts.length} Silben)`;
-
-        title.appendChild(strong);
-        title.appendChild(small);
-
-        const slots = document.createElement("div");
-        slots.className = "slots";
-        slots.id = t.id;
-
-        // Drop + Click target
-        wireDropZone(slots);
-
-        // Initial hint
-        updateSlotHint(slots);
-
-        card.appendChild(title);
-        card.appendChild(slots);
-        wordsWrap.appendChild(card);
-      });
-
-      // Pool ist ebenfalls Drop-Zone (zurücklegen)
-      wireDropZone(pool);
-      updateSlotHint(pool);
+    function getZones() {
+      return Array.from(document.querySelectorAll(".slots, #pool"));
     }
 
     function updateSlotHint(zoneEl) {
@@ -495,7 +456,7 @@
           hint.className = "slot-hint";
           hint.textContent = zoneEl.id === "pool"
             ? "Silben hier ablegen"
-            : "Silben hier hineinziehen oder mit Klick platzieren";
+            : "Silben hier hineinziehen oder antippen";
           zoneEl.appendChild(hint);
         }
       } else {
@@ -503,10 +464,83 @@
       }
     }
 
-    function wireDropZone(zoneEl) {
-      zoneEl.addEventListener("dragover", (e) => {
-        e.preventDefault();
+    function makeChip(text) {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = text;
+      chip.setAttribute("draggable", "true"); // Desktop DnD
+      chip.dataset.syllable = text;
+
+      // Klick-Selection (Fallback / zusätzlich)
+      chip.addEventListener("click", (e) => {
+        // Wenn gerade Pointer-Drag war, Klick nicht togglen
+        if (pointerDrag.active) return;
+
+        if (selectedChip === chip) {
+          chip.classList.remove("selected");
+          selectedChip = null;
+          return;
+        }
+        if (selectedChip) selectedChip.classList.remove("selected");
+        selectedChip = chip;
+        chip.classList.add("selected");
       });
+
+      // Desktop Drag Start
+      chip.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", chip.dataset.syllable);
+        if (selectedChip && selectedChip !== chip) selectedChip.classList.remove("selected");
+        selectedChip = chip;
+        chip.classList.add("selected");
+      });
+
+      // Pointer Events Drag (Mobile + Desktop)
+      chip.addEventListener("pointerdown", onPointerDownChip, { passive: false });
+
+      return chip;
+    }
+
+    function renderFields() {
+      wordsWrap.innerHTML = "";
+
+      // 6 generische Felder
+      for (let i = 1; i <= 6; i++) {
+        const card = document.createElement("div");
+        card.className = "word-card";
+
+        const title = document.createElement("div");
+        title.className = "word-title";
+
+        const strong = document.createElement("strong");
+        strong.textContent = `Feld ${i}`;
+
+        const small = document.createElement("span");
+        small.className = "slot-hint";
+        small.textContent = "beliebige Silbenanzahl";
+
+        title.appendChild(strong);
+        title.appendChild(small);
+
+        const slots = document.createElement("div");
+        slots.className = "slots";
+        slots.id = `field${i}`;
+
+        wireDropZone(slots);
+        updateSlotHint(slots);
+
+        card.appendChild(title);
+        card.appendChild(slots);
+        wordsWrap.appendChild(card);
+      }
+
+      // Pool als Drop-Zone
+      wireDropZone(pool);
+      updateSlotHint(pool);
+    }
+
+    function wireDropZone(zoneEl) {
+      // Desktop DnD
+      zoneEl.addEventListener("dragover", (e) => e.preventDefault());
 
       zoneEl.addEventListener("drop", (e) => {
         e.preventDefault();
@@ -524,7 +558,7 @@
         moveChipToZone(chip, zoneEl);
       });
 
-      // Klick: wenn ein Chip selektiert ist, in diese Zone verschieben
+      // Klick-Ziel: selektierten Chip ablegen
       zoneEl.addEventListener("click", () => {
         if (!selectedChip) return;
         clearFeedback();
@@ -532,43 +566,20 @@
       });
     }
 
-    function removeFromPlacements(syll) {
-      for (const key of Object.keys(state.placements)) {
-        const idx = state.placements[key].indexOf(syll);
-        if (idx !== -1) state.placements[key].splice(idx, 1);
-      }
-    }
-
-    function addToPlacements(wordId, syll) {
-      state.placements[wordId].push(syll);
-    }
-
     function moveChipToZone(chipEl, zoneEl) {
-      const syll = chipEl.dataset.syllable;
       const fromZone = chipEl.parentElement;
 
-      // State aktualisieren
-      removeFromPlacements(syll);
-
-      // DOM verschieben
       zoneEl.appendChild(chipEl);
 
-      if (zoneEl.id !== "pool") {
-        addToPlacements(zoneEl.id, syll);
-      }
-
-      // Selection zurücksetzen
       chipEl.classList.remove("selected");
       selectedChip = null;
 
-      // Hints aktualisieren
       if (fromZone) updateSlotHint(fromZone);
       updateSlotHint(zoneEl);
     }
 
     function resetAll() {
       clearFeedback();
-      state.placements = Object.fromEntries(targets.map(t => [t.id, []]));
 
       const chips = Array.from(document.querySelectorAll(".chip"));
       chips.forEach(ch => {
@@ -577,66 +588,225 @@
       });
       selectedChip = null;
 
-      // Hints überall neu setzen
       updateSlotHint(pool);
-      targets.forEach(t => {
-        const z = document.getElementById(t.id);
-        if (z) updateSlotHint(z);
-      });
+      getZones().forEach(z => updateSlotHint(z));
 
       successWrapper.classList.remove("visible");
+    }
+
+    function getWordsFromFields() {
+      const fields = Array.from(document.querySelectorAll(".slots"));
+      const words = fields.map(field => {
+        const parts = Array.from(field.querySelectorAll(".chip")).map(ch => ch.dataset.syllable);
+        return parts;
+      });
+      return words;
     }
 
     function checkSolution() {
       clearFeedback();
 
-      let allCorrect = true;
-
-      for (const t of targets) {
-        const userParts = state.placements[t.id];
-        if (userParts.length !== t.parts.length) {
-          allCorrect = false;
-          continue;
-        }
-        for (let i = 0; i < t.parts.length; i++) {
-          if (userParts[i] !== t.parts[i]) {
-            allCorrect = false;
-            break;
-          }
-        }
+      // Bedingung: Pool leer (alle Silben benutzt)
+      const poolHasChip = pool.querySelector(".chip") != null;
+      if (poolHasChip) {
+        setFeedbackBad("❌ Es sind noch Silben im Pool. Bitte alle Silben auf die Felder verteilen.");
+        return;
       }
 
-      // Optional: Pool muss leer sein
-      const poolHasChip = pool.querySelector(".chip") != null;
-      if (poolHasChip) allCorrect = false;
+      const words = getWordsFromFields();
 
-      if (allCorrect) {
-        setFeedbackOk("✅ Perfekt! Alle Wörter stimmen.");
+      // Bedingung: genau 6 Felder müssen ein Wort enthalten (nicht leer)
+      // (leere Felder wären automatisch falsch)
+      const nonEmpty = words.filter(w => w.length > 0);
+      if (nonEmpty.length !== 6) {
+        setFeedbackBad("❌ Bitte alle 6 Felder mit Silben füllen.");
+        return;
+      }
+
+      // Jetzt: egal welches Feld welches Wort ist,
+      // aber die Menge der gebildeten Wörter muss exakt den Targets entsprechen.
+      const targetSet = targets.map(serializeParts).sort();
+      const userSet = nonEmpty.map(serializeParts).sort();
+
+      // Zusätzlich: Keine Doppelwörter / exakt matchen
+      const ok = arraysEqual(targetSet, userSet);
+
+      if (ok) {
+        setFeedbackOk("✅ Perfekt! Du hast alle 6 richtigen Wörter gelegt (in beliebigen Feldern).");
         successWrapper.classList.add("visible");
       } else {
-        setFeedbackBad("❌ Noch nicht ganz. Prüfe Silben & Reihenfolge (und ob alle Silben verteilt sind).");
+        setFeedbackBad("❌ Noch nicht ganz. Prüfe die Silben-Reihenfolge in den Feldern.");
       }
+    }
+
+    // -------- Pointer-Drag (Touch / Mobile) --------
+    function onPointerDownChip(e) {
+      // Nur primärer Pointer (Finger/Maus)
+      if (e.isPrimary === false) return;
+
+      // Bei Touch: Scroll/Zoom unterbinden während Drag
+      e.preventDefault();
+      clearFeedback();
+
+      const chip = e.currentTarget;
+
+      // capture
+      chip.setPointerCapture(e.pointerId);
+
+      // Auswahl setzen (damit auch Desktop konsistent bleibt)
+      if (selectedChip && selectedChip !== chip) selectedChip.classList.remove("selected");
+      selectedChip = chip;
+      chip.classList.add("selected");
+
+      const rect = chip.getBoundingClientRect();
+      pointerDrag.active = true;
+      pointerDrag.chip = chip;
+      pointerDrag.startParent = chip.parentElement;
+
+      // Offset, damit Chip unter dem Finger "greift"
+      pointerDrag.offsetX = e.clientX - rect.left;
+      pointerDrag.offsetY = e.clientY - rect.top;
+
+      // Placeholder, damit Layout nicht springt
+      const ph = document.createElement("div");
+      ph.style.width = rect.width + "px";
+      ph.style.height = rect.height + "px";
+      ph.style.borderRadius = "999px";
+      ph.style.border = "1px dashed rgba(248,250,252,0.18)";
+      ph.style.background = "rgba(248,250,252,0.06)";
+      pointerDrag.placeholder = ph;
+
+      // Chip "floaten"
+      chip.classList.add("dragging");
+      chip.style.position = "fixed";
+      chip.style.left = (e.clientX - pointerDrag.offsetX) + "px";
+      chip.style.top = (e.clientY - pointerDrag.offsetY) + "px";
+      chip.style.zIndex = "9999";
+      chip.style.pointerEvents = "none";
+
+      // placeholder einsetzen
+      if (pointerDrag.startParent) {
+        pointerDrag.startParent.insertBefore(ph, chip);
+      }
+
+      document.addEventListener("pointermove", onPointerMoveDoc, { passive: false });
+      document.addEventListener("pointerup", onPointerUpDoc, { passive: false });
+      document.addEventListener("pointercancel", onPointerUpDoc, { passive: false });
+    }
+
+    function zoneFromPoint(x, y) {
+      const el = document.elementFromPoint(x, y);
+      if (!el) return null;
+      return el.closest(".slots, #pool");
+    }
+
+    function setDragOverZone(zone) {
+      if (pointerDrag.lastOverZone && pointerDrag.lastOverZone !== zone) {
+        pointerDrag.lastOverZone.classList.remove("drag-over");
+      }
+      pointerDrag.lastOverZone = zone;
+      if (zone) zone.classList.add("drag-over");
+    }
+
+    function onPointerMoveDoc(e) {
+      if (!pointerDrag.active) return;
+      e.preventDefault();
+
+      const chip = pointerDrag.chip;
+      chip.style.left = (e.clientX - pointerDrag.offsetX) + "px";
+      chip.style.top = (e.clientY - pointerDrag.offsetY) + "px";
+
+      const zone = zoneFromPoint(e.clientX, e.clientY);
+      setDragOverZone(zone);
+    }
+
+    function cleanupPointerDrag() {
+      const chip = pointerDrag.chip;
+
+      if (pointerDrag.lastOverZone) {
+        pointerDrag.lastOverZone.classList.remove("drag-over");
+      }
+
+      if (chip) {
+        chip.classList.remove("dragging");
+        chip.style.position = "";
+        chip.style.left = "";
+        chip.style.top = "";
+        chip.style.zIndex = "";
+        chip.style.pointerEvents = "";
+      }
+
+      if (pointerDrag.placeholder && pointerDrag.placeholder.parentElement) {
+        pointerDrag.placeholder.parentElement.removeChild(pointerDrag.placeholder);
+      }
+
+      pointerDrag.active = false;
+      pointerDrag.chip = null;
+      pointerDrag.startParent = null;
+      pointerDrag.offsetX = 0;
+      pointerDrag.offsetY = 0;
+      pointerDrag.placeholder = null;
+      pointerDrag.lastOverZone = null;
+
+      document.removeEventListener("pointermove", onPointerMoveDoc);
+      document.removeEventListener("pointerup", onPointerUpDoc);
+      document.removeEventListener("pointercancel", onPointerUpDoc);
+    }
+
+    function onPointerUpDoc(e) {
+      if (!pointerDrag.active) return;
+      e.preventDefault();
+
+      const chip = pointerDrag.chip;
+      const dropZone = zoneFromPoint(e.clientX, e.clientY);
+
+      // zurücksetzen der "floating" styles
+      if (chip) chip.style.pointerEvents = "";
+
+      // wenn Zone gefunden: dort ablegen, sonst zurück in Startparent
+      const targetZone = dropZone || pointerDrag.startParent || pool;
+
+      // Chip wieder normal in DOM einhängen
+      chip.style.position = "";
+      chip.style.left = "";
+      chip.style.top = "";
+      chip.style.zIndex = "";
+      chip.style.pointerEvents = "";
+
+      // Placeholder entfernen und Chip wirklich in Zielzone
+      if (pointerDrag.placeholder && pointerDrag.placeholder.parentElement) {
+        pointerDrag.placeholder.parentElement.removeChild(pointerDrag.placeholder);
+      }
+
+      targetZone.appendChild(chip);
+
+      chip.classList.remove("dragging");
+      chip.classList.remove("selected");
+      selectedChip = null;
+
+      // Hints updaten
+      getZones().forEach(z => updateSlotHint(z));
+      updateSlotHint(pool);
+
+      cleanupPointerDrag();
     }
 
     // --- Init ---
     function init() {
-      renderWords();
+      renderFields();
 
       // Chips in Pool rendern
       pool.innerHTML = "";
       syllables.forEach(s => pool.appendChild(makeChip(s)));
       updateSlotHint(pool);
 
-      // Buttons
       checkBtn.addEventListener("click", checkSolution);
       resetBtn.addEventListener("click", resetAll);
 
-      // Erfolg schließen
       closeSuccessBtn.addEventListener("click", () => {
         successWrapper.classList.remove("visible");
       });
 
-      // ESC schließt Erfolgsoverlay
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") successWrapper.classList.remove("visible");
       });
@@ -646,3 +816,4 @@
   </script>
 </body>
 </html>
+
