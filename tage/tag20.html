@@ -1,66 +1,389 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Tag 20 – Winter-Leckerei</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="theme-color" content="#0b1220">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Adventsrätsel – Tag 20</title>
+
+  <style>
+    :root {
+      --glass-bg: rgba(15, 23, 42, 0.35);
+      --glass-border: rgba(248, 250, 252, 0.6);
+      --panel: rgba(15, 23, 42, 0.9);
+      --panel-border: rgba(148, 163, 184, 0.7);
+      --ok: #bbf7d0;
+      --bad: #fecaca;
+      --warn: #fde68a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #000;
+      color: #e5e7eb;
+      overflow-x: hidden;
+    }
+
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      /* Optional: eigenes Hintergrundbild */
+      background-image: url("assets/geschenkeberg.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      opacity: 0.8;
+    }
+
+    .main-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      font-family: "Brush Script MT","Comic Sans MS","Comic Sans",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color: #fee2e2;
+      margin: 40px 12px 24px;
+      text-shadow:
+        0 0 10px rgba(248, 113, 113, 0.9),
+        0 0 20px rgba(248, 113, 113, 0.8),
+        0 0 35px rgba(248, 113, 113, 0.75);
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+      min-height: 130vh;
+      padding: 20px 12px 40px;
+      margin-top: 180px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .tile {
+      background: var(--glass-bg);
+      border-radius: 22px;
+      padding: 16px 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      margin-bottom: 16px;
+    }
+
+    .lock-title {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .puzzle-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .puzzle-grid { grid-template-columns: 1fr; }
+      .page-content { margin-top: 120px; }
+    }
+
+    .panel {
+      border-radius: 18px;
+      border: 1px solid var(--panel-border);
+      padding: 12px 14px;
+      background: var(--panel);
+    }
+
+    .panel-head {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .sub {
+      font-size: 0.88rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .img-wrap {
+      display: grid;
+      place-items: center;
+      margin: 10px 0 14px;
+    }
+
+    .puzzle-img {
+      width: min(100%, 720px);
+      border-radius: 16px;
+      border: 1px solid rgba(248, 250, 252, 0.25);
+      box-shadow: 0 14px 26px rgba(0,0,0,0.35);
+    }
+
+    /* Silben-Chips */
+    .chip-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.75);
+      min-height: 70px;
+    }
+
+    .chip {
+      user-select: none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.75);
+      background: rgba(15, 23, 42, 0.95);
+      color: #f9fafb;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      cursor: grab;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .chip:active { cursor: grabbing; }
+    .chip.selected {
+      outline: 2px solid var(--warn);
+      box-shadow: 0 0 0 4px rgba(253,230,138,0.15);
+    }
+
+    /* Lösungsfelder */
+    .words {
+      display: grid;
+      gap: 12px;
+    }
+
+    .word-card {
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.75);
+      padding: 10px;
+    }
+
+    .word-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .word-title strong {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+      opacity: 0.9;
+    }
+
+    .slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 46px;
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.65);
+    }
+
+    .slot-hint {
+      font-size: 0.82rem;
+      opacity: 0.75;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f9fafb;
+    }
+
+    .btn:disabled { opacity: 0.4; cursor: default; }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      min-height: 1.2em;
+    }
+    .feedback.ok { color: var(--ok); }
+    .feedback.bad { color: var(--bad); }
+
+    /* Erfolgsoverlay */
+    #successTileWrapper {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9985;
+      padding: 24px 16px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.92));
+    }
+    #successTileWrapper.visible { display: flex; }
+    #successTile { max-width: 720px; width: 100%; margin: 0; }
+
+    .success-title {
+      text-align: center;
+      font-weight: 900;
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ok);
+    }
+    .success-text { font-size: 0.98rem; line-height: 1.6; }
+
+    .small {
+      font-size: 0.82rem;
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+    kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: rgba(248,250,252,0.12);
+      border: 1px solid rgba(248,250,252,0.18);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-<body onload="adventEnsureAccess();">
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <div class="logo"><span class="emoji">🍪</span><h1>Tag 20: Winter-Leckerei</h1></div>
-        <a class="lock" href="../index.html">⬅︎ Zurück</a>
+
+<body>
+  <div class="bg-layer"></div>
+
+  <h1 class="main-title">Geschenkezauber – Tag 20</h1>
+
+  <div class="page-content">
+    <div class="container">
+
+      <!-- Intro -->
+      <div class="tile">
+        <p>
+          Beim Schlittenflug ist dem Weihnachtsmann ein Sack voller Wortteile aufgerissen –
+          alles ist durcheinander! Kannst du die Silben wieder richtig zusammensetzen?
+        </p>
+        <p class="small">
+          Bedienung: Ziehen & Ablegen (Drag & Drop). Auf Handy/Tablet geht auch:
+          Silbe antippen (markieren) → in ein Ziel-Feld tippen (einfügen).
+          Silben im Ziel-Feld antippen, um sie zurückzulegen.
+        </p>
       </div>
-      <p class="muted">Datum: 20.12.</p>
-      <h2>Rätsel</h2>
-      <p>Welches Dessert entsteht im Ofen mit Apfel, Zucker, Zimt und Nüssen?</p>
-      
-      <div style="height:8px"></div>
-      <div class="row wrap">
-        <input id="answer" class="input" placeholder="Deine Antwort hier eingeben …" autocomplete="off">
-        <button class="btn" onclick="solve()">Lösen</button>
-        <button class="btn secondary" onclick="reveal()">Lösung anzeigen</button>
+
+      <!-- Rätsel -->
+      <div class="tile">
+        <div class="lock-title">Rätsel</div>
+
+        <div class="puzzle-grid">
+
+          <!-- Links: Bild + Silben -->
+          <div class="panel">
+            <div class="panel-head">Bildvorlage</div>
+            <div class="sub">Nutze das Bild als Hinweis – die Wortfetzen daraus musst du zusammensetzen.</div>
+
+            <div class="img-wrap">
+              <!-- HIER dein Bild eintragen -->
+              <img class="puzzle-img" src="assets/tag20_wortfetzen.jpg" alt="Wortfetzen-Rätsel" />
+              <!-- Tipp: Wenn du exakt dein eingebundenes Bild nutzen willst, speichere es z.B. als assets/tag20_wortfetzen.jpg -->
+            </div>
+
+            <div class="panel-head">Wortfetzen</div>
+            <div class="sub">Ziehe die Silben in die richtigen Lösungswörter (insgesamt 6 Wörter).</div>
+
+            <div id="pool" class="chip-pool" aria-label="Silben Pool"></div>
+
+            <div class="controls">
+              <button class="btn" id="checkBtn">Lösung prüfen</button>
+              <button class="btn" id="resetBtn" type="button">Zurücksetzen</button>
+              <span class="small">Tipp: Reihenfolge im Wort zählt.</span>
+            </div>
+            <div id="feedback" class="feedback"></div>
+          </div>
+
+          <!-- Rechts: Lösungswörter (Drop-Zonen) -->
+          <div class="panel">
+            <div class="panel-head">Lösungswörter</div>
+            <div class="sub">Fülle alle 6 Felder. Jedes Feld kann mehrere Silben enthalten.</div>
+
+            <div id="words" class="words"></div>
+          </div>
+
+        </div>
       </div>
-      <div id="feedback" class="note hidden"></div>
-      <hr>
-      <div id="letterBox" class="hidden">
-        <p>Geschafft! Der Buchstabe für heute ist:</p>
-        <div class="letter">B</div>
-      </div>
-      <div class="footer"><small>Tipp: Notiere dir jeden Tages-Buchstaben. Am 24. ergibt sich die Botschaft.</small></div>
     </div>
   </div>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/app.js"></script>
+
+  <!-- Erfolg -->
+  <div id="successTileWrapper">
+    <div class="tile" id="successTile">
+      <div class="success-title">Geschafft!</div>
+      <div class="success-text">
+        <p>
+          Du hast alle 6 Wörter korrekt zusammengesetzt. 🎄✨
+        </p>
+        <p>
+          Dein Lösungsbuchstabe für Tag 20 ist: <strong>m</strong>
+        </p>
+        <p class="small">
+          (Buchstaben kannst du natürlich frei anpassen.)
+        </p>
+        <div class="controls" style="justify-content:center; margin-top: 12px;">
+          <button class="btn" id="closeSuccessBtn" type="button">Weiter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const ANSWERS = "bratapfel";
-    const TODAY_LETTER = "B";
-    function showLetter(){
-      document.getElementById('letterBox').classList.remove('hidden');
-      fireConfetti();
-    }
-    function setFeedback(msg, ok){
-      const box = document.getElementById('feedback');
-      box.textContent = msg;
-      box.classList.remove('hidden');
-      if(ok){ box.classList.add('success'); } else { box.classList.remove('success'); }
-    }
-    function solve(){
-      const el = document.getElementById('answer');
-      checkAnswer(el, ANSWERS, () => {
-        setFeedback("Richtig! 💫", true);
-        showLetter();
-      }, () => {
-        setFeedback("Fast! Versuche es noch einmal. ❄️", false);
-      });
-    }
-    function reveal(){
-      setFeedback("Die gesuchte Antwort war: " + ANSWERS.split('|')[0].toUpperCase(), true);
-      showLetter();
-    }
-  </script>
-</body>
-</html>
+    // --- Konfiguration ---
+    // Silben aus dem Bild (genau die "Wortfetzen")
+    const syllables = [
+      "BAUM","DER","FER","GLÜH","KER","LA","MET","NEN","NUSS","PFEF","REN","TA","TAN","TIER","WEIN","WUN","ZE"
+    ];
+
+    // 6 Zielwörter (jeweils als Silbenfolge)
+    const targets = [
+      { id: "w1", label: "Wort 1", parts: ["TAN","NEN","BAUM"] },
+      { id: "w2", label: "Wort 2", parts: ["REN","TIER"] },
+      { id: "w3", label: "Wort 3", parts: ["PFEF","FER","NUSS"] },
+      { id: "w4", label: "Wort 4", parts: ["GLÜH","WEIN"] },
+      { id: "w5", label: "Wort 5", parts: ["LA","MET","TA"] },
+      { id: "w6", label: "Wort 6", parts: ["WUN","DER","KER","ZE"] },
+    ];
+
+    // --- DOM ---
+    const pool = document.getElementById("pool");
+    const wor
+
